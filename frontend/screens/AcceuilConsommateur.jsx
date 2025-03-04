@@ -57,10 +57,10 @@ const AcceuilConsommateur = ({ navigation }) => {
       {/* Header fixe en haut */}
       <View style={styles.hdr}>
         <TouchableOpacity style={styles.btn1}>
-          <AntDesign name="bars" style={styles.plus} size={30}/>
+          <AntDesign name="bars" style={styles.plus} size={25}/>
         </TouchableOpacity>
         <TouchableOpacity>
-          <MaterialCommunityIcons name="chat-question-outline" size={30} style={{color:'#ffff'}}/>
+          <MaterialCommunityIcons name="chat-question-outline" size={26} style={{color:'#ffff'}}/>
         </TouchableOpacity>
       </View>
      
