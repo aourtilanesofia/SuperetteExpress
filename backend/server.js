@@ -5,10 +5,13 @@ import dotenv from 'dotenv';
 
 //routes imports 
 import testRouter from './routes/testRoutes.js';
+import connectDB from './config/db.js';
 
 //Configuration dot env
 dotenv.config();
 
+//Conexion a la base de données
+connectDB();
 
 
 //L'objet REST
