@@ -1,42 +1,6 @@
-/*import mongoose from "mongoose";
-import bcrypt from 'bcryptjs';
-const consommateurSchema = new mongoose.Schema({
-    nom:{
-        type: String,
-        required:[true,"Le champ est obligatoire"],
-    },
-    numTel:{
-        type: Number,
-        required:[true,"Le champ est obligatoire"],
-    },
-    adresse:{
-        type: String,
-        required:[true,"Le champ est obligatoire"],
-    },
-    email:{
-        type: String,
-        required:[true,"Le champ est obligatoire"],
-        unique:[true,"L'adresse e-mail existe déja"],
-    },
-    mdp:{
-        type: String,
-        required:[true,"Le champ est obligatoire"],
-        minLength:[6,"Le mot de passe doit contenir au moins 6 caractères"],
-    },
-},
-{timestamps:true}
-);
 
-//Une fonction de hachage
-consommateurModel.pre('save', async function () {
-    this.mdp = await bcrypt.hash(this.mdp, 10); 
-});
-
-export const consommateurModel = mongoose.model("Consommateurs",consommateurSchema);
-export default consommateurModel;*/
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import JWT from 'jsonwebtoken';
+import JWT from "jsonwebtoken";
 
 const consommateurSchema = new mongoose.Schema(
   {
@@ -66,27 +30,37 @@ const consommateurSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//  Hachage du mot de passe avant l'enregistrement
-consommateurSchema.pre("save", async function (next) {
-  if (!this.isModified("mdp")) return next();
-
-  this.mdp = await bcrypt.hash(this.mdp, 10);
-  next();
-});
-
-// une fonction de comparaison 
-consommateurSchema.methods.comparePassword = async function (plainPassword) {
-    return await bcrypt.compare(plainPassword, this.mdp);
-    
-};
-
-//JWT token
+// JWT token
 consommateurSchema.methods.generateToken = function () {
-    return JWT.sign({_id:this._id},process.env.JWT_SECRET,{expiresIn:"7d"});
-    
+  return JWT.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
+
+
+// Méthode pour supprimer un consommateur
+consommateurSchema.methods.deleteAccount = async function () {
+  try {
+    // Vérifier que l'utilisateur existe
+    if (!this._id) {
+      throw new Error("Aucun utilisateur trouvé");
+    }
+
+    // Utilisation de deleteOne() pour supprimer le consommateur
+    await this.constructor.deleteOne({ _id: this._id }); // Utilisation de this.constructor pour accéder au modèle
+    return { success: true, message: "Compte supprimé avec succès." };
+  } catch (error) {
+    console.error("Erreur lors de la suppression du compte:", error);
+    throw new Error("Erreur lors de la suppression du compte");
+  }
+};
+
+
+
+
+
+
 
 // Création du modèle après avoir tout défini
 const consommateurModel = mongoose.model("Consommateurs", consommateurSchema);
 
 export default consommateurModel;
+
