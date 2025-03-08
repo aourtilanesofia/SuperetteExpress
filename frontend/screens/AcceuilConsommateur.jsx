@@ -56,7 +56,7 @@ const AcceuilConsommateur = ({ navigation }) => {
     <Layout>
       {/* Header fixe en haut */}
       <View style={styles.hdr}>
-        <TouchableOpacity style={styles.btn1}>
+        <TouchableOpacity style={styles.btn1} onPress={() => navigation.navigate('AutresOptions')}>
           <AntDesign name="bars" style={styles.plus} size={25}/>
         </TouchableOpacity>
         <TouchableOpacity>

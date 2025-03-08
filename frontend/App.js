@@ -15,6 +15,7 @@ import AcceuilConsommateur from './screens/AcceuilConsommateur';
 import ProduitsDetails from './screens/ProduitsDetails';
 import Compte from './screens/Compte';
 import UpdateProfile from './screens/UpdateProfile';
+import AutresOptions from './screens/AutresOptions';
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
         <Stack.Screen name='SplashScreen' component={SplashScreen} options={{ headerShown:false,}}/>
         <Stack.Screen name='FirstScreen' component={FirstScreen}options={{ headerShown:false,}}/>
         <Stack.Screen name='WelcomePage' component={WelcomePage} options={{headerShown:false,}}/>
@@ -35,6 +37,7 @@ export default function App() {
         <Stack.Screen name='ProduitsDetails' component={ProduitsDetails} options={{ headerTitle: '' }} />
         <Stack.Screen name='Compte' component={Compte} options={{ headerTitle: '' }} />
         <Stack.Screen name='UpdateProfile' component={UpdateProfile} options={{headerTitle: ''}}/>
+        <Stack.Screen name='AutresOptions' component={AutresOptions} options={{headerTitle: ''}}/>
         
 
       </Stack.Navigator>
