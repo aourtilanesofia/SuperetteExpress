@@ -11,10 +11,14 @@
   "author": "sofia",
   "license": "ISC",
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "bcryptjs": "^3.0.2",
     "colors": "^1.4.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "morgan": "^1.10.0"
   }
