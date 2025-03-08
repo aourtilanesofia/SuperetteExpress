@@ -1,5 +1,5 @@
 import express from 'express';
-import { connexionController, getConsommateurProfileController, inscriptionController, updateMDPController, updateProfileController } from '../controllers/consommateurController.js';
+import { connexionController, getConsommateurProfileController, inscriptionController,  updateProfileController, deleteAccountController } from '../controllers/consommateurController.js';
 import  isAuth  from './../middlewares/authMiddelware.js';
 
 //créer un objet router
@@ -20,7 +20,10 @@ router.get('/profile',isAuth, getConsommateurProfileController);
 router.put('/profile-update',isAuth,updateProfileController);
 
 //modifier le MDP
-router.put('/update-mdp', isAuth,updateMDPController);
+//router.put('/update-mdp', isAuth,updateMDPController);
+
+// Supprimer le compte
+router.delete('/delete-account', isAuth, deleteAccountController);
 
 
 export default router;

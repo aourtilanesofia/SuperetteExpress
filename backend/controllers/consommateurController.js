@@ -1,104 +1,102 @@
+
 import consommateurModel from "../models/consommateurModel.js";
 
-//INSCRIPTION
-export const inscriptionController = async (req,res) => {
+// INSCRIPTION
+export const inscriptionController = async (req, res) => {
     try {
-        const {nom,numTel,adresse,email,mdp} = req.body
-        // Validation 
-        if(!nom || !numTel || !adresse || !email || !mdp){
-            return res.status(500).send({
-                success : false,
-                message: 'Remplissez tous les champs svp!',
+        const { nom, numTel, adresse, email, mdp } = req.body;
 
-            });
-        }
-        // Vérifier l'existence du consommateur 
-        const existingConsommateur = await consommateurModel.findOne({email})
-
-        //Validation
-        if (existingConsommateur) {
-            return res.status(500).send({
+        if (!nom || !numTel || !adresse || !email || !mdp) {
+            return res.status(400).send({
                 success: false,
-                message:"Adresse e-mail déja utilisée!",
+                message: "Remplissez tous les champs svp!",
             });
-            
         }
 
+        const existingConsommateur = await consommateurModel.findOne({ email });
 
-        const consommateur = await consommateurModel.create({nom,numTel,adresse,email,mdp});
+        if (existingConsommateur) {
+            return res.status(400).send({
+                success: false,
+                message: "Adresse e-mail déjà utilisée!",
+            });
+        }
+
+        const consommateur = await consommateurModel.create({ nom, numTel, adresse, email, mdp });
+
         res.status(201).send({
             success: true,
-            message: 'Inscription réussie, veuillez vous connecter',
-            consommateur
-        })
-        
-    } catch (error) {
-        console.log(error)
-        res.status(500).send({
-            success:false,
-            message:'Error in register API',
-            error
+            message: "Inscription réussie, veuillez vous connecter",
+            consommateur,
         });
-        
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Erreur dans l'API d'inscription",
+            error,
+        });
     }
 };
 
-//CONNEXION
-export const connexionController = async (req,res) => {
+// CONNEXION
+export const connexionController = async (req, res) => {
     try {
-        const {email,mdp} = req.body
-        //validation
+        const { email, mdp } = req.body;
+
         if (!email || !mdp) {
-            return res.status(500).send({
+            return res.status(400).send({
                 success: false,
-                message:'svp, entrez votre e-mail ou mot de passe!',
+                message: "Veuillez entrer votre e-mail et votre mot de passe!",
             });
         }
-        //check consommateur
-        const consommateur = await consommateurModel.findOne({email})
-        // validation du consommateur
+
+        const consommateur = await consommateurModel.findOne({ email });
+
         if (!consommateur) {
             return res.status(404).send({
                 success: false,
-                massage:'Utilisateur non trouvé!',
+                message: "Utilisateur non trouvé!",
             });
         }
-        //check mdp
-        const isMatch = await consommateur.comparePassword(mdp);
-        //la validation du mdp
-        if (!isMatch) {
-            return res.status(500).send({
-                success:false,
-                message:'invalide',
+
+        if (mdp !== consommateur.mdp) {
+            return res.status(400).send({
+                success: false,
+                message: "Mot de passe invalide",
             });
-        } 
-        //TOKEN
+        }
+
         const token = consommateur.generateToken();
-        res.status(200).cookie("token",token).send({
+
+        res.status(200).cookie("token", token).send({
             success: true,
-            message:'Connecter avec succés',
+            message: "Connecté avec succès",
             token,
-            consommateur
-        })
-        
+            consommateur,
+        });
+
     } catch (error) {
         res.status(500).send({
             success: false,
-            message:'Error in login API',
-            error
-        })
+            message: "Erreur dans l'API de connexion",
+            error,
+        });
     }
 };
 
-//obtenir le profile utilisateur
+// PROFIL UTILISATEUR
 export const getConsommateurProfileController = async (req, res) => {
     try {
         const consommateur = await consommateurModel.findById(req.user._id);
+
         res.status(200).send({
             success: true,
             message: "Profil utilisateur récupéré avec succès",
             consommateur,
-        }); 
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).send({
@@ -109,63 +107,88 @@ export const getConsommateurProfileController = async (req, res) => {
     }
 };
 
-//modifier le profile utilisateur
-
-export const updateProfileController =async (req,res) =>{
+// MODIFIER LE PROFIL
+export const updateProfileController = async (req, res) => {
     try {
-        
-    } catch (error) {
-        const consommateur = await consommateurModel.findById(req.consommateur._id)
-        const {nom,numTel,email,adresse,mdp} = req.body
-        //validation et mise à jour
-        if(nom) consommateur.nom = nom
-        if(numTel) consommateur.numTel = numTel
-        if(email) consommateur.email = email
-        if(adresse) consommateur.adresse = adresse
-        if(mdp) consommateur.mdp = mdp
+        const { nom, numTel, email, adresse,mdp } = req.body;
 
-        // Sauvgarder l'utilisateur
-        await consommateur.save();
-        res.status(200).send({
-            success: true,
-            message:'Utilisateur mis à jour',
-        })
-        console.log(error);
-        res.status(500).send({
-            success: false,
-            message: "Erreur dans la mise a jour du profil",
-            error,
-        });
-        
-    }
-};
-
-
-//modifier le MDP
-export const updateMDPController = async (req, res) => {
-    try {
-        const consommateur = await consommateurModel.findById(req.user._id);
+        const consommateur = await consommateurModel.findById(req.user.id);
         if (!consommateur) {
             return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
         }
 
+        consommateur.nom = nom || consommateur.nom;
+        consommateur.numTel = numTel || consommateur.numTel;
+        consommateur.email = email || consommateur.email;
+        consommateur.adresse = adresse || consommateur.adresse;
+        consommateur.mdp = mdp || consommateur.mdp;
+
+        await consommateur.save();
+
+        res.status(200).json({ success: true, message: "Profil mis à jour", consommateur });
+
+    } catch (error) {
+        console.error("Erreur mise à jour profil :", error);
+        res.status(500).json({ success: false, message: "Erreur serveur." });
+    }
+};
+
+
+
+// SUPPRIMER LE COMPTE
+export const deleteAccountController = async (req, res) => {
+    try {
+      const consommateur = await consommateurModel.findById(req.user._id);
+  
+      if (!consommateur) {
+        return res.status(404).send({
+          success: false,
+          message: "Utilisateur non trouvé!",
+        });
+      }
+  
+      // Utilisation de la méthode deleteAccount mise à jour
+      const result = await consommateur.deleteAccount();
+  
+      res.status(200).send({
+        success: result.success,
+        message: result.message,
+      });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du compte:", error.message);
+      res.status(500).send({
+        success: false,
+        message: error.message || "Erreur serveur",
+      });
+    }
+  };
+// MODIFIER LE MOT DE PASSE (SANS HACHAGE)
+/*export const updateMDPController = async (req, res) => {
+    try {
         const { oldMDP, newMDP } = req.body;
 
         if (!oldMDP || !newMDP) {
-            return res.status(400).json({ success: false, message: "Veuillez fournir l'ancien et le nouveau mot de passe" });
+            return res.status(400).json({ success: false, message: "Ancien et nouveau mot de passe requis" });
         }
 
-        const isMatch = await consommateur.comparePassword(oldMDP);
-        if (!isMatch) {
-            return res.status(400).json({ success: false, message: "Ancien mot de passe invalide" });
+        const consommateur = await consommateurModel.findById(req.user.id);
+        if (!consommateur) {
+            return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
+        }
+
+        if (oldMDP !== consommateur.mdp) {
+            return res.status(400).json({ success: false, message: "Ancien mot de passe incorrect" });
         }
 
         consommateur.mdp = newMDP;
+
         await consommateur.save();
 
         res.status(200).json({ success: true, message: "Mot de passe mis à jour avec succès" });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Erreur lors de la mise à jour du mot de passe", error });
+        console.error("Erreur mise à jour mot de passe :", error);
+        res.status(500).json({ success: false, message: "Erreur serveur." });
     }
-};
+};*/
+

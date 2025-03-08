@@ -70,14 +70,15 @@ const ConConsommateur = ({ navigation }) => {
             const data = await response.json();
             console.log("Données reçues :", data);
     
-            if (!response.ok || !data.consommateur) {
+            if (!response.ok || !data.consommateur || !data.token) {
                 Alert.alert("Erreur", data.message || "Connexion échouée !");
                 setEmail('');
                 setMdp('');
                 return;
             }
     
-            // Sauvegarde des données correctement
+            // Sauvegarde du token et des données utilisateur
+            await AsyncStorage.setItem('token', data.token);
             await AsyncStorage.setItem('user', JSON.stringify(data.consommateur));
     
             Alert.alert("Succès", "Connecté avec succès !");
@@ -90,6 +91,7 @@ const ConConsommateur = ({ navigation }) => {
             Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
         }
     };
+    
 
 
     return (
