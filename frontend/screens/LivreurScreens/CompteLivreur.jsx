@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Layout from '../components/Layout/Layout';
-import { UserData } from '../Data/UserData';
+import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
+import { UserData } from '../../Data/UserData';
 
 const Compte = ({ navigation }) => {
     const [user, setUser] = useState(null);
-
 
 
     useEffect(() => {
@@ -29,16 +28,16 @@ const Compte = ({ navigation }) => {
 
     if (!user) {
         return (
-            <Layout>
+            <LayoutLivreur>
                 <View style={styles.container}>
                     <Text>Chargement...</Text>
                 </View>
-            </Layout>
+            </LayoutLivreur>
         );
     }
 
     return (
-        <Layout>
+        <LayoutLivreur>
             <View style={styles.container}>
             <Image source={{ uri: UserData[0].profilePic }} style={styles.img} />
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -64,8 +63,15 @@ const Compte = ({ navigation }) => {
                     <View style={styles.line} />
 
                     <View style={styles.vw}>
-                        <Text style={styles.txt1}>Adresse:</Text>
-                        <Text style={styles.txt2}>{user.adresse}</Text>
+                        <Text style={styles.txt1}>Catégorie de véhicule:</Text>
+                        <Text style={styles.txt2}>{user.categorie}</Text>
+                    </View>
+
+                    <View style={styles.line} />
+
+                    <View style={styles.vw}>
+                        <Text style={styles.txt1}>Matricule:</Text>
+                        <Text style={styles.txt2}>{user.matricule}</Text>
                     </View>
 
                     <View style={styles.line} />
@@ -74,12 +80,12 @@ const Compte = ({ navigation }) => {
                 </View>
 
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('UpdateProfile')}>
+                    <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('UpdateProfileLivreur')}>
                         <Text style={styles.txtbtn}>Modifier le profil</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-        </Layout>
+        </LayoutLivreur>
     );
 };
 

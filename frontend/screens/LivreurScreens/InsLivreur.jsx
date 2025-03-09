@@ -4,103 +4,111 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fonts } from '../node_modules/@react-navigation/native/lib/module/theming/fonts';
 import { Alert } from 'react-native';
+import { fonts } from '../../node_modules/@react-navigation/native/lib/module/theming/fonts';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-
-const InsConsommateur = ({ navigation }) => {
+const InsLivreur = ({ navigation }) => {
     const [secureEntery, setSecureEntery] = useState(true);
+    const [selectedValue, setSelectedValue] = useState('');
     const [nom, setNom] = useState('');
     const [numTel, setNumTel] = useState('');
-    const [adresse, setAdresse] = useState('');
+    const [categorie, setCategorie] = useState('');
+    const [matricule, setMatricule] = useState('');
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
 
     const handleSignup = async () => {
-        if (!nom || !numTel || !adresse || !email || !mdp) {
+        if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
             Alert.alert("Erreur", "Veuillez remplir tous les champs !");
             setNom(' ');
             setNumTel('');
-            setAdresse('');
+            setCategorie('');
+            setMatricule('');
             setEmail('');
             setMdp('');
             return;
         }
 
         try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/inscriptionL", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ nom, numTel, adresse, email, mdp }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nom, numTel, categorie, matricule, email, mdp }),
             });
 
-            const data = await response.json();
+            const text = await response.text(); // Récupère la réponse brute
+            console.log("Réponse brute de l'API :", text); // Affiche la réponse dans la console
 
             if (!response.ok) {
                 Alert.alert("Erreur", data.message || "Inscription échouée !");
                 setNom(' ');
                 setNumTel('');
-                setAdresse('');
+                setCategorie('');
+                setMatricule('');
                 setEmail('');
                 setMdp('');
                 return;
             }
 
-
+            const data = JSON.parse(text); // Tente de parser la réponse en JSON
             Alert.alert("Succès", "Inscription réussie !");
             setNom(' ');
             setNumTel('');
-            setAdresse('');
+            setCategorie('');
+            setMatricule('');
             setEmail('');
             setMdp('');
-            navigation.navigate("ConConsommateur");
+            navigation.navigate("ConLivreur");
+
         } catch (error) {
             console.error("Erreur d'inscription :", error);
             Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
         }
     };
 
+
+
     return (
         <View style={styles.container}>
             <Text style={styles.txt1}>Inscription</Text>
- 
+
             {/*formulaire*/}
             <View style={styles.formContainer}>
                 <View style={styles.inputContainer}>
                     <FontAwesome name='user-o' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre nom complet'  value={nom}
+                    <TextInput style={styles.textInput} placeholder='Entrez votre nom complet'   value={nom}
                         onChangeText={setNom} />
                 </View>
 
                 <View style={styles.inputContainer}>
                     <SimpleLineIcons name='phone' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre numéro de téléphone' keyboardType='phone-pad'
-                        value={numTel}
+                    <TextInput style={styles.textInput} placeholder='Entrez votre numéro de téléphone' keyboardType='phone-pad' value={numTel}
                         onChangeText={setNumTel} />
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <MaterialCommunityIcons name='map-marker-outline' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre adresse' 
-                        value={adresse}
-                        onChangeText={setAdresse} />
+                    <Ionicons name='car-outline' size={22} color={'#939494'} />
+                    <TextInput style={styles.textInput} placeholder='Entrez la catégorie de votre véhicule' value={categorie}
+                        onChangeText={setCategorie} />
                 </View>
 
                 <View style={styles.inputContainer}>
+                    <Octicons name='number' size={22} color={'#939494'} />
+                    <TextInput style={styles.textInput} placeholder='Entrez votre matricule'  value={matricule}
+                        onChangeText={setMatricule} />
+                </View>
+
+
+                <View style={styles.inputContainer}>
                     <Ionicons name='mail-outline' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre E-mail' keyboardType='email-address'
-                        value={email}
+                    <TextInput style={styles.textInput} placeholder='Entrez votre E-mail' keyboardType='email-address' value={email}
                         onChangeText={setEmail} />
                 </View>
 
                 <View style={styles.inputContainer}>
                     <SimpleLineIcon name='lock' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre mot de passe' secureTextEntry={secureEntery}
-                        value={mdp}
+                    <TextInput style={styles.textInput} placeholder='Entrez votre mot de passe' secureTextEntry={secureEntery} value={mdp}
                         onChangeText={setMdp} />
                     <TouchableOpacity onPress={() => { setSecureEntery((prev) => !prev); }}>
                         <Octicons name={secureEntery ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
@@ -114,7 +122,7 @@ const InsConsommateur = ({ navigation }) => {
 
                 <View style={styles.footerContainer}>
                     <Text style={styles.accountText}>Vous avez déja un compte!</Text>
-                    <Text style={styles.signuptext} onPress={() => navigation.navigate('ConConsommateur')}>Se connecter</Text>
+                    <Text style={styles.signuptext} onPress={() => navigation.navigate('ConLivreur')}>Se connecter</Text>
                 </View>
 
             </View>
@@ -122,7 +130,7 @@ const InsConsommateur = ({ navigation }) => {
     )
 }
 
-export default InsConsommateur
+export default InsLivreur;
 
 const styles = StyleSheet.create({
     container: {
@@ -134,11 +142,11 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold',
         color: '#329171',
-        marginTop: 30,
+        marginTop: 10,
 
     },
     formContainer: {
-        marginTop: 60,
+        marginTop: 20,
     },
     inputContainer: {
         borderWidth: 1,
@@ -181,6 +189,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 20,
         gap: 5,
+
     },
     accountText: {
         color: '#4f4f4f',
