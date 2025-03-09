@@ -1,18 +1,18 @@
 
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout/Layout';
+import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
-import { UserData } from '../Data/UserData'
+import { UserData } from '../../Data/UserData';
 
 const UpdateProfile = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [numTel, setnumTel] = useState('');
-    const [adr, setAdr] = useState('');
+    const [categorie, setCategorie] = useState('');
+    const [matricule, setMatricule] = useState('');
     const [mdp, setMDP] = useState('');
-    const [newPassword, setNewPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     // Charger les données du profil depuis AsyncStorage
@@ -24,7 +24,8 @@ const UpdateProfile = () => {
                 setName(user.nom || '');
                 setEmail(user.email || '');
                 setnumTel(user.numTel ? user.numTel.toString() : '');
-                setAdr(user.adresse || '');
+                setCategorie(user.categorie || '');
+                setMatricule(user.matricule || ''); 
                 setMDP(user.mdp || '')
             }
         };
@@ -40,19 +41,19 @@ const UpdateProfile = () => {
                 return;
             }
     
-            if (!name || !email || !numTel || !adr ||!mdp) {
+            if (!name || !email || !numTel || !categorie || !matricule ||!mdp) {
                 alert("Veuillez remplir tous les champs.");
                 return;
             }
     
             // Mise à jour des informations du profil
-            const response = await fetch('http://192.168.43.107:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.43.107:8080/api/v1/livreur/profile-updateL', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ nom: name, email, numTel: numTel.toString(), adresse: adr,mdp }),
+                body: JSON.stringify({ nom: name, email, numTel: numTel.toString(), categorie,matricule,mdp }),
             });
     
             const data = await response.json();
@@ -62,7 +63,7 @@ const UpdateProfile = () => {
             }
     
             // Sauvegarder les nouvelles infos en local
-            await AsyncStorage.setItem('user', JSON.stringify({ nom: name, email, numTel, adresse: adr,mdp }));
+            await AsyncStorage.setItem('user', JSON.stringify({ nom: name, email, numTel, categorie,matricule,mdp }));
     
             // Afficher l'alerte de succès après la mise à jour du profil
             alert("Modification avec succès !");
@@ -78,7 +79,7 @@ const UpdateProfile = () => {
     
 
     return (
-        <Layout>
+        <LayoutLivreur>
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.container}>
                 <Image source={{ uri: UserData[0].profilePic }} style={styles.img} />
@@ -88,7 +89,7 @@ const UpdateProfile = () => {
                     </View>
 
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={email} onChangeText={setEmail} placeholder="Email" keyboardType='email-address' />
+                        <TextInput style={styles.textInput} value={email} onChangeText={setEmail} placeholder="Email" keyboardType='email-address'/>
                     </View>
 
                     <View style={styles.inputContainer}>
@@ -96,7 +97,11 @@ const UpdateProfile = () => {
                     </View>
 
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={adr} onChangeText={setAdr} placeholder="Adresse" />
+                        <TextInput style={styles.textInput} value={categorie} onChangeText={setCategorie} placeholder="Adresse" />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <TextInput style={styles.textInput} value={matricule} onChangeText={setMatricule} placeholder="Matricule" />
                     </View>
 
                     <View style={styles.inputContainer}>
@@ -122,7 +127,7 @@ const UpdateProfile = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-        </Layout>
+        </LayoutLivreur>
     );
 };
 
@@ -130,14 +135,14 @@ export default UpdateProfile;
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 20,
+        marginVertical: 5,
         margin: 10,
     },
     img: {
         height: 100,
         width: '100%',
         resizeMode: 'contain',
-        marginTop: 10,
+        //marginTop: 2,
     },
     inputContainer: {
         borderWidth: 1,
@@ -157,7 +162,7 @@ const styles = StyleSheet.create({
     cnxButton: {
         backgroundColor: '#329171',
         borderRadius: 100,
-        marginVertical: 30,
+        marginVertical: 20,
     },
     cnxtxt: {
         color: '#fff',

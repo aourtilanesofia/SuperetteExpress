@@ -7,15 +7,19 @@ import FirstScreen from './screens/FirstScreen';
 import ConConsommateur from './screens/ConConsommateur';
 import InsConsommateur from './screens/InsConsommateur';
 import WelcomePage from './screens/WelcomePage';
-import WelcomePageLivreur from './screens/WelcomePageLivreur';
-import ConLivreur from './screens/ConLivreur';
-import InsLivreur from './screens/InsLivreur';
+import WelcomePageLivreur from '../frontend/screens/LivreurScreens/WelcomePageLivreur';
+import ConLivreur from '../frontend/screens/LivreurScreens/ConLivreur';
+import InsLivreur from '../frontend/screens/LivreurScreens/InsLivreur';
 import ConCommerçant from'./screens/ConCommerçant';
 import AcceuilConsommateur from './screens/AcceuilConsommateur';
 import ProduitsDetails from './screens/ProduitsDetails';
 import Compte from './screens/Compte';
 import UpdateProfile from './screens/UpdateProfile';
 import AutresOptions from './screens/AutresOptions';
+import AcceuilLivreur from './screens/LivreurScreens/AcceuilLivreur';
+import CompteLivreur from './screens/LivreurScreens/CompteLivreur';
+import UpdateProfileLivreur from './screens/LivreurScreens/UpdateProfileLivreur';
+import AutresOptionsLivreur from './screens/LivreurScreens/AutresOptionsLivreur';
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -38,6 +42,10 @@ export default function App() {
         <Stack.Screen name='Compte' component={Compte} options={{ headerTitle: '' }} />
         <Stack.Screen name='UpdateProfile' component={UpdateProfile} options={{headerTitle: ''}}/>
         <Stack.Screen name='AutresOptions' component={AutresOptions} options={{headerTitle: ''}}/>
+        <Stack.Screen name='AutresOptionsLivreur' component={AutresOptionsLivreur} options={{headerTitle: ''}}/>
+        <Stack.Screen name='AcceuilLivreur' component={AcceuilLivreur} options={{ headerShown:false,}}/>
+        <Stack.Screen name='CompteLivreur' component={CompteLivreur} options={{headerTitle: ''}}/>
+        <Stack.Screen name='UpdateProfileLivreur' component={UpdateProfileLivreur} options={{headerTitle: ''}}/>
         
 
       </Stack.Navigator>

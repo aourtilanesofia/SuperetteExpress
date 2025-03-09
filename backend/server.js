@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import testRouter from './routes/testRoutes.js';
 import connectDB from './config/db.js';
 import consommateurRoutes from './routes/consommateurRoutes.js';
+import livreurRoutes from './routes/livreurRoutes.js';
 
 //Configuration dot env
 dotenv.config();
@@ -30,6 +31,7 @@ app.use(cookieParser());
 //routes
 app.use('/api/v1',testRouter);
 app.use('/api/v1/consommateur',consommateurRoutes);
+app.use('/api/v1/livreur',livreurRoutes);
 
 app.get('/',(req,res) => {
     return res.status(200).send("<h1>Bonjour</h1>");
