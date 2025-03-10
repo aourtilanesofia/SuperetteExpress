@@ -35,7 +35,7 @@ const ConLivreur = ({ navigation }) => {
 
             if (!response.ok || !data.livreur || !data.token) {
                 Alert.alert("Erreur", data.message || "Connexion échouée !");
-                setEmail('');
+                setEmail(''); 
                 setMdp('');
                 return;
             }

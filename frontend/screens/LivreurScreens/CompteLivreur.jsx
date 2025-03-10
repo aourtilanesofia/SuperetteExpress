@@ -7,7 +7,7 @@ import { UserData } from '../../Data/UserData';
 const Compte = ({ navigation }) => {
     const [user, setUser] = useState(null);
 
-
+ 
     useEffect(() => {
         const fetchUser = async () => {
             try {

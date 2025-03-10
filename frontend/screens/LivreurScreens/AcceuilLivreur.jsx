@@ -5,7 +5,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from'react-native-vector-icons/MaterialCommunityIcons';
 
 
-const AcceuilConsommateur = ({ navigation }) => {
+const AcceuilLivreur = ({ navigation }) => {
   return (
     <Layout>
       {/* Header fixe en haut */}
@@ -23,7 +23,7 @@ const AcceuilConsommateur = ({ navigation }) => {
   );
 };
 
-export default AcceuilConsommateur;
+export default AcceuilLivreur;
 
 const styles = StyleSheet.create({
   hdr: {

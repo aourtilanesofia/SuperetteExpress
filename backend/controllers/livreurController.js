@@ -4,12 +4,38 @@ import livreurModel from '../models/livreurModel.js';
 // INSCRIPTION
 export const inscriptionControllerL = async (req, res) => {
     try {
-        const { nom, numTel, categorie,matricule, email, mdp } = req.body;
+        const { nom, numTel, categorie, matricule, email, mdp } = req.body;
 
-        if (!nom || !numTel || !email || !mdp || !categorie || !matricule) {
+        if (!nom || !numTel || !categorie ||!matricule || !email || !mdp) {
             return res.status(400).send({
                 success: false,
                 message: "Remplissez tous les champs svp!",
+            });
+        }
+
+        // Vérification du format de l'email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).send({
+                success: false,
+                message: "L'email doit être au format 'exemple@gmail.com'",
+            });
+        }
+
+        // Vérification de la longueur du mot de passe
+        if (mdp.length <= 6) {
+            return res.status(400).send({
+                success: false,
+                message: "Le mot de passe doit contenir plus de 6 caractères",
+            });
+        }
+
+        // Vérification du format du numéro de téléphone
+        const numTelRegex = /^(06|07|05)[0-9]{8}$/;
+        if (!numTelRegex.test(numTel)) {
+            return res.status(400).send({
+                success: false,
+                message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres",
             });
         }
 
@@ -34,7 +60,7 @@ export const inscriptionControllerL = async (req, res) => {
         console.log(error);
         res.status(500).send({
             success: false,
-            message: "Erreur dans l'API d'inscription",
+            message: "Erreur dans l'inscription",
             error,
         });
     }

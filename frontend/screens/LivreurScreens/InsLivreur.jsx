@@ -18,54 +18,54 @@ const InsLivreur = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
 
-    const handleSignup = async () => {
-        if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
-            Alert.alert("Erreur", "Veuillez remplir tous les champs !");
-            setNom(' ');
-            setNumTel('');
-            setCategorie('');
-            setMatricule('');
-            setEmail('');
-            setMdp('');
-            return;
-        }
-
-        try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/inscriptionL", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nom, numTel, categorie, matricule, email, mdp }),
-            });
-
-            const text = await response.text(); // Récupère la réponse brute
-            console.log("Réponse brute de l'API :", text); // Affiche la réponse dans la console
-
-            if (!response.ok) {
-                Alert.alert("Erreur", data.message || "Inscription échouée !");
-                setNom(' ');
-                setNumTel('');
-                setCategorie('');
-                setMatricule('');
-                setEmail('');
-                setMdp('');
-                return;
-            }
-
-            const data = JSON.parse(text); // Tente de parser la réponse en JSON
-            Alert.alert("Succès", "Inscription réussie !");
-            setNom(' ');
-            setNumTel('');
-            setCategorie('');
-            setMatricule('');
-            setEmail('');
-            setMdp('');
-            navigation.navigate("ConLivreur");
-
-        } catch (error) {
-            console.error("Erreur d'inscription :", error);
-            Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
-        }
-    };
+   const handleSignup = async () => {
+           if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
+               Alert.alert("Erreur", "Veuillez remplir tous les champs !");
+               setNom(' ');
+               setNumTel('');
+               setCategorie('');
+               setMatricule('');
+               setEmail('');
+               setMdp('');
+               return;
+           }
+   
+           try {
+               const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/inscriptionL", {
+                   method: "POST",
+                   headers: {
+                       "Content-Type": "application/json",
+                   },
+                   body: JSON.stringify({ nom, numTel, categorie, matricule, email, mdp }),
+               });
+   
+               const data = await response.json();
+   
+               if (!response.ok) {
+                   Alert.alert("Erreur", data.message || "Inscription échouée !");
+                   setNom(' ');
+                   setNumTel('');
+                   setCategorie('');
+                   setMatricule('');
+                   setEmail('');
+                   setMdp('');
+                   return;
+               }
+   
+   
+               Alert.alert("Succès", "Inscription réussie !");
+               setNom(' ');
+               setNumTel('');
+               setCategorie('');
+               setMatricule('');
+               setEmail('');
+               setMdp('');
+               navigation.navigate("ConLivreur");
+           } catch (error) {
+               console.error("Erreur d'inscription :", error);
+               Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
+           }
+       };
 
 
 
