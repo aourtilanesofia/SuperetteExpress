@@ -59,6 +59,17 @@ const AutresOptionsLivreur = ({ navigation }) => {
         );
     };
 
+     const handleLogout = () => {
+            Alert.alert(
+                "Déconnexion",
+                "Voulez-vous vraiment vous déconnecter ?",
+                [
+                    { text: "Annuler", style: "cancel" },
+                    { text: "Oui", onPress: () => navigation.navigate("ConLivreur") }
+                ]
+            );
+        };
+
     return (
         <LayoutLivreur>
             <View style={styles.container}>
@@ -82,7 +93,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
                 <View style={styles.line} />
 
                 <View>
-                    <TouchableOpacity style={styles.btn}>
+                    <TouchableOpacity style={styles.btn} onPress={handleLogout}>
                         <MaterialIcons name='logout' size={29} />
                         <Text style={styles.txt3}>Se déconnecter</Text>
                     </TouchableOpacity>
@@ -92,7 +103,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
         </LayoutLivreur>
     );
 };
-
+ 
 export default AutresOptionsLivreur;
 
 const styles = StyleSheet.create({
