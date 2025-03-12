@@ -5,7 +5,7 @@ import consommateurModel from "../models/consommateurModel.js";
 export const inscriptionController = async (req, res) => {
     try {
         const { nom, numTel, adresse, email, mdp } = req.body;
-
+ 
         if (!nom || !numTel || !adresse || !email || !mdp) {
             return res.status(400).send({
                 success: false,
@@ -13,30 +13,18 @@ export const inscriptionController = async (req, res) => {
             });
         }
 
-        // Vérification du format de l'email
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).send({
-                success: false,
-                message: "L'email doit être au format 'exemple@gmail.com'",
-            });
+            return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
         }
 
-        // Vérification de la longueur du mot de passe
         if (mdp.length <= 6) {
-            return res.status(400).send({
-                success: false,
-                message: "Le mot de passe doit contenir plus de 6 caractères",
-            });
+            return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
         }
 
-        // Vérification du format du numéro de téléphone
         const numTelRegex = /^(06|07|05)[0-9]{8}$/;
         if (!numTelRegex.test(numTel)) {
-            return res.status(400).send({
-                success: false,
-                message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres",
-            });
+            return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
         }
 
         const existingConsommateur = await consommateurModel.findOne({ email });
@@ -60,12 +48,11 @@ export const inscriptionController = async (req, res) => {
         console.log(error);
         res.status(500).send({
             success: false,
-            message: "Erreur dans l'inscription",
+            message: "Erreur dans l'API d'inscription",
             error,
         });
     }
 };
-
 
 // CONNEXION
 export const connexionController = async (req, res) => {
@@ -95,9 +82,16 @@ export const connexionController = async (req, res) => {
             });
         }
 
+        if (!consommateur.isActive) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Votre compte est désactivé!" 
+            });
+        }
+
         const token = consommateur.generateToken();
 
-        res.status(200).cookie("token", token).send({
+        return res.status(200).cookie("token", token).send({
             success: true,
             message: "Connecté avec succès",
             token,
@@ -105,7 +99,7 @@ export const connexionController = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({ 
             success: false,
             message: "Erreur dans l'API de connexion",
             error,
@@ -219,3 +213,56 @@ export const deleteAccountController = async (req, res) => {
     }
 };*/
 
+// Obtenir tous les consommateurs
+export const getAllConsommateurs = async (req,res) =>{
+    try {
+        const consommateur = await consommateurModel.find();
+        res.json(consommateur);
+    } catch (error) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
+//supprimer un consommateur
+
+export const deleteConsommateur = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("ID reçu :", id);
+
+        if (!id) {
+            return res.status(400).json({ message: "ID manquant" });
+        }
+
+        const consommateur = await consommateurModel.findByIdAndDelete(id);
+        if (!consommateur) {
+            return res.status(404).json({ message: "Utilisateur introuvable" });
+        }
+
+        res.json({ message: "Utilisateur supprimé avec succès" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+//Activer ou désactiver un consommateur
+
+export const toggleStatus = async (req, res) => {
+    try {
+      const consommateur = await consommateurModel.findById(req.params.id);
+      
+      if (!consommateur) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+  
+      consommateur.isActive = !consommateur.isActive;
+      await consommateur.save();
+  
+      res.json(consommateur);
+    } catch (error) {
+      console.error("Erreur lors de l'activation/désactivation :", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
+  

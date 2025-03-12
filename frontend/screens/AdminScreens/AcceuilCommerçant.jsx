@@ -13,7 +13,7 @@ const AcceuilCommerçant = ({ navigation }) => {
       {/* ScrollView pour défiler entre le header et le menu */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.main}>
-          <Text style={styles.txtdash}>Dashboard</Text>
+          <Text style={styles.txtdash}>Dashboard</Text> 
           <View style={styles.btnContainer}>
             <TouchableOpacity style={styles.btn}>
             <AntDesign name="edit" style={styles.icone}/>
@@ -30,7 +30,7 @@ const AcceuilCommerçant = ({ navigation }) => {
               <Text style={styles.btntxt}>Gestion des commandes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestiondesUtilisateurs')}>
               <AntDesign name="user" style={styles.icone}/>
               <Text style={styles.btntxt}>Gestion des utilisateurs</Text>
             </TouchableOpacity>
