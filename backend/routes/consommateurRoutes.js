@@ -1,5 +1,5 @@
 import express from 'express';
-import { connexionController, getConsommateurProfileController, inscriptionController,  updateProfileController, deleteAccountController } from '../controllers/consommateurController.js';
+import { connexionController, getConsommateurProfileController, inscriptionController,  updateProfileController, deleteAccountController, getAllConsommateurs, deleteConsommateur, toggleStatus } from '../controllers/consommateurController.js';
 import  isAuth  from './../middlewares/authMiddelware.js';
 
 //créer un objet router
@@ -25,5 +25,16 @@ router.put('/profile-update',isAuth,updateProfileController);
 // Supprimer le compte
 router.delete('/delete-account', isAuth, deleteAccountController);
 
+//récupere les consommateur 
+
+router.get('/tousConsommateur', getAllConsommateurs);
+
+//Supprimer un consommateur
+
+router.delete('/supConsommateur/:id',deleteConsommateur);
+
+//Activer désactiver un consommateur 
+
+router.put('/status/:id',toggleStatus);
 
 export default router;

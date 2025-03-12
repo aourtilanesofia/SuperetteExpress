@@ -21,6 +21,10 @@ import CompteLivreur from './screens/LivreurScreens/CompteLivreur';
 import UpdateProfileLivreur from './screens/LivreurScreens/UpdateProfileLivreur';
 import AutresOptionsLivreur from './screens/LivreurScreens/AutresOptionsLivreur';
 import AcceuilCommerçant from './screens/AdminScreens/AcceuilCommerçant';
+import GestiondesUtilisateurs from './screens/AdminScreens/GestiondesUtilisateurs';
+import ListeDesClients from './screens/AdminScreens/ListeDesClients';
+import ListeDesLivreurs from './screens/AdminScreens/ListeDesLivreurs';
+import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -48,6 +52,10 @@ export default function App() {
         <Stack.Screen name='CompteLivreur' component={CompteLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='UpdateProfileLivreur' component={UpdateProfileLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='AcceuilCommerçant' component={AcceuilCommerçant} options={{ headerShown: false, }} />
+        <Stack.Screen name='GestiondesUtilisateurs' component={GestiondesUtilisateurs} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ListeDesClients' component={ListeDesClients} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ListeDesLivreurs' component={ListeDesLivreurs} options={{ headerTitle: '' }} />
+        <Stack.Screen name='NotificationsAdmin' component={NotificationsAdmin} options={{ headerTitle: '' }} />
 
 
       </Stack.Navigator>

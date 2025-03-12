@@ -26,6 +26,7 @@ const consommateurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
