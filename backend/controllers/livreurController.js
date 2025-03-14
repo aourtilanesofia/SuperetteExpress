@@ -1,6 +1,7 @@
 
 import livreurModel from '../models/livreurModel.js';
 import Notification from '../models/NotificationModel.js';
+import { sendEmail } from '../utils/emailService.js';
 
 
 // INSCRIPTION
@@ -197,6 +198,13 @@ export const getAllLivreurs = async (req,res) =>{
         if (!livreur) {
             return res.status(404).json({ message: "Livreur non trouvé" });
         }
+
+        // Envoyer un email au livreur
+        await sendEmail(
+            livreur.email,
+            "Validation de votre compte",
+            "Félicitations, votre compte a été validé par l'administrateur ! Vous pouvez maintenant vous connecter."
+        );
 
         
 

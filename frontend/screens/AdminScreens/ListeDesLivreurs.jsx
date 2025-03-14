@@ -30,7 +30,7 @@ const ListeDesLivreurs = () => {
 
   const deleteLivreur = async (id) => {
     Alert.alert("Confirmation", "Voulez-vous supprimer cet utilisateur ?", [
-      { text: "Annuler", style: "cancel" },
+      {text: "Annuler", style: "cancel" },
       {
         text: "Supprimer",
         onPress: async () => {
@@ -70,6 +70,8 @@ const ListeDesLivreurs = () => {
       setLivreurs(
         livreurs.map((livreur) => (livreur._id === id ? result.livreur : livreur))
       );
+
+      Alert. alert("Compte validé !");
     } catch (error) {
       console.error("Erreur validation :", error);
     }

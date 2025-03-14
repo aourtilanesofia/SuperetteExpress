@@ -31,8 +31,11 @@ router.get('/tousLivreurs', getAllLivreurs);
 //Valider livreur
 router.put("/valider/:id", validerLivreur); 
 
+
 //refuser livreur
 router.delete('/refuser/:id',deleteLivreur);
+
+
 
 
 

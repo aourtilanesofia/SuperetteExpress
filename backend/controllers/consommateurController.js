@@ -1,5 +1,6 @@
 
 import consommateurModel from "../models/consommateurModel.js";
+import Notification from '../models/NotificationModel.js';
 
 // INSCRIPTION
 export const inscriptionController = async (req, res) => {
@@ -38,6 +39,20 @@ export const inscriptionController = async (req, res) => {
 
         const consommateur = await consommateurModel.create({ nom, numTel, adresse, email, mdp });
 
+        // Créer la notification **avant** d'envoyer la réponse
+        try {
+            const notification = new Notification({
+                message: `${nom} vient de s'inscrire en tant que Client.`,
+                isRead: false,
+            });
+            await notification.save();
+            console.log("Notification envoyée via Socket.io :", notification);
+            req.io.emit("newNotification", notification);
+        } catch (notifError) {
+            console.error("Erreur lors de la création de la notification :", notifError);
+        }
+ 
+        // Envoyer la réponse une seule fois à la fin
         res.status(201).send({
             success: true,
             message: "Inscription réussie, veuillez vous connecter",

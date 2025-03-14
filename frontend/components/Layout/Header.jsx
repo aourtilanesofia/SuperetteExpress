@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     paddingHorizontal:20,
-    marginTop:30,
+    //marginTop:5,
 
   },
   inputBox:{
