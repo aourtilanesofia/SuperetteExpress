@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor:'lightgrey'
   },
   catContainer:{
-    padding:10,
+    padding:18,
     justifyContent:'center',
     alignItems:'center',
   },
