@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import { io } from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
 
 const socket = io("http://192.168.43.107:8080"); // Mets l'URL de ton backend
 
@@ -14,6 +15,11 @@ const MenuAdmin = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const { t } = useTranslation();
+
+  const handleLanguagePress = () => {
+    navigation.navigate('LanguageSelection'); // Aller à l'écran de sélection de langue
+  };
 
   useEffect(() => {
     // Charger le nombre de notifications non lues au démarrage
@@ -65,8 +71,8 @@ const MenuAdmin = () => {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuContainer}>
-        <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "" && styles.active]} size={26} />
+      <TouchableOpacity style={styles.menuContainer} onPress={handleLanguagePress}>
+        <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "LanguageSelection" && styles.active]} size={26} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuContainer} onPress={handleLogout}>

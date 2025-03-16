@@ -1,44 +1,3 @@
-/*import { StyleSheet, Text, View, ScrollView } from 'react-native'
-import React from 'react';
-import Layout from '../components/Layout/Layout';
-import Categories from '../components/Category/Categories';
-import Banner from '../components/Banner/Banner';
-import Produits from '../components/Produits/Produits';
-import Header from './../components/Layout/Header';
-
-
-const AcceuilConsommateur = ({ navigation }) => {
-  return (
-
-    <View style={styles.container}>
-      <Layout>
-
-        <Header />
-        <Text style={styles.txt}>Explorez les catégories</Text>
-        <Categories />
-        <Banner />
-        <Produits />
-      </Layout>
-    </View>
-
-  )
-}
-
-export default AcceuilConsommateur;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  txt: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    padding: 20,
-    paddingTop: 30,
-  }
-
-
-})*/
 
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import React from "react";
@@ -49,9 +8,12 @@ import Banner from "../components/Banner/Banner";
 import Produits from "../components/Produits/Produits";
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 
 
 const AcceuilConsommateur = ({ navigation }) => {
+  const { t } = useTranslation();
+
   return (
     <Layout>
       {/* Header fixe en haut */}
@@ -67,7 +29,7 @@ const AcceuilConsommateur = ({ navigation }) => {
       {/* ScrollView pour défiler entre le header et le menu */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
          <Header/>
-        <Text style={styles.txt}>Explorez les catégories</Text>
+        <Text style={styles.txt}>{t('explorer_categorie')}</Text>
         <Categories />
         <Banner />
         <Produits />

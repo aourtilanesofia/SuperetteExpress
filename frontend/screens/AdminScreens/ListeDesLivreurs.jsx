@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View, FlatList, ActivityIndicator, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 const ListeDesLivreurs = () => { 
   const [livreurs, setLivreurs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchLivreurs();
@@ -83,7 +86,7 @@ const ListeDesLivreurs = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Liste des Livreurs</Text>
+      <Text style={styles.title}>{t('Liste_des_livreurs')}</Text>
       <FlatList
         data={livreurs}
         keyExtractor={(item) => item._id} // Sécurisation de la clé

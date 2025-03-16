@@ -2,9 +2,12 @@ import { StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from '
 import React from 'react'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const [searchText, setSearchText] = useState('');
+  const { t } = useTranslation();
+  
   // function for search
   const handleSearch = () => {
     console.log(searchText);
@@ -13,7 +16,7 @@ const Header = () => {
   return (
     <View style={{ height:90}}>
       <View style={styles.container}>
-      <TextInput placeholder='Recherchez' style={styles.inputBox}  value={searchText} onChangeText={(text) => setSearchText(text) }/>
+      <TextInput placeholder={t('recherche')} style={styles.inputBox}  value={searchText} onChangeText={(text) => setSearchText(text) }/>
       <TouchableOpacity style={styles.rech} onPress={handleSearch}>
         <FontAwesome name='search' size={17} />
         </TouchableOpacity>  
