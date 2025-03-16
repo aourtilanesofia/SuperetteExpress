@@ -136,7 +136,7 @@ export default UpdateProfile;
 const styles = StyleSheet.create({
     container: {
         marginVertical: 5,
-        margin: 10,
+        margin: 20,
     },
     img: {
         height: 100,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         borderWidth: 1,
         borderColor: '#329171',
-        borderRadius: 30,
+        borderRadius: 15,
         height: 50,
         paddingHorizontal: 20,
         flexDirection: 'row',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     },
     cnxButton: {
         backgroundColor: '#329171',
-        borderRadius: 100,
+        borderRadius: 15,
         marginVertical: 20,
     },
     cnxtxt: {

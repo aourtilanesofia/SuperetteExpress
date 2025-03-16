@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         borderWidth: 1,
         borderColor: '#329171',
-        borderRadius: 30,
+        borderRadius: 15,
         height: 50,
         paddingHorizontal: 20,
         flexDirection: 'row',
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         marginVertical: 15
     },
     textInput: { flex: 1, paddingHorizontal: 15 },
-    cnxButton: { backgroundColor: '#329171', borderRadius: 100, marginVertical: 33 },
+    cnxButton: { backgroundColor: '#329171', borderRadius: 15, marginVertical: 33 },
     cnxtxt: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center', padding: 12 },
     footerContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 20 },
     accountText: { color: '#4f4f4f' },

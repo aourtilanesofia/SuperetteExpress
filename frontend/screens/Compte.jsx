@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     btn: {
         backgroundColor: '#329171',
         padding: 13,
-        borderRadius: 100,
+        borderRadius: 15,
     },
     txtbtn: {
         justifyContent: 'center',
