@@ -1,3 +1,4 @@
+import './i18n';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -25,6 +26,9 @@ import GestiondesUtilisateurs from './screens/AdminScreens/GestiondesUtilisateur
 import ListeDesClients from './screens/AdminScreens/ListeDesClients';
 import ListeDesLivreurs from './screens/AdminScreens/ListeDesLivreurs';
 import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
+import LanguageSelection from './screens/LanguageSelection';
+
+
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -56,6 +60,10 @@ export default function App() {
         <Stack.Screen name='ListeDesClients' component={ListeDesClients} options={{ headerTitle: '' }} />
         <Stack.Screen name='ListeDesLivreurs' component={ListeDesLivreurs} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsAdmin' component={NotificationsAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name="LanguageSelection" component={LanguageSelection} options={{ headerTitle: '' }} />
+
+        
+
 
 
       </Stack.Navigator>

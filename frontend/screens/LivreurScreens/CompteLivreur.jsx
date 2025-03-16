@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import { UserData } from '../../Data/UserData';
+import { useTranslation } from 'react-i18next';
 
 const Compte = ({ navigation }) => {
     const [user, setUser] = useState(null);
-
+    const { t } = useTranslation();
  
     useEffect(() => {
         const fetchUser = async () => {
@@ -42,35 +43,35 @@ const Compte = ({ navigation }) => {
             <Image source={{ uri: UserData[0].profilePic }} style={styles.img} />
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                     
-                    <Text style={styles.name}>Bienvenue {user.nom} 👋</Text>
+                    <Text style={styles.name}>{t('Bienvenue')} {user.nom} 👋</Text>
                 </View>
 
                 <View style={{ marginTop: 40 }}>
                     <View style={styles.line} />
 
                     <View style={styles.vw}>
-                        <Text style={styles.txt1}>Adresse E-mail:</Text>
+                        <Text style={styles.txt1}>{t('email')}:</Text>
                         <Text style={styles.txt2}>{user.email}</Text>
                     </View>
 
                     <View style={styles.line} />
 
                     <View style={styles.vw}>
-                        <Text style={styles.txt1}>Numéro de téléphone:</Text>
+                        <Text style={styles.txt1}>{t('num')}:</Text>
                         <Text style={styles.txt2}>{user.numTel}</Text>
                     </View>
 
                     <View style={styles.line} />
 
                     <View style={styles.vw}>
-                        <Text style={styles.txt1}>Catégorie de véhicule:</Text>
+                        <Text style={styles.txt1}>{t('Catégorie_de_véhicule')}:</Text>
                         <Text style={styles.txt2}>{user.categorie}</Text>
                     </View>
 
                     <View style={styles.line} />
 
                     <View style={styles.vw}>
-                        <Text style={styles.txt1}>Matricule:</Text>
+                        <Text style={styles.txt1}>{t('Matricule')}:</Text>
                         <Text style={styles.txt2}>{user.matricule}</Text>
                     </View>
 
@@ -81,7 +82,7 @@ const Compte = ({ navigation }) => {
 
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('UpdateProfileLivreur')}>
-                        <Text style={styles.txtbtn}>Modifier le profil</Text>
+                        <Text style={styles.txtbtn}>{t('Modifier_le_profil')}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

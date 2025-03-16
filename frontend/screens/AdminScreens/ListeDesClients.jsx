@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View, FlatList, ActivityIndicator, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 const ListeDesClients = () => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchClients();
@@ -64,7 +67,7 @@ const ListeDesClients = () => {
   return (
     
       <View style={styles.container}>
-      <Text style={styles.title}>Liste des Clients</Text>
+      <Text style={styles.title}>{t('Liste_des_clients')}</Text>
       <FlatList
         data={clients}
         keyExtractor={(item) => item._id}

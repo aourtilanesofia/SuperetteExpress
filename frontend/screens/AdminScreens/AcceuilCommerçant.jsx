@@ -2,9 +2,11 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-nati
 import React from "react";
 import LayoutAdmin from "../../components/LayoutAdmin/LayoutAdmin";
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useTranslation } from 'react-i18next';
 
 
 const AcceuilCommerçant = ({ navigation }) => {
+  const { t } = useTranslation();
   return (
     <LayoutAdmin>
       {/* Header fixe en haut */}
@@ -13,26 +15,26 @@ const AcceuilCommerçant = ({ navigation }) => {
       {/* ScrollView pour défiler entre le header et le menu */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.main}>
-          <Text style={styles.txtdash}>Dashboard</Text> 
+          <Text style={styles.txtdash}>{t('Dashboard')}</Text> 
           <View style={styles.btnContainer}>
             <TouchableOpacity style={styles.btn}>
             <AntDesign name="edit" style={styles.icone}/>
-              <Text style={styles.btntxt}>Gestion des produits</Text>
+              <Text style={styles.btntxt}>{t('Gestion_des_produits')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.btn}>
             <AntDesign name="edit" style={styles.icone}/>
-              <Text style={styles.btntxt}>Gestion des catégories</Text>
+              <Text style={styles.btntxt}>{t('Gestion_des_catégories')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.btn}>
             <AntDesign name="bars" style={styles.icone}/>
-              <Text style={styles.btntxt}>Gestion des commandes</Text>
+              <Text style={styles.btntxt}>{t('Gestion_des_commandes')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestiondesUtilisateurs')}>
               <AntDesign name="user" style={styles.icone}/>
-              <Text style={styles.btntxt}>Gestion des utilisateurs</Text>
+              <Text style={styles.btntxt}>{t('Gestion_des_utilisateurs')}</Text>
             </TouchableOpacity>
           </View>
         </View> 

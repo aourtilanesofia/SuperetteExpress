@@ -2,20 +2,22 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react'
 import LayoutAdmin from "../../components/LayoutAdmin/LayoutAdmin";
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useTranslation } from 'react-i18next';
 
 const GestiondesUtilisateurs = ({ navigation }) => {
+  const { t } = useTranslation();
     return (
         <LayoutAdmin>
-            <Text style={styles.txtdash}>Gestion des utilisateurs</Text>
+            <Text style={styles.txtdash}>{t('Gestion_des_utilisateurs')}</Text>
             <View style={styles.btnContainer}>
                 <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('ListeDesClients')}>
                     <AntDesign name="bars" style={styles.icone} />
-                    <Text style={styles.btntxt}>Liste des clients</Text>
+                    <Text style={styles.btntxt}>{t('Liste_des_clients')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('ListeDesLivreurs')}>
                     <AntDesign name="bars" style={styles.icone} />
-                    <Text style={styles.btntxt}>Liste des livreurs</Text>
+                    <Text style={styles.btntxt}>{t('Liste_des_livreurs')}</Text>
                 </TouchableOpacity>
             </View>
         </LayoutAdmin>

@@ -5,6 +5,7 @@ import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
 import { UserData } from '../../Data/UserData';
+import { useTranslation } from 'react-i18next';
 
 const UpdateProfile = () => {
     const [name, setName] = useState('');
@@ -14,6 +15,8 @@ const UpdateProfile = () => {
     const [matricule, setMatricule] = useState('');
     const [mdp, setMDP] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+    const { t } = useTranslation();
 
     // Charger les données du profil depuis AsyncStorage
     useEffect(() => {
@@ -123,7 +126,7 @@ const UpdateProfile = () => {
                     </View>
 
                     <TouchableOpacity style={styles.cnxButton} onPress={handleUpdateProfile}>
-                        <Text style={styles.cnxtxt}>Valider</Text>
+                        <Text style={styles.cnxtxt}>{t('valider')}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
