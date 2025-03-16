@@ -62,7 +62,8 @@ const ListeDesClients = () => {
   }
 
   return (
-    <View style={styles.container}>
+    
+      <View style={styles.container}>
       <Text style={styles.title}>Liste des Clients</Text>
       <FlatList
         data={clients}
@@ -83,6 +84,7 @@ const ListeDesClients = () => {
           )}
       />
     </View>
+    
   );
 };
 
@@ -90,13 +92,13 @@ export default ListeDesClients;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10,  },
   clientItem: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ddd" },
   clientName: { fontSize: 18, fontWeight: "bold" },
   clientEmail: { fontSize: 14, color: "gray", marginBottom:15 },
   btnsup:{
     
-    borderRadius:10,
+    borderRadius:15,
 
   },
   btnact:{},

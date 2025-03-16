@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, FlatList, ActivityIndicator, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 
-const ListeDesLivreurs = () => {
+const ListeDesLivreurs = () => { 
   const [livreurs, setLivreurs] = useState([]);
   const [loading, setLoading] = useState(true);
 
