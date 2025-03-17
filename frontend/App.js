@@ -27,6 +27,9 @@ import ListeDesClients from './screens/AdminScreens/ListeDesClients';
 import ListeDesLivreurs from './screens/AdminScreens/ListeDesLivreurs';
 import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
 import LanguageSelection from './screens/LanguageSelection';
+import GestionDesCategories from './screens/AdminScreens/GestionDesCategories';
+import ModifierCategories from './screens/AdminScreens/ModifierCategories';
+import AjouterCategories from './screens/AdminScreens/AjouterCategories';
 
 
 
@@ -61,6 +64,9 @@ export default function App() {
         <Stack.Screen name='ListeDesLivreurs' component={ListeDesLivreurs} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsAdmin' component={NotificationsAdmin} options={{ headerTitle: '' }} />
         <Stack.Screen name="LanguageSelection" component={LanguageSelection} options={{ headerTitle: '' }} />
+        <Stack.Screen name="GestionDesCategories" component={GestionDesCategories} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ModifierCategories" component={ModifierCategories} options={{ headerTitle: '' }} />
+        <Stack.Screen name="AjouterCategories" component={AjouterCategories} options={{ headerTitle: '' }} />
 
         
 

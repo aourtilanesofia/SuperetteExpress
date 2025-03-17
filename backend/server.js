@@ -12,6 +12,7 @@ import connectDB from './config/db.js';
 import consommateurRoutes from './routes/consommateurRoutes.js';
 import livreurRoutes from './routes/livreurRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import categorieRoutes from './routes/categorieRoutes.js';
 
 //Configuration dot env
 dotenv.config();
@@ -42,11 +43,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// Servir les fichiers statiques depuis le dossier "assets"
+app.use("/assets", express.static("assets"));
+
 //routes
 app.use('/api/v1',testRouter);
 app.use('/api/v1/consommateur',consommateurRoutes);
 app.use('/api/v1/livreur',livreurRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/categories', categorieRoutes);
 
 app.get('/',(req,res) => {
     return res.status(200).send("<h1>Bonjour</h1>");

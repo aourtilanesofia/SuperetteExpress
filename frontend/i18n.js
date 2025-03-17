@@ -30,6 +30,13 @@ const resources = {
       Liste_des_clients:"Customer list",
       Liste_des_livreurs:"List of delivery people",
       Dashboard:"Dashboard",
+      Liste_des_catégories:"List of categories",
+      modifier:"Update",
+      supprimer:"Delete",
+      Nom_de_la_catégorie:"Category name",
+      URL_de_image:"Image URL",
+      Mettre_à_jour:"Update",
+      ajouter:"Add",
 
     }
   },
@@ -59,6 +66,13 @@ const resources = {
       Liste_des_clients:"Liste des clients",
       Liste_des_livreurs:"Liste des livreurs",
       Dashboard:"Tableau de bord",
+      Liste_des_catégories:"Liste des catégories",
+      modifier:"Modifier",
+      supprimer:"Supprimer",
+      Nom_de_la_catégorie:"Nom de la catégorie",
+      URL_de_image:"URL de l'image",
+      Mettre_à_jour:"Mettre à jour",
+      ajouter:"Ajouter",
     }
   },
   ar: {
@@ -86,6 +100,13 @@ const resources = {
       Liste_des_clients:"قائمة العملاء",
       Liste_des_livreurs:"قائمة سائقي التوصيل",
       Dashboard:"لوحة التحكم",
+      Liste_des_catégories:"قائمة الفئات",
+      modifier:"تعديل",
+      supprimer:"مسح",
+      Nom_de_la_catégorie:"اسم الفئة",
+      URL_de_image:"عنوان الصورة",
+      Mettre_à_jour:"تحديث",
+      ajouter:"اضافة",
     }
 
   }

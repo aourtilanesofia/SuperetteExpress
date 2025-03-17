@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 const GestiondesUtilisateurs = ({ navigation }) => {
   const { t } = useTranslation();
     return (
-        <LayoutAdmin>
+        <LayoutAdmin> 
             <Text style={styles.txtdash}>{t('Gestion_des_utilisateurs')}</Text>
             <View style={styles.btnContainer}>
                 <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('ListeDesClients')}>
