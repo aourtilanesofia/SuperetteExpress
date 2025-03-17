@@ -68,7 +68,7 @@ export const categoriesData = [
     {
         _id: 12,
         name: 'Huiles, miel \n et sauses',
-        path:'Huiles, miel \n et sauses',
+        path:'Huiles, miel et sauses',
         icon: require('../assets/huile.png'),
     },
     {
