@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
@@ -9,7 +9,7 @@ import { fonts } from '../node_modules/@react-navigation/native/lib/module/themi
 import { Alert } from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-
+ 
 const InsConsommateur = ({ navigation }) => {
     const [secureEntery, setSecureEntery] = useState(true);
     const [nom, setNom] = useState('');
@@ -65,6 +65,7 @@ const InsConsommateur = ({ navigation }) => {
     };
 
     return (
+        <ScrollView>
         <View style={styles.container}>
             <Text style={styles.txt1}>Inscription</Text>
  
@@ -119,6 +120,7 @@ const InsConsommateur = ({ navigation }) => {
 
             </View>
         </View>
+        </ScrollView>
     )
 }
 
