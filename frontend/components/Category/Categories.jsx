@@ -79,7 +79,14 @@ const Categories = () => {
         {categories.map((item) => (
           <View key={item._id}>
             <TouchableOpacity style={styles.catContainer}>
-              <Image source={{ uri: `${backendUrl}${item.image}` }} style={[styles.img, styles.catIcon]} />
+            <Image
+                source={{ 
+                  uri: item.image.startsWith('http') ? item.image : `${backendUrl}${item.image}` 
+                }}
+                style={styles.img}
+                resizeMode="contain"
+                onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}
+              />
               <Text style={styles.txt}>{item.nom}</Text>
             </TouchableOpacity>
           </View>
@@ -100,7 +107,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 9,
     height: 120,
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#E0E0E0',
   },
   catContainer: {
     padding: 18,

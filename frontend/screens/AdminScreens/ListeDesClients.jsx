@@ -6,7 +6,7 @@ const ListeDesClients = () => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
 
   useEffect(() => {
     fetchClients();
@@ -79,7 +79,7 @@ const ListeDesClients = () => {
                 <Button title="Supprimer" color="red" onPress={() => deleteClient(item._id)} style={styles.btnsup}/>
                 <Button
                   title={item.isActive ? "Désactiver" : "Activer"}
-                  color={item.isActive ? "orange" : "green"}
+                  color={item.isActive ? "orange" : "#4CAF50"}
                   onPress={() => toggleStatus(item._id)}
                 />
               </View>

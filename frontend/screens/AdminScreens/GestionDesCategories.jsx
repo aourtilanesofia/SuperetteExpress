@@ -57,7 +57,12 @@ const GestionDesCategories = () => {
                 contentContainerStyle={{ paddingBottom: 40 }}
                 renderItem={({ item }) => (
                     <View style={styles.categoryItem}>
-                        <Image source={{ uri: `http://192.168.43.107:8080${item.image}` }} style={styles.image}/>
+                        <Image 
+                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.43.107:8080${item.image}` }} 
+                            style={styles.image} 
+                            resizeMode="contain"
+                            onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}
+                        />
 
                         <Text style={styles.categoryText}>{item.nom}</Text>
                         <TouchableOpacity 
@@ -87,7 +92,7 @@ const GestionDesCategories = () => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-    categoryItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 8 },
+    categoryItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, padding: 10, backgroundColor: '#f0f0f0', borderRadius: 8 },
     image: { width: 50, height: 50, marginRight: 10 },
     categoryText: { flex: 1, fontSize: 16 },
     editButton: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 5, marginRight: 5 },
@@ -99,7 +104,7 @@ const styles = StyleSheet.create({
         right: 20,
         backgroundColor: '#007BFF',
         width: 60, // Taille fixe pour éviter la déformation
-        height: 60,
+        height: 60, 
         borderRadius: 30, // Pour un cercle parfait
         elevation: 5, // Ombre sur Android
         shadowColor: '#000', // Ombre sur iOS
