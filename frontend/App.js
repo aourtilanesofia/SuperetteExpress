@@ -30,6 +30,9 @@ import LanguageSelection from './screens/LanguageSelection';
 import GestionDesCategories from './screens/AdminScreens/GestionDesCategories';
 import ModifierCategories from './screens/AdminScreens/ModifierCategories';
 import AjouterCategories from './screens/AdminScreens/AjouterCategories';
+import Panier from './screens/Panier';
+import Valider from './screens/Valider';
+import ListeDesCommandes from './screens/ListeDesCommandes';
 
 
 
@@ -67,6 +70,10 @@ export default function App() {
         <Stack.Screen name="GestionDesCategories" component={GestionDesCategories} options={{ headerTitle: '' }} />
         <Stack.Screen name="ModifierCategories" component={ModifierCategories} options={{ headerTitle: '' }} />
         <Stack.Screen name="AjouterCategories" component={AjouterCategories} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Panier" component={Panier} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Valider" component={Valider} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ListeDesCommandes" component={ListeDesCommandes} options={{ headerTitle: '' }} />
+      
 
         
 
