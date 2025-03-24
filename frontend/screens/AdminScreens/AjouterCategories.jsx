@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,ScrollView  } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 const AjouterCategories = ({ navigation }) => {
@@ -8,19 +8,26 @@ const AjouterCategories = ({ navigation }) => {
     const { t } = useTranslation();
 
     const handleAdd = async () => {
+        if (!nom || !image) {
+
+            Alert.alert("Erreur","Veuillez remplir tous les champs !");
+            return;
+        }
         try {
             await fetch('http://192.168.43.107:8080/api/categories/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })
             });
+            Alert.alert('Succés','Catégorie ajoutée avec succés!');
             navigation.goBack();
         } catch (error) {
             console.error("Erreur lors de l'ajout", error);
         }
     };
-
+ 
     return (
+        
         <View style={styles.container}>
             <Text style={styles.txt}>{t('Nom_de_la_catégorie')} :</Text>
             <TextInput style={styles.input} value={nom} onChangeText={setName} />
@@ -30,13 +37,14 @@ const AjouterCategories = ({ navigation }) => {
                 <Text style={styles.buttonText}>{t('ajouter')}</Text>
             </TouchableOpacity>
         </View>
+    
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
-    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 , borderColor:'#329171'},
-    button: { backgroundColor: '#329171', padding: 15, borderRadius: 5, alignItems: 'center' ,marginTop:26},
+    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 , borderColor:'#000'},
+    button: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 5, alignItems: 'center' ,marginTop:26},
     buttonText: { color: '#fff', fontWeight: 'bold',fontSize:16 },
     txt:{fontSize:16, fontWeight:'bold',marginBottom:17, marginTop:20}
 });

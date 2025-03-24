@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
@@ -70,6 +70,7 @@ const InsLivreur = ({ navigation }) => {
 
 
     return (
+        <ScrollView>
         <View style={styles.container}>
             <Text style={styles.txt1}>Inscription</Text>
 
@@ -127,6 +128,7 @@ const InsLivreur = ({ navigation }) => {
 
             </View>
         </View>
+        </ScrollView>
     )
 }
 

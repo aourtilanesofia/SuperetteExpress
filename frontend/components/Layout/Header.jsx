@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     left:15,
     height:45,
     color:'black',
-    backgroundColor:'lightgrey',
+    backgroundColor:'#E0E0E0',
     paddingLeft:15,
     fontSize:15,
     borderRadius:10,

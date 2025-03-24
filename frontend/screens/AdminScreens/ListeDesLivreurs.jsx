@@ -17,7 +17,7 @@ const ListeDesLivreurs = () => {
       const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/tousLivreurs");
       const data = await response.json();
       
-      console.log("Données reçues :", data); // Debugging
+      //console.log("Données reçues :", data); // Debugging
       
       if (!Array.isArray(data)) {
         throw new Error("Format des données invalide");
@@ -95,8 +95,8 @@ const ListeDesLivreurs = () => {
             <Text style={styles.livreurName}>{item.nom}</Text>
             <Text style={styles.livreurEmail}>{item.email}</Text>
             <View style={styles.buttonContainer}>
-              <Button title="Valider" color="green" onPress={() => validerLivreur(item._id)} />
-              <Button title="Supprimer" color="red" onPress={() => deleteLivreur(item._id)} />
+              <Button title="Valider" color="#4CAF50" onPress={() => validerLivreur(item._id)}   style={styles.btn1}/>
+              <Button title="Supprimer" color="red" onPress={() => deleteLivreur(item._id)}  style={styles.btn1}/>
             </View>
           </View>
         )}
@@ -114,4 +114,5 @@ const styles = StyleSheet.create({
   livreurName: { fontSize: 18, fontWeight: "bold" },
   livreurEmail: { fontSize: 14, color: "gray", marginBottom: 15 },
   buttonContainer: { gap: 7 },
+  btn1:{borderRadius:5},
 });
