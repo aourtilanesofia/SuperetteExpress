@@ -13,6 +13,7 @@ import consommateurRoutes from './routes/consommateurRoutes.js';
 import livreurRoutes from './routes/livreurRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import categorieRoutes from './routes/categorieRoutes.js';
+import produitRoutes from "./routes/produitRoutes.js";
 
 //Configuration dot env
 dotenv.config();
@@ -38,6 +39,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     req.io = io;
     next();
@@ -46,14 +48,18 @@ app.use((req, res, next) => {
 // Servir les fichiers statiques depuis le dossier "assets"
 app.use("/assets", express.static("assets"));
 
+
 //routes
-app.use('/api/v1',testRouter);
-app.use('/api/v1/consommateur',consommateurRoutes);
-app.use('/api/v1/livreur',livreurRoutes);
+app.use('/api/v1', testRouter);
+app.use('/api/v1/consommateur', consommateurRoutes);
+app.use('/api/v1/livreur', livreurRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/categories', categorieRoutes);
+app.use("/assets", express.static("assets"));
+app.use("/api/produits", produitRoutes);
 
-app.get('/',(req,res) => {
+
+app.get('/', (req, res) => {
     return res.status(200).send("<h1>Bonjour</h1>");
 });
 

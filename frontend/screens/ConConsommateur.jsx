@@ -61,7 +61,7 @@ const ConConsommateur = ({ navigation }) => {
         }
     
         try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.224.149:8080/api/v1/consommateur/connexion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, mdp }),

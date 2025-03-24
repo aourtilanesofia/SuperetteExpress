@@ -1,4 +1,6 @@
-export const ProduitsData=[
+// ces produits sont statiques
+
+/*export const ProduitsData=[
     {
         _id: 1,
         name:"Côte d'or Tablette de Chocolat ",
@@ -35,7 +37,7 @@ export const ProduitsData=[
         image: require('../assets/laitt.png'),
 
     },
-    {
+   {
         _id: 5,
         name:"Lait Candia ",
         description:'lorem ipsum dolor sit amet consectetur lorem ipsum dolor sit amet consectetur',
@@ -46,4 +48,4 @@ export const ProduitsData=[
     },
 
     
-];
+];*/
