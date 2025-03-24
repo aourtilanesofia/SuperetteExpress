@@ -17,12 +17,12 @@ const AcceuilCommerçant = ({ navigation }) => {
         <View style={styles.main}>
           <Text style={styles.txtdash}>{t('Dashboard')}</Text> 
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestiondesProduits')}>
             <AntDesign name="edit" style={styles.icone}/>
               <Text style={styles.btntxt}>{t('Gestion_des_produits')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestionDesCategories')} >
+            <TouchableOpacity style={styles.btn}>
             <AntDesign name="edit" style={styles.icone}/>
               <Text style={styles.btntxt}>{t('Gestion_des_catégories')}</Text>
             </TouchableOpacity>

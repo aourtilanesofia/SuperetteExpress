@@ -6,8 +6,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
 const GestionDesCategories = () => {
-    const [categories, setCategories] = useState([]);
     const navigation = useNavigation();
+    const [categories, setCategories] = useState([]);
     const { t } = useTranslation();
 
     useFocusEffect(
@@ -18,7 +18,7 @@ const GestionDesCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://192.168.43.107:8080/api/categories');
+            const response = await fetch('http://192.168.224.149:8080/api/categories');
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -36,7 +36,7 @@ const GestionDesCategories = () => {
                     text: "Supprimer",
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.43.107:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+                            await fetch(`http://192.168.224.149:8080/api/categories/delete/${id}`, { method: 'DELETE' });
                             fetchCategories();
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);
@@ -57,7 +57,7 @@ const GestionDesCategories = () => {
                 contentContainerStyle={{ paddingBottom: 40 }}
                 renderItem={({ item }) => (
                     <View style={styles.categoryItem}>
-                        <Image source={{ uri: `http://192.168.43.107:8080${item.image}` }} style={styles.image}/>
+                        <Image source={{ uri: `http://192.168.224.149:8080${item.image}` }} style={styles.image}/>
 
                         <Text style={styles.categoryText}>{item.nom}</Text>
                         <TouchableOpacity 
