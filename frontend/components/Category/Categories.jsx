@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 
-const backendUrl = "http://192.168.224.149:8080";
+const backendUrl = "http://192.168.43.107:8080";
 
 const Categories = () => {  // Ajout de navigation
   const [categories, setCategories] = useState([]);
@@ -28,19 +28,14 @@ const Categories = () => {  // Ajout de navigation
     <ScrollView horizontal>
       <View style={styles.container}>
         {categories.map((item) => (
-          <View key={item._id}>
-            <TouchableOpacity style={styles.catContainer}>
-            <Image
-                source={{ 
-                  uri: item.image.startsWith('http') ? item.image : `${backendUrl}${item.image}` 
-                }}
-                style={styles.img}
-                resizeMode="contain"
-                onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}
-              />
-              <Text style={styles.txt}>{item.nom}</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            key={item._id} 
+            style={styles.catContainer} 
+            onPress={() => navigation.navigate("ProduitsParCategorie", { categorie: item.nom})}
+          >
+            <Image source={{ uri: `${backendUrl}${item.image}` }} style={styles.img} />
+            <Text style={styles.txt}>{item.nom}</Text>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>

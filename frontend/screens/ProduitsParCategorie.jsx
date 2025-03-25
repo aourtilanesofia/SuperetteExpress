@@ -20,10 +20,9 @@ const ProduitsParCategorie = ({ }) => {
   <Layout>
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
        <View style={styles.container}>
-       <Header searchText={searchText} setSearchText={setSearchText} />
         <Text style={styles.txt}>{t('Produits de la catégorie : ')}
           <Text style={styles.txttc}>{categorie}</Text>
-        </Text>
+        </Text> 
         <ProduitsParCateg searchText={searchText}/>
         </View>
      
@@ -68,5 +67,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 20,
     color: "#329171",
+},
+hdr:{
+
 }
 });

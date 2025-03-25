@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { Server } from "socket.io";
 import http from "http";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 //routes imports 
 import testRouter from './routes/testRoutes.js';
@@ -14,6 +17,8 @@ import livreurRoutes from './routes/livreurRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import categorieRoutes from './routes/categorieRoutes.js';
 import produitRoutes from "./routes/produitRoutes.js";
+import panierRoutes from "./routes/panierRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 //Configuration dot env
 dotenv.config();
@@ -32,6 +37,9 @@ const io = new Server(server, {
     },
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 
 //middlewares
@@ -48,6 +56,9 @@ app.use((req, res, next) => {
 // Servir les fichiers statiques depuis le dossier "assets"
 app.use("/assets", express.static("assets"));
 
+// Servir les fichiers statiques du dossier "assets"
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
 
 //routes
 app.use('/api/v1', testRouter);
@@ -57,6 +68,8 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/categories', categorieRoutes);
 app.use("/assets", express.static("assets"));
 app.use("/api/produits", produitRoutes);
+app.use("/panier", panierRoutes);
+app.use("/api/commandes", orderRoutes);
 
 
 app.get('/', (req, res) => {

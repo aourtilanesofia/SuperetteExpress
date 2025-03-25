@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 
 
-const backendUrl = "http://192.168.224.149:8080"; 
+const backendUrl = "http://192.168.43.107:8080"; 
 
 const ModifierProduit = ({ route, navigation }) => {
   const { produit } = route.params;
@@ -156,26 +156,26 @@ const ModifierProduit = ({ route, navigation }) => {
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, marginTop: 50, backgroundColor: "#f8f8f8" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: "#329171" },
+  container: { flex: 1, padding: 20, marginTop: 10,},
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 27, textAlign: "center", color: "#000" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
-  label: { fontSize: 16, fontWeight: "bold", width: 100 },
-  input: { flex: 1, borderWidth: 1, borderColor: "#329171", padding: 10, borderRadius: 10 },
+  label: { fontSize: 15, fontWeight: "bold", width: 100 },
+  input: { flex: 1, borderWidth: 1, borderColor: "#000", padding: 13, borderRadius: 10 },
   textarea: { height: 120, textAlignVertical: "top" },
   picker: { flex: 1, height: 50, borderWidth: 1, borderColor: "#329171", borderRadius: 10 },
   imageContainer: { width: 150, height: 150, borderRadius: 10, backgroundColor: "#ddd", justifyContent: "center", alignItems: "center", overflow: "hidden", flex: 1 },
   image: { width: "100%", height: "100%", resizeMode: "cover" },
   imagePlaceholder: { color: "#329171", fontWeight: "bold", textAlign: "center" },
-  btnModifier: { backgroundColor: "#329171", padding: 15, borderRadius: 10, alignItems: "center" },
+  btnModifier: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 10, alignItems: "center" ,marginTop:45,},
   btnText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
 
   pickerContainer: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#329171",
+    borderColor: "#000",
     borderRadius: 10,
     backgroundColor: "#fff",
-    height: 42,
+    height: 48,
     justifyContent: "center",
   },
 

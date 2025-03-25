@@ -18,7 +18,7 @@ const GestionDesCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://192.168.224.149:8080/api/categories');
+            const response = await fetch('http://192.168.43.107:8080/api/categories');
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -36,7 +36,7 @@ const GestionDesCategories = () => {
                     text: "Supprimer",
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.224.149:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+                            await fetch(`http://192.168.43.107:8080/api/categories/delete/${id}`, { method: 'DELETE' });
                             fetchCategories();
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);

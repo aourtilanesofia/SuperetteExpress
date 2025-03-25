@@ -22,7 +22,7 @@ const AcceuilCommerçant = ({ navigation }) => {
               <Text style={styles.btntxt}>{t('Gestion_des_produits')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestionDesCategories')}>
             <AntDesign name="edit" style={styles.icone}/>
               <Text style={styles.btntxt}>{t('Gestion_des_catégories')}</Text>
             </TouchableOpacity>

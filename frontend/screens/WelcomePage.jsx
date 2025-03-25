@@ -1,4 +1,4 @@
-/*import { StyleSheet, Text, View,Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View,Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { colors } from './../utils/colors';
 
@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
 
     }
-});*/
+});
 
-import { StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground } from 'react-native';
+/*import { StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import React from 'react';
 import { colors } from './../utils/colors';
 
@@ -180,5 +180,5 @@ const styles = StyleSheet.create({
         fontSize:17,
         fontWeight:'bold',
     }
-});
+});*/
 

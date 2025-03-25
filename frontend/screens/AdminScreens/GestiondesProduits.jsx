@@ -4,7 +4,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 
-const backendUrl = "http://192.168.224.149:8080"; 
+const backendUrl = "http://192.168.43.107:8080";
 
 const GestiondesProduits = () => {
   const navigation = useNavigation();
@@ -77,7 +77,7 @@ const GestiondesProduits = () => {
             {/*En-tête de la catégorie */}
             <TouchableOpacity style={styles.categorieHeader} onPress={() => toggleCategorie(categorie)}>
               <Text style={styles.categorieTitle}>{categorie}</Text>
-              <Icon name={categoriesOuvertes[categorie] ? "chevron-up" : "chevron-down"} size={20} color="white" />
+              <Icon name={categoriesOuvertes[categorie] ? "chevron-up" : "chevron-down"} size={17} color="white" />
             </TouchableOpacity>
 
             {/*iste des produits (affichée uniquement si la catégorie est ouverte) */}
@@ -92,7 +92,7 @@ const GestiondesProduits = () => {
                       <View>
                         <Text style={styles.nomProduit}>{item.nom}</Text>
                         <Text>
-                          <Text style={{ fontWeight: "bold" }}>{item.prix} DA</Text> -  
+                          <Text style={{ fontWeight: "bold" }}>{item.prix} DA</Text> -
                           <Text style={{ fontWeight: "bold" }}> {item.stock} Kg</Text>
                         </Text>
                       </View>
@@ -117,7 +117,8 @@ const GestiondesProduits = () => {
       </ScrollView>
 
       <TouchableOpacity style={styles.btnAjouter} onPress={() => navigation.navigate("AjouterProduit")}>
-        <Icon name="plus" size={30} color="white" />
+        
+        <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -125,24 +126,44 @@ const GestiondesProduits = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#f8f8f8" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: "black" },
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 20, color: "black" },
 
   // Style pour les catégories
   categorieContainer: { marginBottom: 15, backgroundColor: "#fff", borderRadius: 10, elevation: 5 },
-  categorieHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#329171", padding: 15, borderRadius: 10 },
-  categorieTitle: { fontSize: 18, fontWeight: "bold", color: "white" },
+  categorieHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#329171", padding: 16, borderRadius: 10 },
+  categorieTitle: { fontSize: 17, fontWeight: "bold", color: "white" },
 
   produitContainer: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ddd" },
   produit: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   image: { width: 50, height: 50, borderRadius: 10, marginRight: 10 },
-  nomProduit: { fontSize: 18, fontWeight: "bold" },
+  nomProduit: { fontSize: 16, fontWeight: "bold" },
 
   // Style des boutons
   btnContainer: { flexDirection: "row", justifyContent: "space-between" },
-  btnModifier: { backgroundColor: "#329171", padding: 10, borderRadius: 10, flex: 1, alignItems: "center", marginRight: 5 },
-  btnSupprimer: { backgroundColor: "red", padding: 10, borderRadius: 10, flex: 1, alignItems: "center", marginLeft: 5 },
-  btnAjouter: { position: "absolute", bottom: 27, right: 21, backgroundColor: "#329171", width: 52, height: 52, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 5 },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  btnModifier: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginRight:7 },
+  btnSupprimer: { backgroundColor: "red", padding: 8, borderRadius:8, flex: 1, alignItems: "center", marginLeft:7 },
+  btnAjouter: {  position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007BFF',
+    width: 60, // Taille fixe pour éviter la déformation
+    height: 60, 
+    borderRadius: 30, // Pour un cercle parfait
+    elevation: 5, // Ombre sur Android
+    shadowColor: '#000', // Ombre sur iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    alignItems: 'center',
+    justifyContent: 'center',},
+  btnText: { color: "#fff", fontSize: 13, fontWeight: "bold" },
+  addButtonText: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical: 'center', // Important pour Android
+},
 });
 
 export default GestiondesProduits;

@@ -22,8 +22,8 @@ const Menu = () => {
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuContainer}>
-        <AntDesign name='shoppingcart' style={[styles.icon , route.name ===" " && styles.active]} size={25}/>
+      <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('Panier')}>
+        <AntDesign name='shoppingcart' style={[styles.icon , ["Panier", "Valider"].includes(route.name) && styles.active]} size={25}/>
         
       </TouchableOpacity>
 
@@ -32,8 +32,8 @@ const Menu = () => {
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuContainer}>
-        <Ionicons name='bag-outline' style={[styles.icon , route.name ===" " && styles.active]} size={25}/>
+      <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('ListeDesCommandes')}>
+        <Ionicons name='bag-outline' style={[styles.icon , route.name ==="ListeDesCommandes" && styles.active]} size={25}/>
         
       </TouchableOpacity>
 
