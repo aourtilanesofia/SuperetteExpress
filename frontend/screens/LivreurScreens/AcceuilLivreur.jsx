@@ -27,6 +27,7 @@ export default AcceuilLivreur;
 
 const styles = StyleSheet.create({
   hdr: {
+    marginTop:42,
     height: 60, 
     backgroundColor: "#329171",
     flexDirection: "row",

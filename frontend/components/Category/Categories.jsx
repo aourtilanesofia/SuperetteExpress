@@ -1,63 +1,13 @@
-/*import { StyleSheet, Text, Touchable, TouchableOpacity, View, Image, ScrollView} from 'react-native'
-import React from 'react'
-import { categoriesData } from '../../Data/CategoriesData'
-
-
-const Categories = () => {
-  return (
-    <ScrollView horizontal={true}>
-      <View style={styles.container}>
-      {categoriesData?.map((item) => (
-        <View key={item._id} >
-          <TouchableOpacity style={styles.catContainer}>
-            <Image source={item.icon} style={[styles.img, styles.catIcon]}/>
-            <Text style={styles.txt}>{item.name}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </View>
-
-    </ScrollView>
-    
-  );
-};
-
-export default Categories;
-
-const styles = StyleSheet.create({
-  img:{
-    width:40,
-    height:40,
-  },
-  container:{
-    flexDirection:'row',
-    padding:9,
-    //marginTop:2,
-    height:120,
-    backgroundColor:'lightgrey'
-  },
-  catContainer:{
-    padding:18,
-    justifyContent:'center',
-    alignItems:'center',
-  },
-  catIcon:{
-    fontSize:20,
-    verticalAlign:'top',
-
-  },
-  txt:{
-    fontSize:13,
-  }
-})*/
-
 import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+
 
 const backendUrl = "http://192.168.43.107:8080";
 
-const Categories = () => {
+const Categories = () => {  // Ajout de navigation
   const [categories, setCategories] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -73,23 +23,19 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
+
   return (
-    <ScrollView horizontal={true}>
+    <ScrollView horizontal>
       <View style={styles.container}>
         {categories.map((item) => (
-          <View key={item._id}>
-            <TouchableOpacity style={styles.catContainer}>
-            <Image
-                source={{ 
-                  uri: item.image.startsWith('http') ? item.image : `${backendUrl}${item.image}` 
-                }}
-                style={styles.img}
-                resizeMode="contain"
-                onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}
-              />
-              <Text style={styles.txt}>{item.nom}</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            key={item._id} 
+            style={styles.catContainer} 
+            onPress={() => navigation.navigate("ProduitsParCategorie", { categorie: item.nom})}
+          >
+            <Image source={{ uri: `${backendUrl}${item.image}` }} style={styles.img} />
+            <Text style={styles.txt}>{item.nom}</Text>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>
@@ -99,10 +45,6 @@ const Categories = () => {
 export default Categories;
 
 const styles = StyleSheet.create({
-  img: {
-    width: 40,
-    height: 40,
-  },
   container: {
     flexDirection: 'row',
     padding: 9,
@@ -114,11 +56,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  catIcon: {
-    fontSize: 20,
-    verticalAlign: 'top',
+  img: {
+    width: 40,
+    height: 40,
   },
   txt: {
     fontSize: 13,
+    textAlign: 'center',
   },
 });

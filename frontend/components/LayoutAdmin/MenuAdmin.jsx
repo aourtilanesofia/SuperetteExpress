@@ -9,7 +9,7 @@ import { Alert } from 'react-native';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
-const socket = io("http://192.168.43.107:8080"); // Mets l'URL de ton backend
+const socket = io("http://192.168.224.149:8080"); // Mets l'URL de ton backend
 
 const MenuAdmin = () => {
   const route = useRoute();
@@ -23,7 +23,7 @@ const MenuAdmin = () => {
 
   useEffect(() => {
     // Charger le nombre de notifications non lues au démarrage
-    fetch("http://192.168.43.107:8080/api/v1/notifications")
+    fetch("http://192.168.224.149:8080/api/v1/notifications")
       .then((res) => res.json())
       .then((data) => {
         setUnreadCount(data.filter(n => !n.isRead).length);

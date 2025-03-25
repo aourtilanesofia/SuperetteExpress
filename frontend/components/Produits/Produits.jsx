@@ -1,84 +1,51 @@
-/*import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import ProductsCard from './ProductsCard'
-import { ProduitsData } from '../../Data/ProduitsData'
+import { StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import ProductsCard from './ProductsCard';
 
-const Produits = () => {
-  return (
-    <View style={styles.container}>
-        {ProduitsData.map(p => (
-            <ProductsCard key={p._id} p={p} />
-        ))}
-      
-    </View>
-  )
-}
+const backendUrl = "http://192.168.43.107:8080"; // Remplace par ton URL de backend
 
-export default Produits
+const Produits = ({searchText }) => {
+  const [produits, setProduits] = useState([]);
 
-const styles = StyleSheet.create({
-    container:{
-        flexDirection:'row',
-        //justifyContent:'space-between',
-    }
-})*/
-/*import { StyleSheet, Text, View, FlatList } from 'react-native'
-import React from 'react'
-import ProductsCard from './ProductsCard'
-import { ProduitsData } from '../../Data/ProduitsData'
+  useEffect(() => { 
+    const fetchProduits = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/produits`);
+        const data = await response.json();
+        setProduits(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des produits :", error);
+      }
+    };
 
-const Produits = () => {
+    fetchProduits();
+  }, []);
+
+  const produitsFiltres = produits.filter((produit) =>
+    produit.nom.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <FlatList
-      data={ProduitsData}
-      keyExtractor={(item) => item._id.toString()}
-      renderItem={({ item }) => <ProductsCard p={item} />}
-      numColumns={2}
-      columnWrapperStyle={styles.row} // Ajoute un espacement entre les colonnes
-      contentContainerStyle={styles.container} // Style global
-    />
-  )
-}
-
-export default Produits
-
-const styles = StyleSheet.create({
-  container: {
-    //padding: 10,
-  },
-  row: {
-    justifyContent: 'space-between',
-  },
-})*/
-
-import { StyleSheet, FlatList } from 'react-native'
-import React from 'react'
-import ProductsCard from './ProductsCard'
-import { ProduitsData } from '../../Data/ProduitsData'
-
-const Produits = () => {
-  return (
-    <FlatList
-      data={ProduitsData}
+      data={produitsFiltres}
       keyExtractor={(item) => item._id.toString()}
       renderItem={({ item }) => <ProductsCard p={item} />}
       numColumns={2}
       columnWrapperStyle={styles.row}
       contentContainerStyle={styles.container}
       nestedScrollEnabled={true}
-    
+      removeClippedSubviews={true}
     />
-  )
-}
+  );
+};
 
-export default Produits
+export default Produits;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10, // Ajoute un padding global
+    paddingHorizontal: 10,
   },
   row: {
     justifyContent: 'space-between',
   },
-})
-
+});

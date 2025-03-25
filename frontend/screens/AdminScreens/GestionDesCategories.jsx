@@ -6,8 +6,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
 const GestionDesCategories = () => {
-    const [categories, setCategories] = useState([]);
     const navigation = useNavigation();
+    const [categories, setCategories] = useState([]);
     const { t } = useTranslation();
 
     useFocusEffect(
@@ -57,6 +57,7 @@ const GestionDesCategories = () => {
                 contentContainerStyle={{ paddingBottom: 40 }}
                 renderItem={({ item }) => (
                     <View style={styles.categoryItem}>
+
                         <Image 
                             source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.43.107:8080${item.image}` }} 
                             style={styles.image} 

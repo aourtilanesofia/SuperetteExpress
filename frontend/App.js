@@ -25,16 +25,19 @@ import AcceuilCommerçant from './screens/AdminScreens/AcceuilCommerçant';
 import GestiondesUtilisateurs from './screens/AdminScreens/GestiondesUtilisateurs';
 import ListeDesClients from './screens/AdminScreens/ListeDesClients';
 import ListeDesLivreurs from './screens/AdminScreens/ListeDesLivreurs';
-import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
-import LanguageSelection from './screens/LanguageSelection';
 import GestionDesCategories from './screens/AdminScreens/GestionDesCategories';
-import ModifierCategories from './screens/AdminScreens/ModifierCategories';
 import AjouterCategories from './screens/AdminScreens/AjouterCategories';
 import Panier from './screens/Panier';
 import Valider from './screens/Valider';
 import ListeDesCommandes from './screens/ListeDesCommandes';
-
-
+import ModifierCategories from "./screens/AdminScreens/ModifierCategories";
+import GestiondesProduits from './screens/AdminScreens/GestiondesProduits';
+import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
+import AjouterProduit from "./screens/AdminScreens/AjouterProduit";
+import ModifierProduit from "./screens/AdminScreens/ModifierProduit";
+import LanguageSelection from './screens/LanguageSelection';
+import ProduitsParCategorie from './screens/ProduitsParCategorie';
+import CommandeDetails from './screens/CommandeDetails';
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -63,22 +66,21 @@ export default function App() {
         <Stack.Screen name='UpdateProfileLivreur' component={UpdateProfileLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='AcceuilCommerçant' component={AcceuilCommerçant} options={{ headerShown: false, }} />
         <Stack.Screen name='GestiondesUtilisateurs' component={GestiondesUtilisateurs} options={{ headerTitle: '' }} />
+        <Stack.Screen name='GestiondesProduits' component={GestiondesProduits} options={{ headerTitle: '' }} />
+        <Stack.Screen name="GestionDesCategories" component={GestionDesCategories} options={{ headerTitle: '' }} />
         <Stack.Screen name='ListeDesClients' component={ListeDesClients} options={{ headerTitle: '' }} />
         <Stack.Screen name='ListeDesLivreurs' component={ListeDesLivreurs} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsAdmin' component={NotificationsAdmin} options={{ headerTitle: '' }} />
         <Stack.Screen name="LanguageSelection" component={LanguageSelection} options={{ headerTitle: '' }} />
-        <Stack.Screen name="GestionDesCategories" component={GestionDesCategories} options={{ headerTitle: '' }} />
-        <Stack.Screen name="ModifierCategories" component={ModifierCategories} options={{ headerTitle: '' }} />
+        <Stack.Screen name="AjouterProduit" component={AjouterProduit} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ModifierProduit" component={ModifierProduit} options={{ headerTitle: '' }} />
         <Stack.Screen name="AjouterCategories" component={AjouterCategories} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ModifierCategories" component={ModifierCategories} options={{ headerTitle: '' }} />
         <Stack.Screen name="Panier" component={Panier} options={{ headerTitle: '' }} />
         <Stack.Screen name="Valider" component={Valider} options={{ headerTitle: '' }} />
         <Stack.Screen name="ListeDesCommandes" component={ListeDesCommandes} options={{ headerTitle: '' }} />
-      
-
-        
-
-
-
+        <Stack.Screen name="ProduitsParCategorie" component={ProduitsParCategorie} options={{ headerTitle: '' }} />
+        <Stack.Screen name="CommandeDetails" component={CommandeDetails} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

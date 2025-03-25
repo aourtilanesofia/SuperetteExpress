@@ -79,10 +79,10 @@ const AutresOptionsLivreur = ({ navigation }) => {
     return (
         <LayoutLivreur>
             <View style={styles.container}>
-                <View style={styles.line} />
-                <View>
+                
+                <View style={styles.v1}>
                     <TouchableOpacity style={styles.btn}  onPress={handleLanguagePress}>
-                        <MaterialCommunityIcons name='syllabary-hiragana' size={30} />
+                        <MaterialCommunityIcons name='syllabary-hiragana' size={28} />
                         <Text style={styles.txt1}>{t('language')}</Text>
                     </TouchableOpacity>
                 </View>
@@ -91,7 +91,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
 
                 <View>
                     <TouchableOpacity style={styles.btn} onPress={handleDelete} disabled={isDeleting}>
-                        <Fontisto name='close-a' size={20} />
+                        <Fontisto name='close-a' size={17} />
                         <Text style={styles.txt2}>{t('Supprimer_mon_compte')}</Text>
                     </TouchableOpacity>
                 </View>
@@ -100,7 +100,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
 
                 <View>
                     <TouchableOpacity style={styles.btn} onPress={handleLogout}>
-                        <MaterialIcons name='logout' size={29} />
+                        <MaterialIcons name='logout' size={26} />
                         <Text style={styles.txt3}>{t('logout')}</Text>
                     </TouchableOpacity>
                 </View>
@@ -129,19 +129,22 @@ const styles = StyleSheet.create({
     txt1: {
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: 17,
+        fontSize: 16,
         marginLeft: 13,
     },
     txt2: {
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: 17,
+        fontSize: 16,
         marginLeft: 23,
     },
     txt3: {
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: 17,
+        fontSize: 16,
         marginLeft: 15,
     },
+    v1:{
+        marginTop:10,
+    }
 });

@@ -116,7 +116,7 @@ const Layout = ({ children }) => {
   return (
     <>
       <StatusBar />
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         {/* Contenu qui sera défini dans chaque page */}
         <View style={styles.content}>{children}</View>
 
@@ -124,7 +124,7 @@ const Layout = ({ children }) => {
         <View style={styles.footer}>
           <Menu />
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 };
