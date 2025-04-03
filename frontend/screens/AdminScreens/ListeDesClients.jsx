@@ -14,7 +14,7 @@ const ListeDesClients = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/tousConsommateur");
+      const response = await fetch("http://192.168.1.47:8080/api/v1/consommateur/tousConsommateur");
       const data = await response.json();
       setClients(data);
     } catch (error) {
@@ -25,13 +25,13 @@ const ListeDesClients = () => {
   };
 
   const deleteClient = async (id) => {
-    Alert.alert("Confirmation", "Voulez-vous supprimer cet utilisateur ?", [
+    Alert.alert("Confirmation", "Voulez-vous vraiment supprimer cet utilisateur ?", [
       { text: "Annuler", style: "cancel" },
       {
         text: "Supprimer",
         onPress: async () => {
           try {
-            await fetch(`http://192.168.43.107:8080/api/v1/consommateur/supConsommateur/${id}`, { method: "DELETE" });
+            await fetch(`http://192.168.1.47:8080/api/v1/consommateur/supConsommateur/${id}`, { method: "DELETE" });
             setClients(clients.filter((client) => client._id !== id));
           } catch (error) {
             console.error("Erreur suppression :", error);
@@ -43,15 +43,15 @@ const ListeDesClients = () => {
 
   const toggleStatus = async (id) => {
     try {
-      const response = await fetch(`http://192.168.43.107:8080/api/v1/consommateur/status/${id}`, {
+      const response = await fetch(`http://192.168.1.47:8080/api/v1/consommateur/status/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" }, // Ajout du header
+        headers: { "Content-Type": "application/json" }, 
       });
    
       const text = await response.text();
-      console.log("Réponse brute :", text); // Debug pour voir la réponse
+      //console.log("Réponse brute :", text); 
   
-      const updatedUser = JSON.parse(text); // Convertir en JSON
+      const updatedUser = JSON.parse(text); 
       setClients(clients.map((client) => (client._id === id ? updatedUser : client)));
   
     } catch (error) {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     borderRadius:15,
 
   },
-  btnact:{},
+  btnact:{}, 
   buttonContainer:{
     gap:7,
   }

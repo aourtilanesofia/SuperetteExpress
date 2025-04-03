@@ -2,7 +2,7 @@ import { StyleSheet, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ProductsCard from './ProductsCard';
 
-const backendUrl = "http://192.168.43.107:8080"; // Remplace par ton URL de backend
+const backendUrl = "http://192.168.1.47:8080"; // Remplace par ton URL de backend
 
 const Produits = ({searchText }) => {
   const [produits, setProduits] = useState([]);

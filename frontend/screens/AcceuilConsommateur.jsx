@@ -8,8 +8,13 @@ import Produits from "../components/Produits/Produits";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
+import { LogBox } from "react-native";
 
 const AcceuilConsommateur = ({ navigation }) => {
+
+  LogBox.ignoreLogs([
+    "Pagination: Support for defaultProps will be removed from function components",
+  ]);
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -18,9 +23,9 @@ const AcceuilConsommateur = ({ navigation }) => {
   // Gérer la visibilité du bouton flottant en fonction du défilement
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setShowScrollTop(offsetY > 200); // Afficher le bouton après 200px de défilement
+    setShowScrollTop(offsetY > 200); 
   };
-
+ 
   return (
     <Layout>
       <View style={styles.hdr}>
@@ -34,8 +39,8 @@ const AcceuilConsommateur = ({ navigation }) => {
 
       <FlatList
         ref={flatListRef}
-        onScroll={handleScroll} // Suivi du défilement
-        scrollEventThrottle={16} // Améliore la réactivité du suivi de scroll
+        onScroll={handleScroll} 
+        scrollEventThrottle={16} 
         ListHeaderComponent={
           <>
             <Header searchText={searchText} setSearchText={setSearchText} onSearch={() => {}} />
@@ -44,7 +49,7 @@ const AcceuilConsommateur = ({ navigation }) => {
                 <Text style={styles.txt}>{t("explorer_categorie")}</Text>
                 <Categories />
                 <Banner />
-                <Text style={styles.txt}>Nos Produits</Text>
+                <Text style={styles.txt}>{t("nos_produits")}</Text>
               </>
             )}
           </>
@@ -57,7 +62,7 @@ const AcceuilConsommateur = ({ navigation }) => {
         )}
         keyExtractor={(item, index) => index.toString()}
         ListFooterComponent={<View style={{ height: 100 }} />}
-        contentContainerStyle={{ paddingBottom: 80 }} // Évite que le bouton cache du contenu
+        contentContainerStyle={{ paddingBottom: 80 }} 
       />
 
       {/* Bouton flottant pour remonter en haut */}

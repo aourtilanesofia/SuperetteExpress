@@ -7,7 +7,7 @@ const WelcomePageLivreur = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.txt1}>Bienvenue sur Superette Express!</Text>
-      <Image source={ require('../../assets/livreur.png')} style={styles.aaa}/>
+      <Image source={ require('../../assets/liv3.png')} style={styles.aaa}/>
       <View style={styles.buttonContainer}>
 
         <TouchableOpacity style={styles.btn1} onPress={() => navigation.navigate('ConLivreur')}>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     
     aaa:{
         alignSelf: 'center',
-        marginTop:100,
+        marginTop:120,
         width:200,
         height:200,
     },

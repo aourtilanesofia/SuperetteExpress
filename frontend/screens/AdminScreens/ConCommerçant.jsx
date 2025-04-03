@@ -1,26 +1,29 @@
-
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
 import React, { useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ConCommerçant = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (email === "admin@gmail.com" && mdp === "admin123") {
-            navigation.navigate("AcceuilCommerçant");
-            setEmail('');
-            setMdp('');
-            Alert.alert("succes","Connecté avec succés!");
+            try {
+                await AsyncStorage.setItem('userRole', 'admin'); 
+                navigation.navigate("AcceuilCommerçant");
+                Alert.alert(" ", "Bienvenue, vous êtes maintenant connecté(e) !");
+            } catch (error) {
+                Alert.alert("Erreur", "Problème de stockage des données !");
+            }
         } else {
             Alert.alert("Erreur", "Email ou mot de passe incorrect !");
-            setEmail('');
-            setMdp('');
         }
+        setEmail('');
+        setMdp('');
     };
 
     return (
@@ -49,8 +52,8 @@ const ConCommerçant = ({ navigation }) => {
                         onChangeText={setMdp}
                     />
                     <TouchableOpacity onPress={() => setSecureEntry(prev => !prev)}>
-                                            <Octicons name={secureEntry ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
-                                        </TouchableOpacity>
+                        <Octicons name={secureEntry ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
+                    </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity style={styles.cnxButton} onPress={handleLogin}>
@@ -59,7 +62,7 @@ const ConCommerçant = ({ navigation }) => {
             </View>
         </View>
     );
-}
+};
 
 export default ConCommerçant;
 

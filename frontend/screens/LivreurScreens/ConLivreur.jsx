@@ -24,14 +24,14 @@ const ConLivreur = ({ navigation }) => {
         }
 
         try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/connexionL", {
+            const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/connexionL", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, mdp }),
             });
 
             const data = await response.json();
-            console.log("Données reçues :", data);
+            //console.log("Données reçues :", data);
 
             if (!response.ok || !data.livreur || !data.token) {
                 Alert.alert("Erreur", data.message || "Connexion échouée !");
@@ -44,7 +44,7 @@ const ConLivreur = ({ navigation }) => {
             await AsyncStorage.setItem('token', data.token);
             await AsyncStorage.setItem('user', JSON.stringify(data.livreur));
 
-            Alert.alert("Succès", "Connecté avec succès !");
+            Alert.alert(" ", "Bienvenue, vous êtes maintenant connecté(e) !");
             setEmail('');
             setMdp('');
             navigation.navigate("AcceuilLivreur");

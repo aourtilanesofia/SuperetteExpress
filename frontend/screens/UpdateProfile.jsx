@@ -44,12 +44,12 @@ const UpdateProfile = () => {
             }
     
             if (!name || !email || !numTel || !adr ||!mdp) {
-                alert("Veuillez remplir tous les champs.");
+                alert("Veuillez remplir tous les champs ! ");
                 return;
             }
     
             // Mise à jour des informations du profil
-            const response = await fetch('http://192.168.43.107:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.1.47:8080/api/v1/consommateur/profile-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,18 +64,16 @@ const UpdateProfile = () => {
                 return;
             }
     
-            // Sauvegarder les nouvelles infos en local
+           
             await AsyncStorage.setItem('user', JSON.stringify({ nom: name, email, numTel, adresse: adr,mdp }));
-    
-            // Afficher l'alerte de succès après la mise à jour du profil
-            alert("Modification avec succès !");
+            alert("Mise à jour effectuée avec succès !");
     
             // Mettre à jour le mot de passe si un nouveau mot de passe est saisi
             
     
         } catch (error) {
             console.error("Erreur :", error);
-            alert("Impossible de mettre à jour le profil");
+            alert("Impossible de mettre à jour le profil ! ");
         }
     };
     
@@ -140,37 +138,39 @@ const styles = StyleSheet.create({
         height: 100,
         width: '100%',
         resizeMode: 'contain',
-        marginTop: 10,
+        marginTop: 20,
     },
     inputContainer: {
         borderWidth: 1,
-        borderColor: '#329171',
-        borderRadius: 15,
+        borderColor: '#9E9E9E',
+        borderRadius: 10,
         height: 50,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         marginVertical: 15,
-        marginTop: 20,
+        marginTop: 26,
     },
     textInput: {
         flex: 1,
-        paddingHorizontal: 15,
+        paddingHorizontal: 12,
     },
     cnxButton: {
         backgroundColor: '#329171',
-        borderRadius: 15,
+        borderRadius: 10,
         marginVertical: 30,
     },
     cnxtxt: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
         padding: 12,
     },
     icon: {
         position: 'absolute',
-        right: 10,
+        right: 1,
+        top: "50%",
+        transform: [{ translateY: -35 }]
     },
 });

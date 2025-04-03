@@ -4,48 +4,47 @@ import LayoutAdmin from '../../components/LayoutAdmin/LayoutAdmin';
 import { io } from 'socket.io-client';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const socket = io("http://192.168.43.107:8080"); // Remplace par l'URL de ton backend
+const socket = io("http://192.168.1.47:8080"); // Remplace par l'URL de ton backend
 
 const NotificationsAdmin = () => {
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    // Charger les notifications depuis l'API au démarrage
-    fetch("http://192.168.43.107:8080/api/v1/notifications")
-      .then((res) => res.json())
-      .then((data) => {
-        setNotifications(data);
-        setUnreadCount(data.filter(n => !n.isRead).length);
+    const [unreadCount, setUnreadCount] = useState(0);
+  
+    useEffect(() => {
+      fetch("http://192.168.1.47:8080/api/v1/notifications")
+        .then((res) => res.json())
+        .then((data) => {
+          const filteredNotifications = data.filter(n => n.role === "administrateur");
+          setNotifications(filteredNotifications);
+          setUnreadCount(filteredNotifications.filter(n => !n.isRead).length);
+        });
+  
+      socket.on("newNotification", (notification) => {
+        if (notification.role === "administrateur") {
+          setNotifications((prev) => [notification, ...prev]);
+          setUnreadCount((prev) => prev + 1);
+        }
       });
-
-    // Écouter les nouvelles notifications en temps réel
-    socket.on("newNotification", (notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-    });
-
-    return () => {
-      socket.off("newNotification");
+  
+      return () => {
+        socket.off("newNotification");
+      };
+    }, []);
+  
+    const markAsRead = (id) => {
+      fetch(`http://192.168.1.47:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
+        .then(() => {
+          setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+          setUnreadCount((prev) => Math.max(0, prev - 1));
+        });
     };
-  }, []);
-
-  // Marquer une notification comme lue
-  const markAsRead = (id) => {
-    fetch(`http://192.168.43.107:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
-      .then(() => {
-        setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      });
-  };
-
-  // Supprimer une notification
-  const deleteNotification = (id) => {
-    fetch(`http://192.168.43.107:8080/api/v1/notifications/${id}`, { method: "DELETE" })
-      .then(() => {
-        setNotifications((prev) => prev.filter(n => n._id !== id));
-      });
-  };
+  
+    const deleteNotification = (id) => {
+      fetch(`http://192.168.1.47:8080/api/v1/notifications/${id}`, { method: "DELETE" })
+        .then(() => {
+          setNotifications((prev) => prev.filter(n => n._id !== id));
+        });
+    };
 
   return (
     <LayoutAdmin>
@@ -56,6 +55,7 @@ const NotificationsAdmin = () => {
         ) : (
           <FlatList
             data={notifications}
+            contentContainerStyle={{ paddingBottom: 55 }}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => markAsRead(item._id)} style={[styles.notification, item.isRead && styles.read]}>
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     backgroundColor: 'red',
-    borderRadius: 5,
+    borderRadius: 5, 
     marginRight: 10,
   },
   notificationText: {

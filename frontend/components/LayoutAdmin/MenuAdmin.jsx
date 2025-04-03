@@ -1,15 +1,14 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
-const socket = io("http://192.168.224.149:8080"); // Mets l'URL de ton backend
+const socket = io("http://192.168.1.47:8080"); // Mets l'URL de ton backend
 
 const MenuAdmin = () => {
   const route = useRoute();
@@ -18,26 +17,27 @@ const MenuAdmin = () => {
   const { t } = useTranslation();
 
   const handleLanguagePress = () => {
-    navigation.navigate('LanguageSelection'); // Aller à l'écran de sélection de langue
+    navigation.navigate('LanguageSelection');
   };
 
-  useEffect(() => {
-    // Charger le nombre de notifications non lues au démarrage
-    fetch("http://192.168.224.149:8080/api/v1/notifications")
-      .then((res) => res.json())
-      .then((data) => {
-        setUnreadCount(data.filter(n => !n.isRead).length);
-      });
-
-    // Écouter les nouvelles notifications via WebSocket
-    socket.on("newNotification", (notification) => {
-      setUnreadCount((prev) => prev + 1);
+ useEffect(() => {
+  fetch("http://192.168.1.47:8080/api/v1/notifications")
+    .then((res) => res.json())
+    .then((data) => {
+      const adminNotifications = data.filter(n => n.role === "administrateur" && !n.isRead);
+      setUnreadCount(adminNotifications.length);
     });
 
-    return () => {
-      socket.off("newNotification");
-    };
-  }, []);
+  socket.on("newNotification", (notification) => {
+    if (notification.role === "administrateur") {
+      setUnreadCount((prev) => prev + 1);
+    }
+  });
+
+  return () => {
+    socket.off("newNotification");
+  };
+}, []);
 
   const handleLogout = () => {
     Alert.alert(

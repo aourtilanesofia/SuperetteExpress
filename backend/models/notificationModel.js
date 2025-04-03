@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Livreur",
         required: false, // Facultatif, utile si la notification concerne un livreur
-    },
+    }, 
     consommateurId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Consommateur",
@@ -23,6 +23,8 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    role: { type: String, enum: ["livreur", "client", "administrateur"], required: true },
+    
 });
 
 const Notification = mongoose.model("Notification", notificationSchema);

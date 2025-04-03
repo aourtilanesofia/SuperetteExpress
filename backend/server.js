@@ -52,12 +52,16 @@ app.use((req, res, next) => {
     req.io = io;
     next();
 });
+// Middleware pour servir les fichiers statiques (images, etc.) depuis le dossier 'uploads/'
+app.use("/uploads", express.static("uploads"));
 
 // Servir les fichiers statiques depuis le dossier "assets"
 app.use("/assets", express.static("assets"));
 
 // Servir les fichiers statiques du dossier "assets"
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+
+
 
 
 //routes

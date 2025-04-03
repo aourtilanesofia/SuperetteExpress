@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator,Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LogBox } from "react-native";
+import { useTranslation } from "react-i18next";
 
-const backendUrl = "http://192.168.43.107:8080";
+const backendUrl = "http://192.168.1.47:8080";
 LogBox.ignoreLogs([
   "VirtualizedLists should never be nested",
 ]);
-
+ 
 const ProduitsDetails = () => {
   const [produit, setProduit] = useState(null);
   const [quantite, setQuantite] = useState(1);
   const navigation = useNavigation();
   const route = useRoute();
   const { id } = route.params;
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProduit = async () => {
@@ -38,6 +40,11 @@ const ProduitsDetails = () => {
   };
 
   const ajouterAuPanier = async () => {
+    if (produit.stock === 0) {
+      alert("Produit en rupture de stock !");
+      return;
+    }
+
     try {
       const panierExistantRaw = await AsyncStorage.getItem("cart");
       const panierExistant = JSON.parse(panierExistantRaw) || [];
@@ -50,7 +57,7 @@ const ProduitsDetails = () => {
       }
 
       await AsyncStorage.setItem("cart", JSON.stringify(panierExistant));
-      alert("Produit ajouté au panier !");
+      Alert.alert(" ","Produit ajouté au panier !");
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier :", error);
     }
@@ -60,53 +67,59 @@ const ProduitsDetails = () => {
     return <ActivityIndicator size="large" color="#329171" style={styles.loading} />;
   }
 
+
   return (
     <FlatList
       data={[produit]}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
         <View style={styles.container}>
-          {/* Image du produit */}
           <View style={styles.imageContainer}>
             <Image source={{ uri: `${backendUrl}${item.image}` }} style={styles.image} />
           </View>
 
-          {/* Informations du produit */}
           <View style={styles.detailsContainer}>
             <Text style={styles.titre}>{item.nom}</Text>
             <View style={styles.v1}>
-              <Text style={styles.labe}>Prix :</Text>
+              <Text style={styles.labe}>{t("prix")} :</Text>
               <Text style={styles.prix}>{item.prix} DA</Text>
             </View>
           </View>
 
-          {/* Description */}
           <View style={styles.detailsContainer}>
-            <Text style={styles.label}>Description :</Text>
+            <Text style={styles.label}>{t("description")} :</Text>
             <Text style={styles.description}>{item.description}</Text>
           </View>
 
-          {/* Ajouter au panier + Quantité */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.btnPanier} onPress={ajouterAuPanier}>
-              <Text style={styles.btnPanierText}>Ajouter au panier</Text>
+            <TouchableOpacity
+              style={[
+                styles.btnPanier,
+                item.stock === 0 && styles.btnRupture, 
+              ]}
+              onPress={ajouterAuPanier}
+              disabled={item.stock === 0} 
+            >
+              <Text style={styles.btnPanierText}>
+              {item.stock === 0 ? t("rupture_stock") : t("ajouter_panier")}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.quantiteContainer}>
-              <TouchableOpacity style={styles.btnQuantite} onPress={diminuerQuantite}>
+              <TouchableOpacity style={styles.btnQuantite} onPress={() => setQuantite(Math.max(1, quantite - 1))}>
                 <Text style={styles.btnText}> - </Text>
               </TouchableOpacity>
 
               <Text style={styles.quantite}>{quantite}</Text>
 
-              <TouchableOpacity style={styles.btnQuantite} onPress={augmenterQuantite}>
+              <TouchableOpacity style={styles.btnQuantite} onPress={() => setQuantite(quantite + 1)}>
                 <Text style={styles.btnText}> + </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       )}
-      contentContainerStyle={{ flexGrow: 1 }} // Ajoute de l'espace pour éviter le chevauchement
+      contentContainerStyle={{ flexGrow: 1 }}
     />
   );
 };
@@ -209,6 +222,9 @@ const styles = StyleSheet.create({
   v1: {
     flexDirection: "row",
     marginTop: 15,
+  },
+  btnRupture: {
+    backgroundColor: "red",
   },
 });
 

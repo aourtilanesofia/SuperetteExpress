@@ -14,7 +14,7 @@ const Compte = ({ navigation }) => {
             try {
                 const storedUser = await AsyncStorage.getItem('user');
                 if (storedUser) {
-                    setUser(JSON.parse(storedUser));
+                 setUser(JSON.parse(storedUser));
                 } else {
                     Alert.alert("Erreur", "Aucune donnée utilisateur trouvée.");
                 }
@@ -34,7 +34,7 @@ const Compte = ({ navigation }) => {
                     <Text>Chargement...</Text>
                 </View>
             </LayoutLivreur>
-        );
+        ); 
     }
 
     return (
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     btn: {
         backgroundColor: '#329171',
         padding: 13,
-        borderRadius: 15,
+        borderRadius: 10,
     },
     txtbtn: {
         justifyContent: 'center',
@@ -139,6 +139,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 17,
+        fontSize: 16,
     }
 });

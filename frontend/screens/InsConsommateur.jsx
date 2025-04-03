@@ -30,7 +30,7 @@ const InsConsommateur = ({ navigation }) => {
         }
 
         try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.1.47:8080/api/v1/consommateur/inscription", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,14 +44,14 @@ const InsConsommateur = ({ navigation }) => {
                 Alert.alert("Erreur", data.message || "Inscription échouée !");
                 setNom(' ');
                 setNumTel('');
-                setAdresse('');
+                setAdresse(''); 
                 setEmail('');
                 setMdp('');
                 return;
             }
 
 
-            Alert.alert("Succès", "Inscription réussie !");
+            Alert.alert(" ", "Vous êtes maintenant inscrit !");
             setNom(' ');
             setNumTel('');
             setAdresse('');

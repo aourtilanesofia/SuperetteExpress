@@ -1,6 +1,5 @@
 import produitModel from "../models/produitModel.js";
 
-
 // Liste des produits
 export const getProducts = async (req, res) => {
   try {
@@ -12,41 +11,46 @@ export const getProducts = async (req, res) => {
   }
 };
 
-
-// Liste des produits par son ID
+// Liste des produits par ID
 export const getProductById = async (req, res) => {
   try {
-      const { id } = req.params;
-      const product = await produitModel.findById(id);
-      if (!product) {
-          return res.status(404).json({ message: "Produit non trouvé" });
-      }
-      res.status(200).json(product);
+    const { id } = req.params;
+    const product = await produitModel.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Produit non trouvé" });
+    }
+    res.status(200).json(product);
   } catch (error) {
-      res.status(500).json({ message: "Erreur serveur", error });
+    res.status(500).json({ message: "Erreur serveur", error });
   }
 };
 
-
 // Ajouter un produit
 export const addProduct = async (req, res) => {
+  const { nom, prix, categorie, stock, description } = req.body;
+  
+
+  const imageUrl = req.file ? `http://192.168.1.47:8080/uploads/${req.file.filename}` : null;
+
   try {
-    console.log("Fichier reçu :", req.file);
-    const { nom, prix, categorie, stock, description, image } = req.body;
-    if (!nom || !prix || !categorie || !stock || !description || !image) {
-      return res.status(400).json({ message: "Tous les champs sont obligatoires." });
-    }
+  
+    const newProduct = new produitModel({
+      nom,
+      prix,
+      categorie,
+      stock,
+      description,
+      image:imageUrl ,
+    });
 
-    if (req.file) {
-      image = `/assets/${req.file.filename}`;
-    }
-
-    const newProduct = new produitModel({ nom, prix, categorie, stock, description, image });
+    // Sauvegarder le produit dans la base de données
     await newProduct.save();
-    res.status(201).json({ message: "Produit ajouté avec succès", produit: newProduct });
+
+    // Retourner une réponse avec le produit ajouté
+    res.status(201).json(newProduct);
   } catch (error) {
-    console.error("Erreur lors de l'ajout du produit :", error);
-    res.status(500).json({ message: "Erreur lors de l'ajout du produit" });
+    console.error("Erreur lors de l'ajout du produit:", error);
+    res.status(500).json({ message: "Erreur serveur lors de l'ajout du produit" });
   }
 };
 
@@ -55,9 +59,13 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prix, categorie, stock, description } = req.body;
-    const image = req.file ? req.file.path : req.body.image;
-    const updatedProduct = await produitModel.findByIdAndUpdate(id, { nom, prix, categorie, stock, description, image }, { new: true });
+    const { nom, prix, categorie, stock, description, image } = req.body;
+
+    const updatedProduct = await produitModel.findByIdAndUpdate(
+      id,
+      { nom, prix, categorie, stock, description, image },
+      { new: true }
+    );
 
     if (!updatedProduct) {
       return res.status(404).json({ message: "Produit non trouvé" });
@@ -69,7 +77,6 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la modification du produit" });
   }
 };
-
 
 // Supprimer un produit
 export const deleteProduct = async (req, res) => {
@@ -88,14 +95,11 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-
 // Récupérer les produits par catégorie
 export const getProductsByCategory = async (req, res) => {
   try {
-    const { categorie } = req.params; // Récupérer la catégorie depuis l'URL
-    console.log("🔹 Catégorie reçue :", req.params.categorie);
-    const produits = await produitModel.find({ categorie: categorie }); // Filtrer par texte
-    console.log("🔹 Produits trouvés :", produits);
+    const { categorie } = req.params;
+    const produits = await produitModel.find({ categorie });
 
     if (produits.length === 0) {
       return res.status(404).json({ message: "Aucun produit trouvé pour cette catégorie" });
@@ -107,10 +111,3 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-
-
-
-
-
-
-

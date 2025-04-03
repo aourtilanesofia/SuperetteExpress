@@ -9,7 +9,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
     setQty(item.qty); // Synchroniser l'état local avec l'item mis à jour
   }, [item.qty]); 
  
-
+ 
   const handleQuantityChange = (type) => {
     let newQty = qty;
 
@@ -26,7 +26,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: `http://192.168.43.107:8080${item.image}` }} style={styles.image} />
+      <Image source={{ uri: `http://192.168.1.47:8080${item.image}` }} style={styles.image} />
 
 
       <View style={styles.details}>

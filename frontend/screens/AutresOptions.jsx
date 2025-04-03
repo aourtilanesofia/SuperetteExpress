@@ -6,14 +6,13 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
 
 const AutresOptions = ({ navigation }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const { t } = useTranslation();
 
     const handleLanguagePress = () => {
-        navigation.navigate('LanguageSelection'); // Aller à l'écran de sélection de langue
+        navigation.navigate('LanguageSelection'); 
       };
 
     const handleDelete = async () => {
@@ -34,10 +33,10 @@ const AutresOptions = ({ navigation }) => {
                         try {
                             const token = await AsyncStorage.getItem("token");
                             if (!token) {
-                                alert('Vous devez être connecté pour supprimer votre compte.');
+                                alert('Vous devez être connecté pour supprimer votre compte!');
                                 return;
                             }
-                            const response = await fetch('http://192.168.43.107:8080/api/v1/consommateur/delete-account', {
+                            const response = await fetch('http://192.168.1.47:8080/api/v1/consommateur/delete-account', {
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,
@@ -48,7 +47,7 @@ const AutresOptions = ({ navigation }) => {
 
                             if (response.ok) {
                                 await AsyncStorage.removeItem('token'); // Supprimer le token après la suppression
-                                alert('Votre compte a été supprimé avec succès.');
+                                alert('Votre compte a été supprimé avec succès !');
                                 navigation.navigate('WelcomePage');
                             } else {
                                 alert(data.message || 'Erreur lors de la suppression du compte.');
