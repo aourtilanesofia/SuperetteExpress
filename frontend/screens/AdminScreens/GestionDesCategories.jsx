@@ -18,7 +18,7 @@ const GestionDesCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://192.168.43.107:8080/api/categories');
+            const response = await fetch('http://192.168.1.47:8080/api/categories');
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -36,7 +36,7 @@ const GestionDesCategories = () => {
                     text: "Supprimer",
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.43.107:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+                            await fetch(`http://192.168.1.47:8080/api/categories/delete/${id}`, { method: 'DELETE' });
                             fetchCategories();
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);
@@ -59,7 +59,7 @@ const GestionDesCategories = () => {
                     <View style={styles.categoryItem}>
 
                         <Image 
-                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.43.107:8080${item.image}` }} 
+                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.1.47:8080${item.image}` }} 
                             style={styles.image} 
                             resizeMode="contain"
                             onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}
@@ -104,23 +104,23 @@ const styles = StyleSheet.create({
         bottom: 20,
         right: 20,
         backgroundColor: '#007BFF',
-        width: 60, // Taille fixe pour éviter la déformation
+        width: 60,
         height: 60, 
-        borderRadius: 30, // Pour un cercle parfait
-        elevation: 5, // Ombre sur Android
-        shadowColor: '#000', // Ombre sur iOS
+        borderRadius: 30, 
+        elevation: 5, 
+        shadowColor: '#000', 
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 3,
         alignItems: 'center',
-        justifyContent: 'center', // Centre bien le texte
+        justifyContent: 'center', 
     },
     addButtonText: {
         fontSize: 24,
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
-        textAlignVertical: 'center', // Important pour Android
+        textAlignVertical: 'center', 
     },
     title: {
         fontSize: 20,

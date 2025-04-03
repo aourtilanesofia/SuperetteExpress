@@ -10,7 +10,7 @@ export const inscriptionController = async (req, res) => {
         if (!nom || !numTel || !adresse || !email || !mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Remplissez tous les champs svp!",
+                message: "Veuillez remplir tous les champs ! ",
             });
         }
 
@@ -44,9 +44,10 @@ export const inscriptionController = async (req, res) => {
             const notification = new Notification({
                 message: `${nom} vient de s'inscrire en tant que Client.`,
                 isRead: false,
+                role: "administrateur",
             });
             await notification.save();
-            console.log("Notification envoyée via Socket.io :", notification);
+            //console.log("Notification envoyée via Socket.io :", notification);
             req.io.emit("newNotification", notification);
         } catch (notifError) {
             console.error("Erreur lors de la création de la notification :", notifError);
@@ -55,7 +56,7 @@ export const inscriptionController = async (req, res) => {
         // Envoyer la réponse une seule fois à la fin
         res.status(201).send({
             success: true,
-            message: "Inscription réussie, veuillez vous connecter",
+            message: "Vous êtes maintenant inscrit!, veuillez vous connecter",
             consommateur,
         });
 
@@ -93,14 +94,14 @@ export const connexionController = async (req, res) => {
         if (mdp !== consommateur.mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Mot de passe invalide",
+                message: "Mot de passe invalide ! ",
             });
         }
 
         if (!consommateur.isActive) {
             return res.status(403).json({ 
                 success: false, 
-                message: "Votre compte est désactivé!" 
+                message: "Votre compte est désactivé !" 
             });
         }
 
@@ -108,7 +109,7 @@ export const connexionController = async (req, res) => {
 
         return res.status(200).cookie("token", token).send({
             success: true,
-            message: "Connecté avec succès",
+            message: "Bienvenue, vous êtes maintenant connecté(e) !",
             token,
             consommateur,
         });
@@ -179,7 +180,7 @@ export const deleteAccountController = async (req, res) => {
       if (!consommateur) {
         return res.status(404).send({
           success: false,
-          message: "Utilisateur non trouvé!",
+          message: "Utilisateur non trouvé !",
         });
       }
   
@@ -198,35 +199,6 @@ export const deleteAccountController = async (req, res) => {
       });
     }
   };
-// MODIFIER LE MOT DE PASSE (SANS HACHAGE)
-/*export const updateMDPController = async (req, res) => {
-    try {
-        const { oldMDP, newMDP } = req.body;
-
-        if (!oldMDP || !newMDP) {
-            return res.status(400).json({ success: false, message: "Ancien et nouveau mot de passe requis" });
-        }
-
-        const consommateur = await consommateurModel.findById(req.user.id);
-        if (!consommateur) {
-            return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
-        }
-
-        if (oldMDP !== consommateur.mdp) {
-            return res.status(400).json({ success: false, message: "Ancien mot de passe incorrect" });
-        }
-
-        consommateur.mdp = newMDP;
-
-        await consommateur.save();
-
-        res.status(200).json({ success: true, message: "Mot de passe mis à jour avec succès" });
-
-    } catch (error) {
-        console.error("Erreur mise à jour mot de passe :", error);
-        res.status(500).json({ success: false, message: "Erreur serveur." });
-    }
-};*/
 
 // Obtenir tous les consommateurs
 export const getAllConsommateurs = async (req,res) =>{
@@ -251,7 +223,7 @@ export const deleteConsommateur = async (req, res) => {
 
         const consommateur = await consommateurModel.findByIdAndDelete(id);
         if (!consommateur) {
-            return res.status(404).json({ message: "Utilisateur introuvable" });
+            return res.status(404).json({ message: "Utilisateur introuvable !" });
         }
 
         res.json({ message: "Utilisateur supprimé avec succès" });

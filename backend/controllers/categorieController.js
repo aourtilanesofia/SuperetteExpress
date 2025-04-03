@@ -16,7 +16,7 @@ export const addCategorie = async (req, res) => {
 export const getCategories = async (req, res) => {
     try {
         const categories = await CategorieModel.find();
-        res.status(200).json(categories);
+        res.status(200).json(categories); 
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });
     }
@@ -31,7 +31,7 @@ export const updateCategorie = async (req, res) => {
             { nom, image }, 
             { new: true }
         );
-        res.status(200).json({ message: 'Catégorie mise à jour', categorie: updatedCategorie });
+        res.status(200).json({ message: 'Catégorie mise à jour !', categorie: updatedCategorie });
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });
     }
@@ -41,7 +41,7 @@ export const updateCategorie = async (req, res) => {
 export const deleteCategorie = async (req, res) => {
     try {
         await CategorieModel.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Catégorie supprimée' });
+        res.status(200).json({ message: 'Catégorie supprimée !' });
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });
     }

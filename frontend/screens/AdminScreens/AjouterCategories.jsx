@@ -14,12 +14,12 @@ const AjouterCategories = ({ navigation }) => {
             return;
         }
         try {
-            await fetch('http://192.168.43.107:8080/api/categories/add', {
+            await fetch('http://192.168.1.47:8080/api/categories/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })
             });
-            Alert.alert('Succés','Catégorie ajoutée avec succés!');
+            Alert.alert(' ','Catégorie ajoutée avec succés!');
             navigation.goBack();
         } catch (error) {
             console.error("Erreur lors de l'ajout", error);
@@ -43,8 +43,8 @@ const AjouterCategories = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
-    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 , borderColor:'#000'},
-    button: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 5, alignItems: 'center' ,marginTop:26},
+    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 10 , borderColor:'#9E9E9E'},
+    button: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 10, alignItems: 'center' ,marginTop:26},
     buttonText: { color: '#fff', fontWeight: 'bold',fontSize:16 },
     txt:{fontSize:16, fontWeight:'bold',marginBottom:17, marginTop:20}
 });

@@ -4,7 +4,7 @@ import LayoutAdmin from "../../components/LayoutAdmin/LayoutAdmin";
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useTranslation } from 'react-i18next';
 
-
+ 
 const AcceuilCommerçant = ({ navigation }) => {
   const { t } = useTranslation();
   return (
@@ -27,7 +27,7 @@ const AcceuilCommerçant = ({ navigation }) => {
               <Text style={styles.btntxt}>{t('Gestion_des_catégories')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('GestionDesCommandes')}>
             <AntDesign name="bars" style={styles.icone}/>
               <Text style={styles.btntxt}>{t('Gestion_des_commandes')}</Text>
             </TouchableOpacity>
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     margin:15,
     borderRadius:5,
     fontWeight:'bold',
+    marginTop:20,
   },
   btnContainer:{
     margin:15,

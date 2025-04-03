@@ -4,7 +4,7 @@ import ProductsCard from '../Produits/ProductsCard';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 
-const backendUrl = "http://192.168.43.107:8080";
+const backendUrl = "http://192.168.1.47:8080";
 
 const ProduitsParCateg = ({searchText} ) => { 
   const [produitsparcategorie, setProduitsParCategorie] = useState([]);

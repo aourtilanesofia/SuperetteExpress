@@ -3,6 +3,17 @@ import Notification from '../models/NotificationModel.js';
 
 const router = express.Router();
 
+// Récupérer les notifications d'un utilisateur spécifique
+router.get("/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const notifications = await Notification.find({ consommateurId: userId, role: "client" });
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+});
+
 // Récupérer toutes les notifications
 router.get('/', async (req, res) => {
     try {
@@ -36,5 +47,17 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la suppression" });
     }
 });
+
+
+router.get("/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const notifications = await Notification.find({ consommateurId: userId, role: "client" });
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+});
+  
 
 export default router;

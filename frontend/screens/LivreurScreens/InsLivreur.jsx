@@ -31,7 +31,7 @@ const InsLivreur = ({ navigation }) => {
            }
    
            try {
-               const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/inscriptionL", {
+               const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/inscriptionL", {
                    method: "POST",
                    headers: {
                        "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const InsLivreur = ({ navigation }) => {
                }
    
    
-               Alert.alert("Succès", "Inscription réussie !");
+               Alert.alert(" ", "Vous êtes maintenant inscrit!");
                setNom(' ');
                setNumTel('');
                setCategorie('');

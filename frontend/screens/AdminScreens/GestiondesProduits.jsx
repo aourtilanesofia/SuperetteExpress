@@ -2,14 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Image, ScrollView } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useTranslation } from "react-i18next";
 
-
-const backendUrl = "http://192.168.43.107:8080";
+const backendUrl = "http://192.168.1.47:8080";
 
 const GestiondesProduits = () => {
   const navigation = useNavigation();
   const [produits, setProduits] = useState([]);
-  const [categoriesOuvertes, setCategoriesOuvertes] = useState({}); // Gère l'état ouvert/fermé des catégories
+  const [categoriesOuvertes, setCategoriesOuvertes] = useState({});
+  const { t } = useTranslation();
 
   // Fonction pour récupérer les produits
   const fetchProduits = () => {
@@ -22,7 +23,6 @@ const GestiondesProduits = () => {
   useEffect(fetchProduits, []);
 
   useFocusEffect(useCallback(fetchProduits, []));
-
 
   // Fonction pour supprimer un produit
   const confirmDelete = (id) => {
@@ -50,14 +50,12 @@ const GestiondesProduits = () => {
     }
   };
 
-
   // Organiser les produits par catégorie
   const produitsParCategorie = produits.reduce((acc, produit) => {
     if (!acc[produit.categorie]) acc[produit.categorie] = [];
     acc[produit.categorie].push(produit);
     return acc;
   }, {});
-
 
   // Basculer l'affichage d'une catégorie
   const toggleCategorie = (categorie) => {
@@ -67,49 +65,60 @@ const GestiondesProduits = () => {
     }));
   };
 
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Liste des Produits</Text>
+      <Text style={styles.title}>{t("listeproduits")}</Text>
       <ScrollView>
         {Object.entries(produitsParCategorie).map(([categorie, produits]) => (
           <View key={categorie} style={styles.categorieContainer}>
-            {/*En-tête de la catégorie */}
+            {/* En-tête de la catégorie */}
             <TouchableOpacity style={styles.categorieHeader} onPress={() => toggleCategorie(categorie)}>
               <Text style={styles.categorieTitle}>{categorie}</Text>
               <Icon name={categoriesOuvertes[categorie] ? "chevron-up" : "chevron-down"} size={17} color="white" />
             </TouchableOpacity>
 
-            {/*iste des produits (affichée uniquement si la catégorie est ouverte) */}
+            {/* Liste des produits (affichée uniquement si la catégorie est ouverte) */}
             {categoriesOuvertes[categorie] && (
               <FlatList
                 data={produits}
                 keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                  <View style={styles.produitContainer}>
-                    <View style={styles.produit}>
-                      <Image source={{ uri: `${backendUrl}${item.image}` }} style={styles.image} />
-                      <View>
-                        <Text style={styles.nomProduit}>{item.nom}</Text>
-                        <Text>
-                          <Text style={{ fontWeight: "bold" }}>{item.prix} DA</Text> -
-                          <Text style={{ fontWeight: "bold" }}> {item.stock} Kg</Text>
-                        </Text>
+                renderItem={({ item }) => {
+                  // Vérifier si l'image commence par "http", sinon ajouter `backendUrl`
+                  const imageUri =
+                    item.image && typeof item.image === "string"
+                      ? item.image.startsWith("http") || item.image.startsWith("file://")
+                        ? item.image
+                        : `${backendUrl}${item.image}`
+                      : null; 
+
+ 
+                  return (
+                    <View style={styles.produitContainer}>
+                      <View style={styles.produit}>
+                        <Image
+                          source={{ uri: imageUri }}
+                          style={styles.image}
+                          onError={() => console.error("Erreur de chargement de l'image :", imageUri)}
+                        />
+                        <View>
+                          <Text style={styles.nomProduit}>{item.nom}</Text>
+                          <Text>{item.prix} DA - {item.stock} {["Fruits", "Légumes"].includes(item.categorie) ? "Kg" : ""}</Text>
+                        </View>
+                      </View>
+                      <View style={styles.btnContainer}>
+                        <TouchableOpacity
+                          style={styles.btnModifier}
+                          onPress={() => navigation.navigate("ModifierProduit", { produit: item })}
+                        >
+                          <Text style={styles.btnText}>{t("modifier")}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnSupprimer} onPress={() => confirmDelete(item._id)}>
+                          <Text style={styles.btnText}>{t("supprimer")}</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                    <View style={styles.btnContainer}>
-                      <TouchableOpacity
-                        style={styles.btnModifier}
-                        onPress={() => navigation.navigate("ModifierProduit", { produit: item })}
-                      >
-                        <Text style={styles.btnText}>Modifier</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.btnSupprimer} onPress={() => confirmDelete(item._id)}>
-                        <Text style={styles.btnText}>Supprimer</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
+                  );
+                }}
               />
             )}
           </View>
@@ -117,7 +126,6 @@ const GestiondesProduits = () => {
       </ScrollView>
 
       <TouchableOpacity style={styles.btnAjouter} onPress={() => navigation.navigate("AjouterProduit")}>
-        
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
@@ -136,34 +144,36 @@ const styles = StyleSheet.create({
   produitContainer: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ddd" },
   produit: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   image: { width: 50, height: 50, borderRadius: 10, marginRight: 10 },
-  nomProduit: { fontSize: 16, fontWeight: "bold" },
+  nomProduit: { fontSize: 15, fontWeight: "bold", maxWidth: 270 },
 
   // Style des boutons
   btnContainer: { flexDirection: "row", justifyContent: "space-between" },
-  btnModifier: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginRight:7 },
-  btnSupprimer: { backgroundColor: "red", padding: 8, borderRadius:8, flex: 1, alignItems: "center", marginLeft:7 },
-  btnAjouter: {  position: 'absolute',
+  btnModifier: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginRight: 7 },
+  btnSupprimer: { backgroundColor: "red", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginLeft: 7 },
+  btnAjouter: {
+    position: 'absolute',
     bottom: 20,
     right: 20,
     backgroundColor: '#007BFF',
-    width: 60, // Taille fixe pour éviter la déformation
-    height: 60, 
-    borderRadius: 30, // Pour un cercle parfait
-    elevation: 5, // Ombre sur Android
-    shadowColor: '#000', // Ombre sur iOS
+    width: 60, 
+    height: 60,
+    borderRadius: 30, 
+    elevation: 5,
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     alignItems: 'center',
-    justifyContent: 'center',},
+    justifyContent: 'center',
+  },
   btnText: { color: "#fff", fontSize: 13, fontWeight: "bold" },
   addButtonText: {
     fontSize: 24,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
-    textAlignVertical: 'center', // Important pour Android
-},
+    textAlignVertical: 'center', 
+  },
 });
 
 export default GestiondesProduits;

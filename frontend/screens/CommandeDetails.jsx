@@ -1,22 +1,30 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import Layout from "../components/Layout/Layout";
+import { useTranslation } from "react-i18next"; 
 
 const CommandeDetails = ({ route, navigation }) => {
     const { commande } = route.params;
-    const [statutCommande, setStatutCommande] = useState(commande.statut);;
+    const [statutCommande, setStatutCommande] = useState(commande.statut);
+    const { t } = useTranslation();
 
     const annulerCommande = async () => {
         try {
-            const response = await fetch(`http://192.168.43.107:8080/api/commandes/cancel/${commande._id}`, {
-                method: "PUT",
+            const response = await fetch(`http://192.168.1.47:8080/api/commandes/cancel/${commande._id}`, {
+                method: "DELETE",
                 headers: { "Content-Type": "application/json" },
             });
-            const data = await response.json();
-
+    
             if (response.ok) {
-                setStatutCommande("Annulée"); // Met à jour le statut localement
+                alert("Votre commande a bien été annulée !");
+    
+                if (route.params?.onDelete) {
+                    route.params.onDelete(commande._id);
+                }
+    
+                navigation.goBack();
             } else {
+                const data = await response.json();
                 alert("Erreur lors de l'annulation : " + data.message);
             }
         } catch (error) {
@@ -25,32 +33,34 @@ const CommandeDetails = ({ route, navigation }) => {
     };
 
     return (
-        <Layout>
+        <Layout> 
             <View style={styles.container}>
-                <Text style={styles.title}>Commande {commande.numeroCommande}</Text>
+                <Text style={styles.title}>{t("Commande")} {commande.numeroCommande}</Text>
                 <Text style={styles.date}>{new Date(commande.date).toLocaleString()}</Text>
 
                 <FlatList
-                
                     data={commande.produits}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <View style={styles.produit}>
                             <Text style={styles.nomProduit}>{item.nom}</Text>
-                            <Text style={styles.txt}>Prix: {item.prix} DA</Text>
-                            <Text style={styles.txt}>Quantité: {item.quantite}</Text>
+                            <Text style={styles.txt}>{t("prix")}: {item.prix} DA</Text>
+                            <Text style={styles.txt}>{t("qte")}: {item.quantite}</Text>
                         </View>
                     )}
                 />
 
-                <Text style={styles.total}>Total : {commande.total} DA</Text>
-                <Text style={[styles.status, { color: statutCommande === "Annulée" ? "red" : "#ff9800" }]}>
+                <Text style={styles.total}>{t("total")} : {commande.total} DA</Text>
+                <Text style={[styles.status, { color: statutCommande === "Annulée" ? "red" : statutCommande === "Confirmée" ? "green" : "#ff9800" }]}> 
                     {statutCommande}
                 </Text>
-
                 {commande.statut !== "Annulée" && (
-                    <TouchableOpacity style={styles.annulerButton} onPress={annulerCommande}>
-                        <Text style={styles.annulerText}>Annuler la commande</Text>
+                    <TouchableOpacity 
+                        style={[styles.annulerButton, commande.statut === "Confirmée" && { backgroundColor: "#ccc" }]} 
+                        onPress={commande.statut === "Confirmée" ? null : annulerCommande} 
+                        disabled={commande.statut === "Confirmée"}
+                    >
+                        <Text style={styles.annulerText}>{t("annulerlacommande")}</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -77,12 +87,11 @@ const styles = StyleSheet.create({
         color: "gray",
     },
     produit: {
-        //backgroundColor: "#fff",
         padding: 10,
         borderRadius: 5,
         marginBottom: 5,
-        borderBottomWidth: 1,  // Ajoute un trait
-        borderBottomColor: "#ccc", // Couleur du trait
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
     },
     nomProduit: {
         fontSize: 16,
@@ -112,8 +121,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
     },
-    txt:{ 
-        fontSize:15,
-        marginTop:10,
+    txt: { 
+        fontSize: 15,
+        marginTop: 10,
     },
 });

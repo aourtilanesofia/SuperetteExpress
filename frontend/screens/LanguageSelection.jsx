@@ -10,7 +10,7 @@ const LanguageSelection = ({ navigation }) => {
   const changeLanguage = async (lang) => {
     await AsyncStorage.setItem('language', lang);
     i18n.changeLanguage(lang);
-    navigation.goBack(); // Retourner à l'écran précédent
+    navigation.goBack(); 
   };
 
   return (
@@ -45,14 +45,14 @@ const styles = StyleSheet.create({
     marginTop: -190,
   },
   btn: {
-    width: 150, // Ajuste selon ton besoin
-    height: 50, // Assure une hauteur uniforme
+    width: 150, 
+    height: 50, 
     padding: 10,
     margin: 5,
     backgroundColor: '#329171',
     borderRadius: 5,
-    justifyContent: 'center', // Centre le texte verticalement
-    alignItems: 'center', // Centre le texte horizontalement
+    justifyContent: 'center', 
+    alignItems: 'center', 
     marginTop:16,
 },
 txt:{

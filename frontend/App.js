@@ -38,6 +38,10 @@ import ModifierProduit from "./screens/AdminScreens/ModifierProduit";
 import LanguageSelection from './screens/LanguageSelection';
 import ProduitsParCategorie from './screens/ProduitsParCategorie';
 import CommandeDetails from './screens/CommandeDetails';
+import GestionDesCommandes from './screens/AdminScreens/GestionDesCommandes';
+import CommandeDetailsAdmin from './screens/AdminScreens/CommandeDetailsAdmin';
+import Paiement from './screens/Paiement';
+import NotificationsConsommateur from './screens/NotificationsConsommateur';
 
 //routes
 const Stack = createNativeStackNavigator();
@@ -81,6 +85,10 @@ export default function App() {
         <Stack.Screen name="ListeDesCommandes" component={ListeDesCommandes} options={{ headerTitle: '' }} />
         <Stack.Screen name="ProduitsParCategorie" component={ProduitsParCategorie} options={{ headerTitle: '' }} />
         <Stack.Screen name="CommandeDetails" component={CommandeDetails} options={{ headerTitle: '' }} />
+        <Stack.Screen name="GestionDesCommandes" component={GestionDesCommandes} options={{ headerTitle: '' }} />
+        <Stack.Screen name="CommandeDetailsAdmin" component={CommandeDetailsAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Paiement" component={Paiement} options={{ headerTitle: '' }} />
+        <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

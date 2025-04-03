@@ -45,12 +45,12 @@ const UpdateProfile = () => {
             }
     
             if (!name || !email || !numTel || !categorie || !matricule ||!mdp) {
-                alert("Veuillez remplir tous les champs.");
+                alert("Veuillez remplir tous les champs !");
                 return;
             }
     
             // Mise à jour des informations du profil
-            const response = await fetch('http://192.168.43.107:8080/api/v1/livreur/profile-updateL', {
+            const response = await fetch('http://192.168.1.47:8080/api/v1/livreur/profile-updateL', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const UpdateProfile = () => {
             await AsyncStorage.setItem('user', JSON.stringify({ nom: name, email, numTel, categorie,matricule,mdp }));
     
             // Afficher l'alerte de succès après la mise à jour du profil
-            alert("Modification avec succès !");
+            alert("Mise à jour effectuée avec succès. !");
     
             // Mettre à jour le mot de passe si un nouveau mot de passe est saisi
             
@@ -124,7 +124,7 @@ const UpdateProfile = () => {
                             />
                         </TouchableOpacity>
                     </View>
-
+ 
                     <TouchableOpacity style={styles.cnxButton} onPress={handleUpdateProfile}>
                         <Text style={styles.cnxtxt}>{t('valider')}</Text>
                     </TouchableOpacity>
@@ -145,18 +145,18 @@ const styles = StyleSheet.create({
         height: 100,
         width: '100%',
         resizeMode: 'contain',
-        //marginTop: 2,
+        marginTop: 10,
     },
     inputContainer: {
         borderWidth: 1,
-        borderColor: '#329171',
-        borderRadius: 15,
+        borderColor: '#9E9E9E',
+        borderRadius: 10,
         height: 50,
-        paddingHorizontal: 20,
+        paddingHorizontal: 13,
         flexDirection: 'row',
         alignItems: 'center',
         marginVertical: 15,
-        marginTop: 20,
+        marginTop: 25,
     },
     textInput: {
         flex: 1,
@@ -164,18 +164,20 @@ const styles = StyleSheet.create({
     },
     cnxButton: {
         backgroundColor: '#329171',
-        borderRadius: 15,
+        borderRadius: 10,
         marginVertical: 20,
     },
     cnxtxt: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
         padding: 12,
     },
     icon: {
         position: 'absolute',
-        right: 10,
+        right: 1,
+        top: "50%",
+        transform: [{ translateY: -35 }]
     },
 });

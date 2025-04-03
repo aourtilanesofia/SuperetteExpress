@@ -14,7 +14,7 @@ const ListeDesLivreurs = () => {
 
   const fetchLivreurs = async () => {
     try {
-      const response = await fetch("http://192.168.43.107:8080/api/v1/livreur/tousLivreurs");
+      const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/tousLivreurs");
       const data = await response.json();
       
       //console.log("Données reçues :", data); // Debugging
@@ -39,7 +39,7 @@ const ListeDesLivreurs = () => {
         onPress: async () => {
           try {
             console.log("Suppression ID :", id);
-            await fetch(`http://192.168.43.107:8080/api/v1/livreur/refuser/${id}`, { method: "DELETE" });
+            await fetch(`http://192.168.1.47:8080/api/v1/livreur/refuser/${id}`, { method: "DELETE" });
             setLivreurs(livreurs.filter((livreur) => livreur._id !== id ));
           } catch (error) {
             console.error("Erreur suppression :", error);
@@ -50,7 +50,7 @@ const ListeDesLivreurs = () => {
   };
 
   const validerLivreur = async (id) => {
-    console.log("Validation ID :", id);
+    //console.log("Validation ID :", id);
 
     if (!id) {
       console.error("Erreur : ID du livreur est undefined !");
@@ -58,13 +58,13 @@ const ListeDesLivreurs = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.43.107:8080/api/v1/livreur/valider/${id}`, {
+      const response = await fetch(`http://192.168.1.47:8080/api/v1/livreur/valider/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });
 
       const result = await response.json();
-      console.log("Réponse API validation :", result);
+      //console.log("Réponse API validation :", result);
 
       if (!response.ok) {
         throw new Error(result.message || "Erreur lors de la validation du livreur");
@@ -74,7 +74,7 @@ const ListeDesLivreurs = () => {
         livreurs.map((livreur) => (livreur._id === id ? result.livreur : livreur))
       );
 
-      Alert. alert("Compte validé !");
+      Alert. alert(" ","Compte validé !");
     } catch (error) {
       console.error("Erreur validation :", error);
     }
@@ -89,7 +89,7 @@ const ListeDesLivreurs = () => {
       <Text style={styles.title}>{t('Liste_des_livreurs')}</Text>
       <FlatList
         data={livreurs}
-        keyExtractor={(item) => item._id} // Sécurisation de la clé
+        keyExtractor={(item) => item._id} 
         renderItem={({ item }) => (
           <View style={styles.livreurItem}>
             <Text style={styles.livreurName}>{item.nom}</Text>

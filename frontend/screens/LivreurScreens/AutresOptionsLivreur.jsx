@@ -36,7 +36,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
                                 alert('Vous devez être connecté pour supprimer votre compte.');
                                 return;
                             }
-                            const response = await fetch('http://192.168.43.107:8080/api/v1/livreur/delete-accountL', {
+                            const response = await fetch('http://192.168.1.47:8080/api/v1/livreur/delete-accountL', {
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,
@@ -46,7 +46,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
                             const data = await response.json();
 
                             if (response.ok) {
-                                await AsyncStorage.removeItem('token'); // Supprimer le token après la suppression
+                                await AsyncStorage.removeItem('token'); 
                                 alert('Votre compte a été supprimé avec succès.');
                                 navigation.navigate('WelcomePageLivreur');
                             } else {

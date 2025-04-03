@@ -10,47 +10,6 @@ const ConConsommateur = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
 
-    // Connexion function
-    /*const handleLogin = async () => {
-        if (!email || !mdp) {
-            Alert.alert("Erreur", "Veuillez remplir tous les champs !");
-            setEmail('');
-            setMdp('');
-
-            return;
-        }
-
-        try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/connexion", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, mdp }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                Alert.alert("Erreur", data.message || "Connexion échouée !");
-                setEmail('');
-                setMdp('');
-
-                return;
-            }
-
-            Alert.alert("Succès", "Connecté avec succès !");
-            setEmail('');
-            setMdp('');
-
-            navigation.navigate("AcceuilConsommateur");
-        } catch (error) {
-            console.error("Erreur de connexion :", error);
-            Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
-        }
-    };*/
-
-    
 
     const handleLogin = async () => {
         if (!email || !mdp) {
@@ -61,7 +20,7 @@ const ConConsommateur = ({ navigation }) => {
         }
     
         try {
-            const response = await fetch("http://192.168.43.107:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.1.47:8080/api/v1/consommateur/connexion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, mdp }),
@@ -77,13 +36,15 @@ const ConConsommateur = ({ navigation }) => {
                 return;
             }
     
-            console.log("ID utilisateur récupéré :", data.consommateur._id);
+            //console.log("ID utilisateur récupéré :", data.consommateur._id);
     
-            // Sauvegarde du token et de l'ID utilisateur
+            // Sauvegarde des informations utilisateur
             await AsyncStorage.setItem('token', data.token);
             await AsyncStorage.setItem('userId', data.consommateur._id);
+            await AsyncStorage.setItem('user', JSON.stringify(data.consommateur));
+            //console.log("Utilisateur mis à jour :", data.consommateur);
     
-            Alert.alert("Succès", "Connecté avec succès !");
+            Alert.alert(" ", "Bienvenue, vous êtes maintenant connecté(e) !");
             setEmail('');
             setMdp('');
             navigation.navigate("AcceuilConsommateur");
@@ -93,6 +54,7 @@ const ConConsommateur = ({ navigation }) => {
             Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
         }
     };
+    
     
     
 

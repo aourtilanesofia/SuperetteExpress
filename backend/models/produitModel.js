@@ -7,10 +7,10 @@ const produitSchema = new mongoose.Schema(
     categorie: { type: String, required: true },
     stock: { type: Number, required: true },
     description: { type: String, required: true },
-    image: { type: String }, // Stockera le chemin de l'image
+    image: {  type: String, required: true }, // Stockera le chemin de l'image
   },
   { timestamps: true }
-);
+);  
 
 const produitModel = mongoose.model("produit", produitSchema);
 

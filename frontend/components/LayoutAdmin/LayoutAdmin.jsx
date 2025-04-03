@@ -8,7 +8,7 @@ const LayoutAdmin = ({ children }) => {
   return (
     <>
       <StatusBar />
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         {/* Contenu qui sera défini dans chaque page */}
         <View style={styles.content}>{children}</View>
 
@@ -16,7 +16,7 @@ const LayoutAdmin = ({ children }) => {
         <View style={styles.footer}>
           <MenuAdmin />
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 };
@@ -26,6 +26,7 @@ export default LayoutAdmin;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop:42,
   },
   content: {
     flex: 1,  // Permet au contenu d'occuper tout l'espace disponible

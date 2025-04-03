@@ -8,7 +8,7 @@ const WelcomePage = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.txt1}>Bienvenue sur Superette Express!</Text>
       <Text style={styles.txt2}>Connectez-vous pour une expérience shopping rapide et simple.</Text>
-      <Image source={ require('../assets/aaa.png')} style={styles.aaa}/>
+      <Image source={ require('../assets/im4.png')} style={styles.aaa}/>
       <View style={styles.buttonContainer}>
 
         <TouchableOpacity style={styles.btn1} onPress={() => navigation.navigate('ConConsommateur')}>
@@ -48,7 +48,19 @@ const styles = StyleSheet.create({
     },
     aaa:{
         alignSelf: 'center',
-        marginTop:70,
+        marginTop:90,
+        //for im1
+        //height:'25%',
+        //width:'53%',
+
+        //FORM IM3
+        //height:'25%',
+        //width:'53%',
+
+        //FORM IM4
+        height:'25%',
+        width:'53%',
+
     },
     buttonContainer:{
         flexDirection:'row',

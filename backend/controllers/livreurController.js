@@ -10,7 +10,7 @@ export const inscriptionControllerL = async (req, res) => {
         const { nom, numTel, categorie, matricule, email, mdp } = req.body;
 
         if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
-            return res.status(400).send({ success: false, message: "Remplissez tous les champs svp!" });
+            return res.status(400).send({ success: false, message: "Veuillez remplir tous les champs !" });
         }
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -30,7 +30,7 @@ export const inscriptionControllerL = async (req, res) => {
         const existingLivreur = await livreurModel.findOne({ email });
         if (existingLivreur) {
             return res.status(400).send({ success: false, message: "Adresse e-mail déjà utilisée!" });
-        }
+        } 
 
         const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, email, mdp });
 
@@ -39,9 +39,10 @@ export const inscriptionControllerL = async (req, res) => {
             const notification = new Notification({
                 message: `${nom} vient de s'inscrire en tant que livreur.`,
                 isRead: false,
+                role: "administrateur",
             });
             await notification.save();
-            console.log("Notification envoyée via Socket.io :", notification);
+            //console.log("Notification envoyée via Socket.io :", notification);
             req.io.emit("newNotification", notification);
         } catch (notifError) {
             console.error("Erreur lors de la création de la notification :", notifError);
@@ -50,7 +51,7 @@ export const inscriptionControllerL = async (req, res) => {
         // Envoyer la réponse une seule fois à la fin
         res.status(201).send({
             success: true,
-            message: "Inscription réussie, veuillez vous connecter",
+            message: "Vous êtes maintenant inscrit !, veuillez vous connecter",
             livreur,
         });
 
@@ -59,7 +60,7 @@ export const inscriptionControllerL = async (req, res) => {
         res.status(500).send({ success: false, message: "Erreur dans l'inscription", error });
     }
 };
-
+ 
 
 // CONNEXION
 export const connexionControllerL = async (req, res) => {
@@ -218,7 +219,7 @@ export const getAllLivreurs = async (req,res) =>{
 export const deleteLivreur = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("ID reçu :", id);
+        //console.log("ID reçu :", id);
 
         if (!id) {
             return res.status(400).json({ message: "ID manquant" });

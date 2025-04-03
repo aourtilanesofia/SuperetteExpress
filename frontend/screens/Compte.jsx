@@ -26,9 +26,15 @@ const Compte = ({ navigation }) => {
             }
         };
 
-        fetchUser();
+        fetchUser(); 
     }, []);
-
+    useEffect(() => {
+        const checkStorage = async () => {
+            const storedUser = await AsyncStorage.getItem('user');
+            console.log("Utilisateur stocké:", storedUser);
+        };
+        checkStorage();
+    }, []);
     if (!user) {
         return (
             <Layout>
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
         height: 100,
         width: '100%',
         resizeMode: 'contain',
-        marginTop: 17,
+        marginTop: 60,
     },
     name: {
         marginTop: 15,
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
     btn: {
         backgroundColor: '#329171',
         padding: 13,
-        borderRadius: 15,
+        borderRadius: 10,
     },
     txtbtn: {
         justifyContent: 'center',
@@ -134,6 +140,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 17,
+        fontSize: 16,
     }
 });
