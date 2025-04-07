@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import multer from 'multer';
 
 
 //routes imports 
@@ -52,6 +53,9 @@ app.use((req, res, next) => {
     req.io = io;
     next();
 });
+
+
+
 // Middleware pour servir les fichiers statiques (images, etc.) depuis le dossier 'uploads/'
 app.use("/uploads", express.static("uploads"));
 
@@ -60,6 +64,8 @@ app.use("/assets", express.static("assets"));
 
 // Servir les fichiers statiques du dossier "assets"
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 
 
@@ -74,6 +80,8 @@ app.use("/assets", express.static("assets"));
 app.use("/api/produits", produitRoutes);
 app.use("/panier", panierRoutes);
 app.use("/api/commandes", orderRoutes);
+
+
 
 
 app.get('/', (req, res) => {

@@ -6,6 +6,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { recupererTotalPanier } from '../../screens/Panier';
 
 const Menu = () => {
   const route = useRoute();
@@ -14,14 +15,25 @@ const Menu = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   // Récupérer le total des articles dans le panier
-  const recupererTotalPanier = async () => {
-    try {
-      const total = await AsyncStorage.getItem('cartTotal');
-      setCartCount(total ? JSON.parse(total) : 0);
-    } catch (error) {
-      console.error("Erreur lors de la récupération du panier :", error);
-    }
-  };
+  // Récupérer le total des articles dans le panier
+const recupererTotalPanier = async () => {
+  try {
+    const items = await AsyncStorage.getItem('cart');
+    const parsedItems = items ? JSON.parse(items) : [];
+
+    // Si chaque item peut avoir une quantité :
+    // const totalCount = parsedItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+    // Sinon, juste la longueur du tableau
+    const totalCount = parsedItems.length;
+
+    setCartCount(totalCount);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du panier :", error);
+    setCartCount(0);
+  }
+};
+
 
   // Récupérer les notifications non lues
   const recupererNotificationsNonLues = async () => {
@@ -59,7 +71,7 @@ const Menu = () => {
 
     // Rafraîchir les données lorsqu'on revient sur l'écran
     const unsubscribe = navigation.addListener('focus', () => {
-      recupererTotalPanier();
+      recupererTotalPanier(setCartCount);
       recupererNotificationsNonLues();
     });
 

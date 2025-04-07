@@ -3,13 +3,21 @@ import React, { useState, useEffect } from "react";
 import { MaterialIcons } from "@expo/vector-icons"; // Import de l'icône poubelle
 
 const CartItem = ({ item, onRemove, onQuantityChange }) => {
-    const [qty, setQty] = useState(item.qty !== undefined ? item.qty : 1);
+  const [qty, setQty] = useState(item.qty !== undefined ? item.qty : 1);
+  const backendUrl = "http://192.168.1.47:8080";
 
   useEffect(() => {
     setQty(item.qty); // Synchroniser l'état local avec l'item mis à jour
-  }, [item.qty]); 
- 
- 
+  }, [item.qty]);
+
+  const imageUri =
+    item.image && typeof item.image === "string"
+      ? item.image.startsWith("http") || item.image.startsWith("file://")
+        ? item.image
+        : `${backendUrl}${item.image}`
+      : null;
+
+
   const handleQuantityChange = (type) => {
     let newQty = qty;
 
@@ -22,16 +30,20 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
     setQty(newQty); // Mettre à jour l'état local
     onQuantityChange(item._id, type); // Informer le parent
   };
-  
+
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: `http://192.168.1.47:8080${item.image}` }} style={styles.image} />
+      <Image
+        source={{ uri: imageUri }}
+        style={styles.image}
+        onError={() => console.error("Erreur de chargement de l'image :", imageUri)}
+      />
 
 
       <View style={styles.details}>
-      <Text style={styles.name}>{item.nom}</Text>
-      <Text style={styles.price}>Prix : {item.prix ? item.prix * (item.qty || 1) : "N/A"} DA</Text>
+        <Text style={styles.name}>{item.nom}</Text>
+        <Text style={styles.price}>Prix : {item.prix ? item.prix * (item.qty || 1) : "N/A"} DA</Text>
 
       </View>
 
@@ -44,7 +56,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
             <Text style={styles.btnQtyText}>-</Text>
           </TouchableOpacity>
 
-          <Text style={styles.text}>{qty}</Text>  
+          <Text style={styles.text}>{qty}</Text>
 
 
           <TouchableOpacity
@@ -71,9 +83,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    borderWidth:0.23,
-    marginLeft:15,
-    marginRight:15,
+    borderWidth: 0.23,
+    marginLeft: 15,
+    marginRight: 15,
   },
   image: {
     height: 75,

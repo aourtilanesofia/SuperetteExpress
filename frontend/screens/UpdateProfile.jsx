@@ -5,7 +5,7 @@ import Layout from '../components/Layout/Layout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
 import { UserData } from '../Data/UserData';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'; 
 
 const UpdateProfile = () => {
     const [name, setName] = useState('');

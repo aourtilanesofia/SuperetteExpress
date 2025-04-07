@@ -8,11 +8,24 @@ import { useTranslation } from "react-i18next";
 const backendUrl = "http://192.168.1.47:8080"; // Remplace par ton URL de backend
 //const backendUrl = "http://192.168.43.107:8080";
 const ProductsCard = ({ p }) => {
+  //console.log('ProductsCard rendu');
+  //console.log('Produit reçu :', p);
+
   const [totalPanier, setTotalPanier] = useState(0);
   const navigation = useNavigation();
   const [quantite, setQuantite] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
+
+  let localAsset = null;
+
+  const imageUri =
+  p.image && typeof p.image === "string"
+    ? p.image.startsWith("http") || p.image.startsWith("file://")
+      ? p.image
+      : `${backendUrl}${p.image}`
+    : null;
+  //console.log('Image URI:', imageUri);
 
 
   const augmenterQuantite = () => setQuantite(quantite + 1);
@@ -84,6 +97,9 @@ const ProductsCard = ({ p }) => {
   useEffect(() => {
     mettreAJourPanier();
   }, []);
+  //console.log(p);
+
+
 
   return (
     <>
@@ -97,12 +113,16 @@ const ProductsCard = ({ p }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.totale}>
-            <Text style={styles.modalTitle}>{t("prix_totale")} : </Text>
-            <Text style={styles.modalPrice}>{p.prix * quantite} DA</Text>
+              <Text style={styles.modalTitle}>{t("prix_totale")} : </Text>
+              <Text style={styles.modalPrice}>{p.prix * quantite} DA</Text>
             </View>
-            
+
             <View style={styles.modalProduct}>
-              <Image source={{ uri: `${backendUrl}${p?.image}` }} style={styles.modalImage} />
+              <Image
+                source={{ uri: imageUri }}
+                style={styles.image}
+                onError={() => console.error("Erreur de chargement de l'image :", imageUri)}
+              />
               <View>
                 <Text style={styles.modalText}>{p.nom}</Text>
                 <Text style={styles.modalText}>{t("prix")}: {p.prix} DA</Text>
@@ -132,7 +152,12 @@ const ProductsCard = ({ p }) => {
 
       {/* Contenu de la carte produit */}
       <View style={styles.card}>
-        <Image source={{ uri: `${backendUrl}${p?.image}` }} style={styles.image} />
+
+        <Image
+          source={{ uri: imageUri }}
+          style={styles.image}
+          onError={(e) => console.error("Erreur de chargement de l'image :", e.nativeEvent.error)}
+        />
         <Text style={styles.title}>{p?.nom || "Produit inconnu"}</Text>
         <Text style={styles.price}>{t("prix")} : {p?.prix ? `${p.prix} DA` : "Prix non disponible"}</Text>
         <View style={styles.btnContainer}>
@@ -188,7 +213,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center', 
     marginBottom: 6,
     color: '#333',
     textTransform: 'capitalize',
@@ -237,8 +262,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width: '90%',
-    height:'45%'
+    width: '93%',
+    height: '50%'
   },
   modalTitle: {
     fontSize: 18,
@@ -268,7 +293,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     maxWidth: 150,
     //justifyContent:'space-between',
-    padding:4,
+    padding: 5,
   },
   counter: {
     flexDirection: 'row',
@@ -285,13 +310,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     padding: 10,
     borderRadius: 5,
-    color:'#fff',
+    color: '#fff',
   },
   btnCancel: {
     backgroundColor: 'red',
     padding: 10,
     borderRadius: 5,
-    color:'#fff',
+    color: '#fff',
   },
   smallButton: {
     backgroundColor: '#BEBEBE',
@@ -302,29 +327,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   buttonText: {
     color: 'white',
     fontSize: 17,
     fontWeight: 'bold',
   },
-  
+
   quantityText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
   },
-  txt:{
-    color:'#fff',
-    fontSize:15,
+  txt: {
+    color: '#fff',
+    fontSize: 15,
     fontWeight: 'bold',
   },
-  totale:{
-    flexDirection:'row',
-    textAlign:'center',
-    alignItems:'center',
-    justifyContent:'center',
-    marginTop:20,
-    }
+  totale: {
+    flexDirection: 'row',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  }
 });

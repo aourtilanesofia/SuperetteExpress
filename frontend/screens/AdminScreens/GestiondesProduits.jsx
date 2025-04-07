@@ -82,7 +82,7 @@ const GestiondesProduits = () => {
               <FlatList
                 data={produits}
                 keyExtractor={(item) => item._id}
-                renderItem={({ item }) => {
+                renderItem={({ item }) => { 
                   // Vérifier si l'image commence par "http", sinon ajouter `backendUrl`
                   const imageUri =
                     item.image && typeof item.image === "string"

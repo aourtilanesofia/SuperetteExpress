@@ -36,7 +36,7 @@ const ModifierCategories = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor:'#ffff' },
+    container: { flex: 1, padding: 20 },
     input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 10, borderColor:'#9E9E9E' },
     button: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 10, alignItems: 'center' ,marginTop:26},
     buttonText: { color: '#fff', fontWeight: 'bold' , fontSize:16},

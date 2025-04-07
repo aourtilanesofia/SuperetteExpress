@@ -133,7 +133,7 @@ const resources = {
       cat:"Catégorie",
       Stock:"Stock",
       image:"Image",
-      modifierproduit:"Modifier un Produi",
+      modifierproduit:"Modifier un Produit",
       listedescommandes:"Liste des commandes",
       client:"Client",
       confirmer:"Confirmer",
