@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 const Panier = () => {
     const [cartItems, setCartItems] = useState([]);
     const navigation = useNavigation();
+    const [cartCount, setCartCount] = useState(0);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -28,7 +29,8 @@ const Panier = () => {
             const newCart = cartItems.filter(item => item._id !== id);
             setCartItems(newCart);
             await AsyncStorage.setItem('cart', JSON.stringify(newCart));
-    
+
+            setCartCount(newCart.length);
             // Recalculer le total des articles dans le panier
             const totalArticles = newCart.reduce((total, item) => total + item.qty, 0);
             await AsyncStorage.setItem('cartTotal', JSON.stringify(totalArticles));
@@ -55,12 +57,12 @@ const Panier = () => {
         try {
             const userId = await AsyncStorage.getItem("userId");
             //console.log("ID utilisateur récupéré :", userId); 
-    
+
             if (!userId) {
                 alert("Utilisateur non connecté !");
                 return;
             }
-    
+
             const newOrder = {
                 userId,
                 produits: cartItems.map(item => ({
@@ -72,25 +74,25 @@ const Panier = () => {
                 total: totalPrice,
                 statut: "En attente"
             };
-    
+
             const response = await fetch("http://192.168.1.47:8080/api/commandes/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newOrder)
             });
-    
-            const responseText = await response.text();  
+
+            const responseText = await response.text();
             console.log("Réponse brute du serveur :", responseText);
-    
-            const data = JSON.parse(responseText);  
-    
+
+            const data = JSON.parse(responseText);
+
             if (response.ok) {
                 //console.log("Commande enregistrée :", data);
-                
+
                 // Réinitialiser le panier
-                await AsyncStorage.removeItem("cart");
-                await AsyncStorage.setItem("cartTotal", JSON.stringify(0)); // Réinitialiser le compteur
-    
+                await AsyncStorage.setItem("cart", JSON.stringify([]));
+                await AsyncStorage.setItem("cartTotal", JSON.stringify(0));
+
                 setCartItems([]);
                 navigation.navigate("Valider", { produits: cartItems });
             } else {
@@ -100,12 +102,21 @@ const Panier = () => {
             console.error("Erreur lors de la validation de la commande :", error);
         }
     };
-    
 
-
+    const recupererTotalPanier = async (setCartCount) => {
+        try {
+            const items = await AsyncStorage.getItem('cartItems');
+            const parsedItems = items ? JSON.parse(items) : [];
+            const totalCount = parsedItems.length;
+            setCartCount(totalCount);
+        } catch (error) {
+            console.error("Erreur lors de la récupération du panier :", error);
+            setCartCount(0);
+        }
+    };
 
     return (
-        <Layout> 
+        <Layout>
             <View style={styles.container}>
                 <Text style={styles.txt}>
                     {cartItems.length > 0 ? t("produits_dans_panier_plural", { count: cartItems.length }) : t("paniervide")}
@@ -142,12 +153,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: '#000',
         fontWeight: 'bold',
-        marginTop:20,
-        marginBottom:10,
+        marginTop: 20,
+        marginBottom: 10,
     },
     grandTotal: {
         borderWidth: 1,
-        borderColor: "lightgray", 
+        borderColor: "lightgray",
         backgroundColor: "#ffffff",
         padding: 6,
         margin: 5,

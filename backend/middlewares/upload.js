@@ -4,7 +4,7 @@ import path from "path";
 // Définir le stockage des images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "assets/"); // Stocke les images dans "assets/"
+    cb(null, 'uploads'); 
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Nom unique pour chaque image

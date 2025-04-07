@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
 
-const backendUrl = "http://192.168.1.47:8080"; 
+const backendUrl = "http://192.168.1.47:8080";
 
 const AjouterProduit = ({ navigation }) => {
   const [nom, setNom] = useState("");
@@ -14,7 +14,7 @@ const AjouterProduit = ({ navigation }) => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState([]);
-   const { t } = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -36,19 +36,19 @@ const AjouterProduit = ({ navigation }) => {
       Alert.alert("Permission refusée", "Nous avons besoin de la permission pour accéder à votre galerie d'images.");
       return;
     }
-  
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
-    } 
+    }
   };
-  
+
 
   // Ajouter un produit dans la base de données
   const handleAjouter = async () => {
@@ -56,12 +56,12 @@ const AjouterProduit = ({ navigation }) => {
       Alert.alert("Erreur", "Veuillez remplir tous les champs !");
       return;
     }
-  
+
     if (isNaN(prix) || isNaN(stock)) {
       Alert.alert("Erreur", "Le prix et le stock doivent être des chiffres uniquement !");
       return;
     }
-  
+
     // Créer un FormData pour envoyer l'image et les autres données
     const formData = new FormData();
     formData.append("nom", nom);
@@ -69,24 +69,24 @@ const AjouterProduit = ({ navigation }) => {
     formData.append("categorie", categorie);
     formData.append("stock", stock);
     formData.append("description", description);
-  
+
     // Ajouter l'image au FormData
     const localUri = image; // URI locale de l'image sélectionnée
     const filename = localUri.split("/").pop(); // Obtenir le nom du fichier
     const type = `image/${filename.split('.').pop()}`; // Détecter automatiquement le type de l'image
-    
-    formData.append("image", { 
+
+    formData.append("image", {
       uri: localUri,
       name: filename,
       type: type,
     });
-  
+
     try {
       const response = await fetch(`${backendUrl}/api/produits/add`, {
         method: "POST",
         body: formData,
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         Alert.alert(" ", "Produit ajouté avec succès !");
@@ -98,12 +98,10 @@ const AjouterProduit = ({ navigation }) => {
       Alert.alert("Erreur", "Une erreur est survenue !");
     }
   };
-  
-  
-  
-  
+
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <Text style={styles.title}>{t("ajouterproduit")}</Text>
 
@@ -159,12 +157,13 @@ const AjouterProduit = ({ navigation }) => {
         <Text style={styles.btnText}>{t("ajouter")}</Text>
       </TouchableOpacity>
     </View>
+ </ScrollView >
   );
 };
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20,backgroundColor:'#fff'},
+  container: { flex: 1, padding: 20 },
   title: { fontSize: 20, fontWeight: "bold", marginBottom: 29, textAlign: "center", color: "#000" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
   label: { fontSize: 15, fontWeight: "bold", width: 100 },
@@ -184,29 +183,29 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-  }, 
+  },
   imagePlaceholder: {
     color: "gray",
     fontWeight: "bold",
     textAlign: "center",
   },
-  btnAjouter: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 10, alignItems: "center", marginTop:45, },
+  btnAjouter: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 45, },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 
-    pickerContainer: {
-      flex: 1,
-      borderWidth: 1,
-      borderColor: "#9E9E9E",
-      borderRadius: 10,
-      backgroundColor: "#fff",
-      height: 48, 
-      justifyContent: "center",
-    },
-  
-    picker: {
-      width: "100%",
-      height: 50, 
-      color: "gray", 
-    },
-  });
+  pickerContainer: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#9E9E9E",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    height: 48,
+    justifyContent: "center",
+  },
+
+  picker: {
+    width: "100%",
+    height: 50,
+    color: "#000",
+  },
+});
 export default AjouterProduit;

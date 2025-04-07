@@ -28,19 +28,19 @@ export const getProductById = async (req, res) => {
 // Ajouter un produit
 export const addProduct = async (req, res) => {
   const { nom, prix, categorie, stock, description } = req.body;
-  
+
 
   const imageUrl = req.file ? `http://192.168.1.47:8080/uploads/${req.file.filename}` : null;
 
   try {
-  
+
     const newProduct = new produitModel({
       nom,
       prix,
       categorie,
       stock,
       description,
-      image:imageUrl ,
+      image: imageUrl,
     });
 
     // Sauvegarder le produit dans la base de données
@@ -59,13 +59,29 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prix, categorie, stock, description, image } = req.body;
+    const { nom, prix, categorie, stock, description } = req.body;
+
+    // Si une nouvelle image est envoyée
+    const imageUrl = req.file
+      ? `http://192.168.1.47:8080/uploads/${req.file.filename}`
+      : req.body.imagePath || req.body.image; // accepte imagePath s’il existe
+
+    const updateFields = {};
+    if (nom !== undefined) updateFields.nom = nom;
+    if (prix !== undefined) updateFields.prix = prix;
+    if (categorie !== undefined) updateFields.categorie = categorie;
+    if (stock !== undefined) updateFields.stock = stock;
+    if (description !== undefined) updateFields.description = description;
+    if (imageUrl !== undefined) updateFields.image = imageUrl;
 
     const updatedProduct = await produitModel.findByIdAndUpdate(
       id,
-      { nom, prix, categorie, stock, description, image },
+      updateFields,
       { new: true }
     );
+    if (!req.body && !req.file) {
+      return res.status(400).json({ message: "Aucune donnée envoyée" });
+    }
 
     if (!updatedProduct) {
       return res.status(404).json({ message: "Produit non trouvé" });
@@ -77,6 +93,7 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la modification du produit" });
   }
 };
+
 
 // Supprimer un produit
 export const deleteProduct = async (req, res) => {

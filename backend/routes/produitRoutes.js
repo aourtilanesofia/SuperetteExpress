@@ -8,7 +8,7 @@ import {
   getProductById, 
   getProductsByCategory
 } from "../controllers/produitController.js";
- 
+  
 const router = express.Router();
 
 // Route pour récupérer tous les produits
@@ -22,6 +22,7 @@ router.post("/add", upload.single("image"), addProduct);
 
 // Route pour mettre à jour un produit
 router.put("/update/:id", upload.single("image"), updateProduct);
+
 
 // Route pour supprimer un produit
 router.delete("/delete/:id", deleteProduct);

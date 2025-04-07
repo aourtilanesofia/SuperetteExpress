@@ -69,6 +69,6 @@ const styles = StyleSheet.create({
     color: "#329171",
 },
 hdr:{
-
+ 
 }
 });

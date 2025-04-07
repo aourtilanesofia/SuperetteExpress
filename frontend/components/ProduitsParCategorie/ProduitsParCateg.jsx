@@ -31,7 +31,7 @@ const ProduitsParCateg = ({searchText} ) => {
   );
   
 
-   return (
+   return ( 
       <FlatList
         data={produitsFiltres}
         keyExtractor={(item, index) => `${item.categorie}-${index}`}

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert,  ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
 
 
 const backendUrl = "http://192.168.1.47:8080";
- 
+
 const ModifierProduit = ({ route, navigation }) => {
   const { produit } = route.params;
 
@@ -17,21 +17,23 @@ const ModifierProduit = ({ route, navigation }) => {
   const [description, setDescription] = useState(produit.description);
   const [categories, setCategories] = useState([]);
   const { t } = useTranslation();
-  
+
 
   const [image, setImage] = useState(() => {
     if (!produit.image) return null;
-    
+
     // Si l'image est déjà une URL complète
     if (produit.image.startsWith('http')) {
       return produit.image;
     }
-    
+
     // Si c'est un chemin relatif
     return `${backendUrl}${produit.image.startsWith('/') ? '' : '/'}${produit.image}`;
   });
 
-  
+
+
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -57,18 +59,33 @@ const ModifierProduit = ({ route, navigation }) => {
 
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
   
-    if (!result.canceled) {
-      // Envoyer l'image au serveur
-      uploadImage(result.uri);
+      console.log("Résultat de la sélection d'image:", result);
+  
+      // Vérifiez si l'image a été sélectionnée
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri; // L'URI est dans le premier objet du tableau `assets`
+        console.log("Image sélectionnée:", imageUri);
+        setImage(imageUri); // Mettez à jour l'état avec l'URI de l'image
+        uploadImage(imageUri); // Si vous avez une fonction pour uploader l'image
+      } else {
+        console.log("Aucune image sélectionnée ou échec de la récupération de l'URI");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sélection d'image:", error);
     }
   };
   
+  
+  
+
+
   // Fonction pour télécharger l'image
   const uploadImage = async (uri) => {
     const formData = new FormData();
@@ -77,25 +94,42 @@ const ModifierProduit = ({ route, navigation }) => {
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : 'image';
   
-    formData.append('file', {
+    formData.append('image', {
       uri: localUri,
       name: filename,
       type: type,
     });
   
     try {
-      const response = await axios.post('http://192.168.1.47:8080/api/produits/add', formData, {
+      const response = await fetch(`${backendUrl}/api/produits/update/${produit._id}`, {
+        method: 'PUT',
+        body: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      //console.log('Image téléchargée avec succès:', response.data);
+  
+      if (!response.ok) {
+        const errorText = await response.text(); // Récupérer la réponse sous forme de texte brut
+        console.error("Erreur de serveur:", errorText);
+        Alert.alert("Erreur de serveur", errorText); // Affiche l'erreur serveur dans une alerte
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
+  
+      const data = await response.json(); // Tenter de parser la réponse en JSON
+      console.log('Image téléchargée avec succès:', data);
+  
     } catch (error) {
       console.error('Erreur lors du téléchargement de l\'image:', error);
+      Alert.alert('Erreur', "Impossible de télécharger l'image");
     }
   };
   
   
+
+
+
+
 
 
   const handleModifier = async () => {
@@ -111,11 +145,11 @@ const ModifierProduit = ({ route, navigation }) => {
     const originalImageUrl = normalizeImageUrl(produit.image);
   
     if (nom === produit.nom &&
-        prix === produit.prix.toString() &&
-        categorie === produit.categorie &&
-        stock === produit.stock.toString() &&
-        description === produit.description &&
-        currentImageUrl === originalImageUrl) {
+      prix === produit.prix.toString() &&
+      categorie === produit.categorie &&
+      stock === produit.stock.toString() &&
+      description === produit.description &&
+      currentImageUrl === originalImageUrl) {
       Alert.alert("Avertissement", "Aucune modification détectée !");
       return;
     }
@@ -138,25 +172,21 @@ const ModifierProduit = ({ route, navigation }) => {
     // Gestion de l'image
     if (currentImageUrl !== originalImageUrl) {
       if (image && image.startsWith('file://')) {
-        // Nouvelle image locale à uploader
-        try {
-          const response = await fetch(image);
-          const blob = await response.blob();
-          modifications.append("image", blob, `product_${Date.now()}.${image.split('.').pop()}`);
-        } catch (error) {
-          console.error("Erreur de traitement de l'image:", error);
-          Alert.alert("Erreur", "Impossible de traiter l'image sélectionnée");
-          return;
-        }
+        const localUri = image;
+        const filename = localUri.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image';
+  
+        modifications.append('image', {
+          uri: localUri,
+          name: filename,
+          type: type,
+        });
       } else if (image) {
-        // Image déjà sur le serveur (chemin relatif ou URL complète)
-        const imagePath = image.startsWith(backendUrl) 
-          ? image.replace(backendUrl, '') 
-          : image;
-        modifications.append("imagePath", imagePath);
+        const imagePath = image.startsWith(backendUrl) ? image.replace(backendUrl, '') : image;
+        modifications.append("imagePath", imagePath); // Pas besoin d'upload si l'image existe déjà sur le serveur
       } else {
-        // Image supprimée
-        modifications.append("removeImage", "true");
+        modifications.append("removeImage", "true"); // Si aucune image n'est fournie, supprimer l'ancienne image
       }
     }
   
@@ -172,32 +202,35 @@ const ModifierProduit = ({ route, navigation }) => {
         throw new Error(data.message || `Erreur ${response.status}: ${response.statusText}`);
       }
   
+      // Afficher un message de succès
       Alert.alert(" ", data.message || "Mise à jour effectuée avec succès !", [
-        { 
-          text: "OK", 
-          onPress: () => navigation.navigate('DetailsProduit', { 
-            produit: data.produit || data.updatedProduct 
-          }) 
+        {
+          text: "OK",
+          onPress: () => navigation.navigate('GestiondesProduits', {
+            produit: data.produit || data.updatedProduct
+          })
         }
       ]);
     } catch (error) {
       console.error("Erreur API:", error);
       Alert.alert(
-        "Erreur", 
+        "Erreur",
         error.message || "Une erreur s'est produite lors de la modification",
-        [{ text: "OK", onPress: () => {} }]
+        [{ text: "OK", onPress: () => { } }]
       );
     }
   };
   
-  
-  const imageUri = image 
-  ? image.startsWith('http') || image.startsWith('file://') 
-    ? image 
-    : `${backendUrl}${image.startsWith('/') ? image : '/' + image}`
-  : null;
+
+
+  const imageUri = image
+    ? image.startsWith('http') || image.startsWith('file://')
+      ? image
+      : `${backendUrl}${image.startsWith('/') ? image : '/' + image}`
+    : null;
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <Text style={styles.title}>{t("modifierproduit")}</Text>
 
@@ -239,22 +272,20 @@ const ModifierProduit = ({ route, navigation }) => {
       <View style={styles.row}>
         <Text style={styles.label}>{t("image")} :</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-  {image ? (
-    <Image
-    source={{
-      uri: image && (image.startsWith('http') || image.startsWith('file://') || image.startsWith(backendUrl)) 
-        ? image
-        : `${backendUrl}${image.startsWith('/') ? '' : '/'}${image}`
-    }}
-    style={styles.image}
-    onError={(e) => {
-      console.log("Erreur de chargement d'image:", e.nativeEvent.error);
-    }}
-  />
-  ) : (
-    <Text style={styles.imagePlaceholder}>+ Ajouter une image</Text>
-  )}
-</TouchableOpacity>
+          {image ? (
+            <Image
+            source={{
+              uri: image && (image.startsWith('http') || image.startsWith('file://') || image.startsWith(backendUrl))
+                ? image
+                : `${backendUrl}${image.startsWith('/') ? '' : '/'}${image}`
+            }}
+            style={styles.image}
+          />
+          ) : (
+            <Text style={styles.imagePlaceholder}>+ Ajouter une image</Text>
+          )}
+        </TouchableOpacity>
+
       </View>
 
       <View style={styles.row}>
@@ -266,12 +297,13 @@ const ModifierProduit = ({ route, navigation }) => {
         <Text style={styles.btnText}>{t("Mettre_à_jour")}</Text>
       </TouchableOpacity>
     </View>
+    </ScrollView>
   );
 };
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 20 },
   title: { fontSize: 20, fontWeight: "bold", marginBottom: 30, textAlign: "center", color: "#000" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
   label: { fontSize: 15, fontWeight: "bold", width: 100 },
@@ -299,10 +331,6 @@ const styles = StyleSheet.create({
     height: 50,
     color: "#000",
   },
-
-
-
-
 });
 
 export default ModifierProduit;
