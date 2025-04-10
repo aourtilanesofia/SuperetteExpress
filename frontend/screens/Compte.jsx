@@ -60,7 +60,7 @@ const Compte = ({ navigation }) => {
                     <View style={styles.profileHeader}>
                         <View style={styles.avatarContainer}>
                             <Image 
-                                source={user.profilePic ? { uri: user.profilePic } : require('../assets/user.png')} 
+                                source={user.profilePic ? { uri: user.profilePic } :   { uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} 
                                 style={styles.avatar}
                             />
                         </View>

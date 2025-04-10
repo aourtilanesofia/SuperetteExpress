@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     color:'#00000',
   },
   active:{
-  color:'#329171',  
+  color:'#2E7D32',  
   },
 })

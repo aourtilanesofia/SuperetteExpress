@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   active: {
-    color: '#329171',
+    color: '#2E7D32',
   },
   badge: {
     position: 'absolute',
