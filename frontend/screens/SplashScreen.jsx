@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         justifyContent:'center',
         alignItems:'center',
-        backgroundColor:'#3f8659',
+        backgroundColor:'#2E7D32',
 
     },
     txt:{

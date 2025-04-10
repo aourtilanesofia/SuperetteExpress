@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         textAlign: "right",
     },
     paiementButton: {
-        backgroundColor: "#329171",
+        backgroundColor: "#2E7D32",
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 5,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     paiementButtonText: {
         color: "#fff",
         fontSize: 14,
-        fontWeight: "bold",
+        //fontWeight: "bold",
         textAlign: 'center',
     },
     disabledButton: {

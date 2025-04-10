@@ -20,6 +20,7 @@ import categorieRoutes from './routes/categorieRoutes.js';
 import produitRoutes from "./routes/produitRoutes.js";
 import panierRoutes from "./routes/panierRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import recetteRoutes from './routes/recetteRoutes.js';
 
 //Configuration dot env
 dotenv.config();
@@ -80,6 +81,7 @@ app.use("/assets", express.static("assets"));
 app.use("/api/produits", produitRoutes);
 app.use("/panier", panierRoutes);
 app.use("/api/commandes", orderRoutes);
+app.use('/api/recettes', recetteRoutes);
 
 
 

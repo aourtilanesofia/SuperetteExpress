@@ -11,21 +11,20 @@ import { useTranslation } from "react-i18next";
 import { LogBox } from "react-native";
 
 const AcceuilConsommateur = ({ navigation }) => {
-
   LogBox.ignoreLogs([
     "Pagination: Support for defaultProps will be removed from function components",
   ]);
+
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const flatListRef = useRef(null);
 
-  // Gérer la visibilité du bouton flottant en fonction du défilement
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setShowScrollTop(offsetY > 200); 
+    setShowScrollTop(offsetY > 200);
   };
- 
+
   return (
     <Layout>
       <View style={styles.hdr}>
@@ -39,8 +38,8 @@ const AcceuilConsommateur = ({ navigation }) => {
 
       <FlatList
         ref={flatListRef}
-        onScroll={handleScroll} 
-        scrollEventThrottle={16} 
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         ListHeaderComponent={
           <>
             <Header searchText={searchText} setSearchText={setSearchText} onSearch={() => {}} />
@@ -62,8 +61,16 @@ const AcceuilConsommateur = ({ navigation }) => {
         )}
         keyExtractor={(item, index) => index.toString()}
         ListFooterComponent={<View style={{ height: 100 }} />}
-        contentContainerStyle={{ paddingBottom: 80 }} 
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
+
+      {/* Bouton flottant pour scanner le code-barres */}
+      <TouchableOpacity
+        style={styles.floatingButtonScan}
+        onPress={() => navigation.navigate("BarcodeScanner")} // Navigation vers la page de scan
+      >
+        <AntDesign name="scan1" size={28} color="#fff" />
+      </TouchableOpacity>
 
       {/* Bouton flottant pour remonter en haut */}
       {showScrollTop && (
@@ -83,12 +90,12 @@ export default AcceuilConsommateur;
 const styles = StyleSheet.create({
   hdr: {
     height: 60,
-    backgroundColor: "#329171",
+    backgroundColor: "#2E7D32",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 15,
-    marginTop:42,
+    marginTop: 42,
   },
   plus: {
     color: "#fff",
@@ -104,7 +111,23 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: 60,
-    backgroundColor: "#329171",
+    backgroundColor: "#2E7D32",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  floatingButtonScan: {
+    position: "absolute",
+    left: 20,
+    bottom: 60,
+    backgroundColor: "#2E7D32",
     width: 50,
     height: 50,
     borderRadius: 25,

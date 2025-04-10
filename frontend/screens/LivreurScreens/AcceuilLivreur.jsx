@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   hdr: {
     marginTop:42,
     height: 60, 
-    backgroundColor: "#329171",
+    backgroundColor: "#2E7D32",
     flexDirection: "row", 
     alignItems: "center",
     justifyContent: "space-between",

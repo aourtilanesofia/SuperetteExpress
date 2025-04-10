@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     categoryText: { flex: 1, fontSize: 16 },
     editButton: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 5, marginRight: 5 },
     deleteButton: { backgroundColor: 'red', padding: 10, borderRadius: 5 },
-    buttonText: { color: '#fff', fontWeight: 'bold' },
+    buttonText: { color: '#fff', fontWeight: '600' },
     addButton: {
         position: 'absolute',
         bottom: 20,

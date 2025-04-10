@@ -5,28 +5,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 import { useTranslation } from "react-i18next";
 
-const backendUrl = "http://192.168.1.47:8080"; // Remplace par ton URL de backend
-//const backendUrl = "http://192.168.43.107:8080";
-const ProductsCard = ({ p }) => {
-  //console.log('ProductsCard rendu');
-  //console.log('Produit reçu :', p);
+const backendUrl = "http://192.168.1.47:8080";
 
+const ProductsCard = ({ p }) => {
   const [totalPanier, setTotalPanier] = useState(0);
   const navigation = useNavigation();
   const [quantite, setQuantite] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
 
-  let localAsset = null;
-
   const imageUri =
-  p.image && typeof p.image === "string"
-    ? p.image.startsWith("http") || p.image.startsWith("file://")
-      ? p.image
-      : `${backendUrl}${p.image}`
-    : null;
-  //console.log('Image URI:', imageUri);
-
+    p.image && typeof p.image === "string"
+      ? p.image.startsWith("http") || p.image.startsWith("file://")
+        ? p.image
+        : `${backendUrl}${p.image}`
+      : null;
 
   const augmenterQuantite = () => setQuantite(quantite + 1);
   const diminuerQuantite = () => {
@@ -45,31 +38,6 @@ const ProductsCard = ({ p }) => {
     }
   };
 
-  const ajouterAuPanier = async () => {
-    if (p.stock === 0) {
-      Alert.alert(" ", "Le produit est en rupture de stock !");
-      return;
-    }
-
-    /*try {
-        const panierExistantRaw = await AsyncStorage.getItem('cart');
-        const panierExistant = JSON.parse(panierExistantRaw) || [];
-        const indexProduit = panierExistant.findIndex(item => item._id === p._id);
-
-        if (indexProduit !== -1) {
-            panierExistant[indexProduit].qty += quantite;
-        } else {
-            panierExistant.push({ ...p, qty: quantite });
-        }
-
-        await AsyncStorage.setItem('cart', JSON.stringify(panierExistant));
-        await mettreAJourPanier();
-        
-        setModalVisible(true); // Affiche le modal
-    } catch (error) {
-        console.error("Erreur lors de l'ajout au panier :", error);
-    }*/
-  };
   const confirmerAjoutAuPanier = async () => {
     try {
       const panierExistantRaw = await AsyncStorage.getItem('cart');
@@ -85,271 +53,405 @@ const ProductsCard = ({ p }) => {
       await AsyncStorage.setItem('cart', JSON.stringify(panierExistant));
       await mettreAJourPanier();
 
-      setModalVisible(false); // Fermer le modal après l'ajout
+      const ingredients = await getIngredientsFromCart();
+
+if (ingredients.length > 0) {
+  try {
+    const response = await fetch(`http://192.168.1.47:8080/api/recettes/recherche`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ingredients }),
+    });
+
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      const recette = data[0]; // prend la première recette correspondante
+      navigation.navigate('VideoRecette', { url: recette.video }); // tu dois créer cet écran
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la recette :", error);
+  }
+}
+
+
+      setModalVisible(false);
       Alert.alert(" ", "Produit ajouté au panier !");
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier :", error);
     }
   };
 
-
-
   useEffect(() => {
     mettreAJourPanier();
   }, []);
-  //console.log(p);
 
-
+  const getIngredientsFromCart = async () => {
+    try {
+      const panierRaw = await AsyncStorage.getItem('cart');
+      const panier = JSON.parse(panierRaw) || [];
+      const ingredients = panier.map(item => item.nom); // suppose que chaque produit a un champ nom
+      return ingredients;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des ingrédients :", error);
+      return [];
+    }
+  };
+  
 
   return (
     <>
-      {/* Ajoute le modal ici */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <View style={styles.totale}>
-              <Text style={styles.modalTitle}>{t("prix_totale")} : </Text>
-              <Text style={styles.modalPrice}>{p.prix * quantite} DA</Text>
-            </View>
-
-            <View style={styles.modalProduct}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>{t("Votre sélection")}</Text>
+            
+            <View style={styles.modalProductContainer}>
               <Image
                 source={{ uri: imageUri }}
-                style={styles.image}
-                onError={() => console.error("Erreur de chargement de l'image :", imageUri)}
+                style={styles.modalImage}
+                onError={() => console.error("Erreur de chargement de l'image")}
               />
-              <View>
-                <Text style={styles.modalText}>{p.nom}</Text>
-                <Text style={styles.modalText}>{t("prix")}: {p.prix} DA</Text>
+              
+              <View style={styles.modalProductInfo}>
+                <Text style={styles.modalProductName}>{p.nom}</Text>
+                <Text style={styles.modalProductPrice}>{p.prix} DA</Text>
               </View>
-              <View style={styles.counter}>
-                <TouchableOpacity style={styles.smallButton} onPress={diminuerQuantite}>
-                  <Text style={styles.buttonText}> -</Text>
+            </View>
+
+            <View style={styles.quantityContainer}>
+              <Text style={styles.quantityLabel}>{t("Quantité")}:</Text>
+              <View style={styles.quantityControls}>
+                <TouchableOpacity 
+                  style={[styles.quantityButton, quantite === 1 && styles.disabledButton]} 
+                  onPress={diminuerQuantite}
+                  disabled={quantite === 1}
+                >
+                  <Text style={styles.quantityButtonText}>-</Text>
                 </TouchableOpacity>
-                <Text style={styles.quantityText}>{quantite}</Text>
-                <TouchableOpacity style={styles.smallButton} onPress={augmenterQuantite}>
-                  <Text style={styles.buttonText}>+</Text>
+                
+                <Text style={styles.quantityValue}>{quantite}</Text>
+                
+                <TouchableOpacity 
+                  style={styles.quantityButton} 
+                  onPress={augmenterQuantite}
+                >
+                  <Text style={styles.quantityButtonText}>+</Text>
                 </TouchableOpacity>
               </View>
+            </View>
+
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalLabel}>{t("Total")}:</Text>
+              <Text style={styles.totalPrice}>{p.prix * quantite} DA</Text>
             </View>
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.btnAdd} onPress={confirmerAjoutAuPanier}>
-                <Text style={styles.txt}>{t("Ajoutez_à_la_liste")}</Text>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]} 
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>{t("annuler")}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btnCancel} onPress={() => setModalVisible(false)}>
-                <Text style={styles.txt}>{t("annuler")}</Text>
+              
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.confirmButton]} 
+                onPress={confirmerAjoutAuPanier}
+              >
+                <Text style={styles.modalButtonText}>{t("Confirmer")}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Contenu de la carte produit */}
       <View style={styles.card}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.productImage}
+            onError={(e) => console.error("Erreur de chargement de l'image")}
+          />
+          {p.stock === 0 && (
+            <View style={styles.outOfStockBadge}>
+              <Text style={styles.outOfStockText}>{t("Rupture")}</Text>
+            </View>
+          )}
+        </View>
 
-        <Image
-          source={{ uri: imageUri }}
-          style={styles.image}
-          onError={(e) => console.error("Erreur de chargement de l'image :", e.nativeEvent.error)}
-        />
-        <Text style={styles.title}>{p?.nom || "Produit inconnu"}</Text>
-        <Text style={styles.price}>{t("prix")} : {p?.prix ? `${p.prix} DA` : "Prix non disponible"}</Text>
-        <View style={styles.btnContainer}>
-          <TouchableOpacity style={styles.btnDetails} onPress={() => navigation.navigate('ProduitsDetails', { id: p._id })}>
-            <Text style={styles.btnText}>{t("Détails")}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.btnAddd}
-            onPress={async () => {
-              if (p.stock === 0) {
-                Alert.alert(" ", "Le produit est en rupture de stock !");
-                return;
-              }
-              await ajouterAuPanier();
-              setModalVisible(true);
-            }}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName} numberOfLines={2}>{p?.nom || "Produit inconnu"}</Text>
+          <Text style={styles.productPrice}>{t("prix")} :{p?.prix ? `${p.prix} DA` : "Prix non disponible"}</Text>
+        </View>
+
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity 
+            style={styles.detailsButton}
+            onPress={() => navigation.navigate('ProduitsDetails', { id: p._id })}
           >
-            <Text style={styles.btnText}>{t("ajouter")}</Text>
+            <Text style={styles.buttonText}>{t("Détails")}</Text>
           </TouchableOpacity>
+          
+          <TouchableOpacity
+  style={[styles.btnAddd, p.stock === 0 && styles.outOfStockButton]}
+  onPress={() => {
+    if (p.stock === 0) {
+      Alert.alert(" ", "Le produit est en rupture de stock !");
+      return;
+    }
+    setModalVisible(true);
+  }}
+>
+  <Text style={styles.buttonText}>{t("ajouter")}</Text>
+</TouchableOpacity>
         </View>
       </View>
     </>
   );
-
 };
 
 export default ProductsCard;
 
 const styles = StyleSheet.create({
+  // Carte produit
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 15,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
     width: '46%',
-    margin: 5,
-    alignItems: 'center',
+    margin: '2%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    borderColor: '#2E7D32',
+    shadowColor: "#2E7D32",
+    shadowRadius: 4,
+    elevation: 3,
     borderWidth: 0.7,
-    borderColor: '#329171',
-    shadowColor: "#329171",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
+    borderColor: '#2E7D32',
   },
-  image: {
-    width: 100,
-    height: 100,
-    resizeMode: 'cover',
+  imageContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  productImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    resizeMode: 'contain',
+    //backgroundColor: '#F8F8F8',
+  },
+  outOfStockBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.9)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 10,
-    backgroundColor: '#f8f8f8',
-    marginBottom: 10,
   },
-  title: {
-    fontSize: 14,
+  outOfStockText: {
+    color: '#FFF',
+    fontSize: 10,
     fontWeight: 'bold',
-    textAlign: 'center', 
-    marginBottom: 6,
-    color: '#333',
-    textTransform: 'capitalize',
   },
-  price: {
-    fontSize: 14,
-    marginBottom: 10,
+  productInfo: {
+    marginBottom: 12,
+    minHeight: 60,
+  },
+  productName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
     textAlign: 'center',
   },
-  btnContainer: {
+  productPrice: {
+    fontSize: 13,
+    //fontWeight: '700',
+    color: '#000',
+    textAlign: 'center',
+  },
+  buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
   },
-  btnDetails: {
-    backgroundColor: '#329171',
+  detailsButton: {
+    backgroundColor: '#2E7D32',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 5,
+    borderRadius: 6,
     flex: 1,
-    marginRight: 5,
+    marginRight: 6,
     alignItems: 'center',
-    elevation: 6,
   },
-  btnAddd: {
-    backgroundColor: '#329171',
+  addButton: {
+    backgroundColor: '#2E7D32',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 5,
+    borderRadius: 6,
     flex: 1,
     alignItems: 'center',
-    elevation: 6,
   },
-  btnText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: 'bold',
+  disabledButton: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.7,
   },
-  modalContainer: {
+  buttonText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  // Modal
+  modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 20,
-    width: '93%',
-    height: '50%'
+    width: '90%',
+    maxWidth: 400,
   },
-  modalTitle: {
-    fontSize: 18,
+  modalHeader: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
     textAlign: 'center',
-    //marginLeft:50,
+    marginBottom: 20,
   },
-  modalPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
-    textAlign: 'center',
-  },
-  modalProduct: {
+  modalProductContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 50,
+    marginBottom: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   modalImage: {
-    width: 70,
-    height: 70,
-    marginRight: 10,
-    //marginLeft: 20,
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 15,
   },
-  modalText: {
+  modalProductInfo: {
+    flex: 1,
+  },
+  modalProductName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+  },
+  modalProductPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    maxWidth: 150,
-    //justifyContent:'space-between',
-    padding: 5,
+    color: '#333',
   },
-  counter: {
+  quantityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  quantityLabel: {
+    fontSize: 16,
+    color: '#666',
+  },
+  quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 15,
+  },
+  quantityButton: {
+    backgroundColor: '#2E7D32',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quantityButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    lineHeight: 20,
+  },
+  quantityValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 15,
+    minWidth: 20,
+    textAlign: 'center',
+  },
+  totalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 25,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  totalPrice: {
+    fontSize: 18,
+    fontWeight: 'bold', 
+    color: '#333',
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 50,
-
   },
-  btnAdd: {
-    backgroundColor: 'green',
-    padding: 10,
-    borderRadius: 5,
-    color: '#fff',
-  },
-  btnCancel: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    color: '#fff',
-  },
-  smallButton: {
-    backgroundColor: '#BEBEBE',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    marginHorizontal: 5,
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-
-  buttonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: 'bold',
+  cancelButton: {
+    backgroundColor: '#E0E0E0',
+    marginRight: 10,
   },
-
-  quantityText: {
+  confirmButton: {
+    backgroundColor: '#2E7D32',
+    marginLeft: 10,
+  },
+  modalButtonText: {
+    color: '#FFF',
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: '600',
   },
-  txt: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
-  totale: {
-    flexDirection: 'row',
-    textAlign: 'center',
+  btnAddd: {
+    backgroundColor: '#2E7D32',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  }
+    elevation: 6,
+  },
+  outOfStockButton: {
+    backgroundColor: '#2E7D32', // Gris pour indiquer rupture
+    // Vous pouvez aussi ajouter d'autres styles si besoin
+    // borderWidth: 1,
+    // borderColor: '#FF0000',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
 });

@@ -163,14 +163,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     cnxButton: {
-        backgroundColor: '#329171',
+        backgroundColor: '#2E7D32',
         borderRadius: 10,
         marginVertical: 20,
     },
     cnxtxt: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '600',
         textAlign: 'center',
         padding: 12,
     },

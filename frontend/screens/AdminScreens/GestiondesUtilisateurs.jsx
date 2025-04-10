@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         marginRight:10,
       },
       txtdash:{
-        backgroundColor:'#329171',
+        backgroundColor:'#2E7D32',
         color:'#fff',
         textAlign:'center',
         padding:10,
