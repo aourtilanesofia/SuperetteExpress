@@ -15,6 +15,7 @@ const ModifierProduit = ({ route, navigation }) => {
   const [categorie, setCategorie] = useState(produit.categorie);
   const [stock, setStock] = useState(produit.stock.toString());
   const [description, setDescription] = useState(produit.description);
+  const [codeBarre, setCodeBarre] = useState(produit.codeBarre || '');
   const [categories, setCategories] = useState([]);
   const { t } = useTranslation();
 
@@ -149,6 +150,7 @@ const ModifierProduit = ({ route, navigation }) => {
       categorie === produit.categorie &&
       stock === produit.stock.toString() &&
       description === produit.description &&
+      codeBarre === produit.codeBarre &&
       currentImageUrl === originalImageUrl) {
       Alert.alert("Avertissement", "Aucune modification détectée !");
       return;
@@ -168,6 +170,8 @@ const ModifierProduit = ({ route, navigation }) => {
     if (categorie !== produit.categorie) modifications.append("categorie", categorie);
     if (stock !== produit.stock.toString()) modifications.append("stock", parseInt(stock));
     if (description !== produit.description) modifications.append("description", description);
+    if (codeBarre !== produit.codeBarre) modifications.append("codeBarre", codeBarre);
+
   
     // Gestion de l'image
     if (currentImageUrl !== originalImageUrl) {
@@ -270,6 +274,17 @@ const ModifierProduit = ({ route, navigation }) => {
       </View>
 
       <View style={styles.row}>
+          <Text style={styles.label}>{t("codeBarre")} :</Text>
+          <TextInput
+            style={styles.input}
+            value={codeBarre}
+            onChangeText={setCodeBarre}
+            keyboardType="default"
+            placeholder="Code barre du produit"
+          />
+        </View>
+
+      <View style={styles.row}>
         <Text style={styles.label}>{t("image")} :</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
           {image ? (
@@ -313,8 +328,8 @@ const styles = StyleSheet.create({
   imageContainer: { width: 150, height: 150, borderRadius: 10, backgroundColor: "#ddd", justifyContent: "center", alignItems: "center", overflow: "hidden", flex: 1 },
   image: { width: "100%", height: "100%", resizeMode: "cover" },
   imagePlaceholder: { color: "#329171", fontWeight: "bold", textAlign: "center" },
-  btnModifier: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 45, },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  btnModifier: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 30, },
+  btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 
   pickerContainer: {
     flex: 1,

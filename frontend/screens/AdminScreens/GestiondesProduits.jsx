@@ -138,8 +138,8 @@ const styles = StyleSheet.create({
 
   // Style pour les catégories
   categorieContainer: { marginBottom: 15, backgroundColor: "#fff", borderRadius: 10, elevation: 5 },
-  categorieHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#329171", padding: 16, borderRadius: 10 },
-  categorieTitle: { fontSize: 17, fontWeight: "bold", color: "white" },
+  categorieHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#2E7D32", padding: 16, borderRadius: 10 },
+  categorieTitle: { fontSize: 17, fontWeight: '600', color: "white" },
 
   produitContainer: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ddd" },
   produit: { flexDirection: "row", alignItems: "center", marginBottom: 10 },

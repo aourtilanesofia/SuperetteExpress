@@ -1,27 +1,23 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
-import { fonts } from '../../node_modules/@react-navigation/native/lib/module/theming/fonts';
-import AcceuilLivreur from './AcceuilLivreur';
 import Octicons from 'react-native-vector-icons/Octicons';
-import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ConLivreur = ({ navigation }) => {
-    const [secureEntery, setSecureEntery] = useState(true);
+    const [secureEntry, setSecureEntry] = useState(true);
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
-
-    //login function
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !mdp) {
-            Alert.alert("Erreur", "Veuillez remplir tous les champs !");
-            setEmail('');
-            setMdp('');
+            Alert.alert("Champs requis", "Veuillez remplir tous les champs");
             return;
         }
+
+        setIsLoading(true);
 
         try {
             const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/connexionL", {
@@ -31,158 +27,210 @@ const ConLivreur = ({ navigation }) => {
             });
 
             const data = await response.json();
-            //console.log("Données reçues :", data);
 
             if (!response.ok || !data.livreur || !data.token) {
-                Alert.alert("Erreur", data.message || "Connexion échouée !");
-                setEmail(''); 
-                setMdp('');
+                Alert.alert("Erreur", data.message || "Email ou mot de passe incorrect");
                 return;
             }
 
-            // Sauvegarde du token et des données utilisateur
-            await AsyncStorage.setItem('token', data.token);
-            await AsyncStorage.setItem('user', JSON.stringify(data.livreur));
+            await AsyncStorage.multiSet([
+                ['token', data.token],
+                ['user', JSON.stringify(data.livreur)]
+            ]);
 
-            Alert.alert(" ", "Bienvenue, vous êtes maintenant connecté(e) !");
-            setEmail('');
-            setMdp('');
             navigation.navigate("AcceuilLivreur");
+            Alert.alert("Connexion réussie", `Bienvenue ${data.livreur.nom || ''}!`);
 
         } catch (error) {
-            console.error("Erreur de connexion :", error);
-            Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
+            console.error("Erreur de connexion:", error);
+            Alert.alert("Erreur", "Problème de connexion au serveur");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-
-
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.txt1}>Connexion</Text>
-
-            {/*formulaire*/}
-            <View style={styles.formContainer}>
-                <View style={styles.inputContainer}>
-                    <Ionicons name='mail-outline' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre E-mail' keyboardType='email-address' value={email}
-                        onChangeText={setEmail}
-                        autoComplete={'email'} />
+        <LinearGradient
+            colors={['#FFFFFF', '#E8F5E9']}
+            style={styles.container}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+        >
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.keyboardView}
+            >
+                <View style={styles.header}>
+                    <Text style={styles.title}>Connexion Livreur</Text>
+                    <Text style={styles.subtitle}>Accédez à votre espace professionnel</Text>
                 </View>
 
-                <View style={styles.inputContainer}>
-                    <SimpleLineIcon name='lock' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre mot de passe' secureTextEntry={secureEntery} value={mdp}
-                        onChangeText={setMdp} />
-                    <TouchableOpacity onPress={() => setSecureEntery(prev => !prev)}>
-                        <Octicons name={secureEntery ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
+                <View style={styles.formContainer}>
+                    {/* Email Input */}
+                    <View style={styles.inputContainer}>
+                        <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder='Adresse email'
+                            placeholderTextColor="#939494"
+                            keyboardType='email-address'
+                            value={email}
+                            onChangeText={setEmail}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    </View>
+
+                    {/* Password Input */}
+                    <View style={styles.inputContainer}>
+                        <Ionicons name='lock-closed-outline' size={22} color={'#329171'} style={styles.icon} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder='Mot de passe'
+                            placeholderTextColor="#939494"
+                            secureTextEntry={secureEntry}
+                            value={mdp}
+                            onChangeText={setMdp}
+                            autoCapitalize="none"
+                        />
+                        <TouchableOpacity 
+                            onPress={() => setSecureEntry(prev => !prev)}
+                            style={styles.eyeIcon}
+                        >
+                            <Octicons 
+                                name={secureEntry ? 'eye-closed' : 'eye'} 
+                                size={19} 
+                                color={'#329171'} 
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Forgot Password */}
+                    <TouchableOpacity style={styles.forgotPassword}>
+                        <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
                     </TouchableOpacity>
+
+                    {/* Login Button */}
+                    <TouchableOpacity 
+                        style={[styles.loginButton, isLoading && styles.disabledButton]}
+                        onPress={handleLogin}
+                        disabled={isLoading}
+                    >
+                        <Text style={styles.loginButtonText}>
+                            {isLoading ? 'Connexion...' : 'Se connecter'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/* Sign Up Link */}
+                    <View style={styles.signupContainer}>
+                        <Text style={styles.signupText}>Pas encore de compte ? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('InsLivreur')}>
+                            <Text style={styles.signupLink}>S'inscrire</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-
-                <TouchableOpacity style={styles.cnxButton} onPress={handleLogin}>
-                    <Text style={styles.cnxtxt}>Se connecter</Text>
-                </TouchableOpacity>
-
-
-                <View style={styles.footerContainer}>
-                    <Text style={styles.accountText}>Vous n'avez pas un compte?</Text>
-                    <Text style={styles.signuptext} onPress={() => navigation.navigate('InsLivreur')}>S'inscrire</Text>
-                </View>
-
-            </View>
-        </View>
-    )
-}
-
-export default ConLivreur;
+            </KeyboardAvoidingView>
+        </LinearGradient>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        padding: 25,
     },
-    txt1: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: '#329171',
-        marginTop: 70,
-
+    keyboardView: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    header: {
+        paddingHorizontal: 30,
+        marginBottom: 40,
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#2E7D32',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#616161',
+        textAlign: 'center',
     },
     formContainer: {
-        marginTop: 100,
+        paddingHorizontal: 30,
     },
     inputContainer: {
-        borderWidth: 1,
-        borderColor: '#329171',
-        borderRadius: 15,
-        height: 50,
-        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 15,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 56,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    icon: {
+        marginRight: 10,
     },
     textInput: {
         flex: 1,
-        paddingHorizontal: 15,
-        fontFamily: fonts.Ligth,
-    },
-    cnxButton: {
-        backgroundColor: '#329171',
-        borderRadius: 15,
-        marginVertical: 33,
-    },
-    cnxtxt: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: 12,
-    },
-    txtggl: {
-        textAlign: 'center',
-        marginVertical: 40,
-        fontSize: 13,
-        color: '#4f4f4f',
-    },
-    googlBtn: {
-
-        flexDirection: 'row',
-        borderWidth: 1.5,
-        borderColor: "#329171",
-        borderRadius: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-
-
-    },
-    img: {
-        width: 25,
-        height: 25,
-
-    },
-    googleText: {
-        color: '#000',
+        height: '100%',
+        color: '#333',
         fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: 12,
     },
-    footerContainer: {
-        flexDirection: 'row',
+    eyeIcon: {
+        padding: 5,
+    },
+    forgotPassword: {
+        alignSelf: 'flex-end',
+        marginBottom: 25,
+    },
+    forgotPasswordText: {
+        color: '#329171',
+        fontSize: 14,
+    },
+    loginButton: {
+        backgroundColor: '#2E7D32',
+        borderRadius: 12,
+        height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 20,
-        gap: 5,
+        shadowColor: '#2E7D32',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
     },
-    accountText: {
-        color: '#4f4f4f',
-        fontFamily: fonts.Regular,
+    disabledButton: {
+        opacity: 0.7,
     },
-    signuptext: {
-        color: '#4f4f4f',
-        fontWeight: 'bold',
-    }
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    signupContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 25,
+    },
+    signupText: {
+        color: '#616161',
+        fontSize: 15,
+    },
+    signupLink: {
+        color: '#2E7D32',
+        fontSize: 15,
+        fontWeight: '600',
+    },
+});
 
-})
+export default ConLivreur;

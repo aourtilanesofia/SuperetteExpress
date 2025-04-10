@@ -12,6 +12,7 @@ const AjouterProduit = ({ navigation }) => {
   const [categorie, setCategorie] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
+  const [codeBarre, setCodeBarre] = useState(""); // Ajout de l'état pour le code barre
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState([]);
   const { t } = useTranslation();
@@ -49,16 +50,20 @@ const AjouterProduit = ({ navigation }) => {
     }
   };
 
-
   // Ajouter un produit dans la base de données
   const handleAjouter = async () => {
-    if (!nom || !prix || !categorie || !stock || !description || !image) {
+    if (!nom || !prix || !categorie || !stock || !description || !image || !codeBarre) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs !");
       return;
     }
 
     if (isNaN(prix) || isNaN(stock)) {
       Alert.alert("Erreur", "Le prix et le stock doivent être des chiffres uniquement !");
+      return;
+    }
+
+    if (isNaN(codeBarre)) {
+      Alert.alert("Erreur", "Le code barre doit contenir uniquement des chiffres !");
       return;
     }
 
@@ -69,6 +74,7 @@ const AjouterProduit = ({ navigation }) => {
     formData.append("categorie", categorie);
     formData.append("stock", stock);
     formData.append("description", description);
+    formData.append("codeBarre", codeBarre); // Ajouter le code barre au FormData
 
     // Ajouter l'image au FormData
     const localUri = image; // URI locale de l'image sélectionnée
@@ -99,68 +105,76 @@ const AjouterProduit = ({ navigation }) => {
     }
   };
 
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("ajouterproduit")}</Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t("ajouterproduit")}</Text>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("nom")} :</Text>
-        <TextInput style={styles.input} value={nom} onChangeText={setNom} placeholder="Nom du produit" />
-      </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("nom")} :</Text>
+          <TextInput style={styles.input} value={nom} onChangeText={setNom} placeholder="Nom du produit" />
+        </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("prix")} :</Text>
-        <TextInput style={styles.input} value={prix} onChangeText={setPrix} keyboardType="numeric" placeholder="Prix en DA" />
-      </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("prix")} :</Text>
+          <TextInput style={styles.input} value={prix} onChangeText={setPrix} keyboardType="numeric" placeholder="Prix en DA" />
+        </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("cat")} :</Text>
-        <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={categorie}
-          style={styles.picker}
-          onValueChange={(itemValue) => setCategorie(itemValue)}
-          >
-          <Picker.Item label="Sélectionner une catégorie" value="" />
-            {categories.map((cat) => (
-          <Picker.Item key={cat._id} label={cat.nom} value={cat.nom} />
-                      ))}
-        </Picker>
-      </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("cat")} :</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={categorie}
+              style={styles.picker}
+              onValueChange={(itemValue) => setCategorie(itemValue)}
+            >
+              <Picker.Item label="Sélectionner une catégorie" value="" />
+              {categories.map((cat) => (
+                <Picker.Item key={cat._id} label={cat.nom} value={cat.nom} />
+              ))}
+            </Picker>
+          </View>
+        </View>
 
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("Stock")} :</Text>
+          <TextInput style={styles.input} value={stock} onChangeText={setStock} keyboardType="numeric" placeholder="Quantité en stock" />
+        </View>
 
-    </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("Stock")} :</Text>
-        <TextInput style={styles.input} value={stock} onChangeText={setStock} keyboardType="numeric" placeholder="Quantité en stock" />
-      </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("Code Barre")} :</Text>
+          <TextInput 
+            style={styles.input} 
+            value={codeBarre} 
+            onChangeText={setCodeBarre} 
+            keyboardType="default"
+            placeholder="Code Barre"
+          />
+        </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("image")} :</Text>
-        <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.image} />
-          ) : (
-            <Text style={styles.imagePlaceholder}>Choisir une image</Text>
-          )}
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("image")} :</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.image} />
+            ) : (
+              <Text style={styles.imagePlaceholder}>Choisir une image</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>{t("description")} :</Text>
+          <TextInput style={[styles.input, styles.textarea]} value={description} onChangeText={setDescription} multiline placeholder="Description du produit" />
+        </View>
+
+        <TouchableOpacity style={styles.btnAjouter} onPress={handleAjouter}>
+          <Text style={styles.btnText}>{t("ajouter")}</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>{t("description")} :</Text>
-        <TextInput style={[styles.input, styles.textarea]} value={description} onChangeText={setDescription} multiline placeholder="Description du produit" />
-      </View>
-
-      <TouchableOpacity style={styles.btnAjouter} onPress={handleAjouter}>
-        <Text style={styles.btnText}>{t("ajouter")}</Text>
-      </TouchableOpacity>
-    </View>
- </ScrollView >
+    </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
@@ -189,14 +203,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  btnAjouter: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 45, },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  btnAjouter: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 30, },
+  btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 
   pickerContainer: {
     flex: 1,
     borderWidth: 1,
     borderColor: "#9E9E9E",
-    borderRadius: 10,
+    borderRadius: 10, 
     backgroundColor: "#fff",
     height: 48,
     justifyContent: "center",
@@ -208,4 +222,5 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 });
+
 export default AjouterProduit;

@@ -14,30 +14,30 @@ const ProduitsParCategorie = ({ }) => {
   const [searchText, setSearchText] = useState('');
   const route = useRoute();
   const { categorie } = route.params;
-  
 
-  return (     
-  <Layout>
-    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-       <View style={styles.container}>
-        <Text style={styles.txt}>{t('Produits de la catégorie : ')}
-          <Text style={styles.txttc}>{categorie}</Text>
-        </Text> 
-        <ProduitsParCateg searchText={searchText}/>
+
+  return (
+    <Layout>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <Text style={styles.inspirationText}>
+            Nos sélections <Text style={styles.accentText}>{categorie}</Text>
+          </Text>
+          <ProduitsParCateg searchText={searchText} />
         </View>
-     
-      </ScrollView> 
-   
-  </Layout>
-);
+
+      </ScrollView>
+
+    </Layout>
+  );
 };
 export default ProduitsParCategorie;
 
 
 const styles = StyleSheet.create({
   hdr: {
-    height: 60, 
-    backgroundColor: "#329171",
+    height: 60,
+    backgroundColor: "#2E7D32",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -66,9 +66,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     padding: 20,
-    color: "#329171",
-},
-hdr:{
- 
-}
+    color: "#2E7D32",
+  },
+  inspirationText: {
+    fontSize: 18,
+    padding: 16,
+    color: '#000'
+  },
+  accentText: {
+    color: '#2E7D32',
+    fontWeight: '700'
+  }
 });

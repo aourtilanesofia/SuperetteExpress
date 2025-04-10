@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         marginTop: 90,
     },
     confirmButton: {
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#2E7D32",
         padding: 10,
         borderRadius: 10,
         width: "40%",
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "bold",
+        fontWeight: "600",
     },
     disabledButton: {
         backgroundColor: "#ccc",

@@ -30,21 +30,21 @@ const styles = StyleSheet.create({
      alignItems:'center',
   },
   btnAdmin:{
-    backgroundColor:'#329171',
+    backgroundColor:'#2E7D32',
     padding:20,
     margin:10,
     borderRadius:10,
     width:250,
   },
   btnCons:{
-    backgroundColor:'#329171',
+    backgroundColor:'#2E7D32',
     padding:20,
     margin:10,
     borderRadius:10,
     width:250,
   },
   btnLiv:{
-    backgroundColor:'#329171',
+    backgroundColor:'#2E7D32',
     padding:20,
     margin:10,
     borderRadius:10,
@@ -53,19 +53,19 @@ const styles = StyleSheet.create({
   txtadmin:{
     color:'#fff',
     fontSize:20,
-    fontWeight:'bold',
+    fontWeight:'600',
     marginLeft:27,
   },
   txtCons:{
     color:'#fff',
     fontSize:20,
-    fontWeight:'bold',
+    fontWeight:'600',
     marginLeft:25,
   },
   txtLiv:{
     color:'#fff',
     fontSize:20,
-    fontWeight:'bold',
+    fontWeight:'600',
     marginLeft:67,
   }
 

@@ -115,7 +115,7 @@ const Panier = () => {
         }
     };
 
-    return (
+    return(
         <Layout>
             <View style={styles.container}>
                 <Text style={styles.txt}>
@@ -163,22 +163,22 @@ const styles = StyleSheet.create({
         padding: 6,
         margin: 5,
         marginHorizontal: 20,
-        borderRadius: 5,
+        borderRadius: 10,
     },
     btnCheckout: {
         marginTop: 10,
         justifyContent: "center",
         alignItems: "center",
         height: 46,
-        backgroundColor: "#329171",
+        backgroundColor: "#2E7D32",
         width: "90%",
         marginHorizontal: 20,
-        borderRadius: 5,
+        borderRadius: 10,
 
     },
     btnCheckoutText: {
         color: "#ffffff",
-        fontWeight: "bold",
+        //fontWeight: "700",
         fontSize: 18,
     },
     footer: {

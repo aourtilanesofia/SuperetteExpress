@@ -48,7 +48,7 @@ export default AcceuilCommerçant;
 const styles = StyleSheet.create({
   hdr: {
     height: 60, 
-    backgroundColor: "#329171",
+    backgroundColor: "#2E7D32",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     height:"96%",
   },
   txtdash:{
-    backgroundColor:'#329171',
+    backgroundColor:'#2E7D32',
     color:'#fff',
     textAlign:'center',
     padding:10,

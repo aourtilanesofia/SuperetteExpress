@@ -42,7 +42,8 @@ import GestionDesCommandes from './screens/AdminScreens/GestionDesCommandes';
 import CommandeDetailsAdmin from './screens/AdminScreens/CommandeDetailsAdmin';
 import Paiement from './screens/Paiement';
 import NotificationsConsommateur from './screens/NotificationsConsommateur';
-
+import BarcodeScanner from './screens/BarcodeScanner';
+import VideoRecette from './screens/VideoRecette';
 //routes
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -89,6 +90,8 @@ export default function App() {
         <Stack.Screen name="CommandeDetailsAdmin" component={CommandeDetailsAdmin} options={{ headerTitle: '' }} />
         <Stack.Screen name="Paiement" component={Paiement} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
+        <Stack.Screen name='BarcodeScanner' component={BarcodeScanner} options={{ headerTitle: '' }} />
+        <Stack.Screen name='VideoRecette' component={VideoRecette} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

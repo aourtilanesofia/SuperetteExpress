@@ -1,83 +1,117 @@
-import { StyleSheet, Text, View,Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../utils/colors';
 
+const { width, height } = Dimensions.get('window');
 
 const WelcomePageLivreur = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.txt1}>Bienvenue sur Superette Express!</Text>
-      <Image source={ require('../../assets/liv3.png')} style={styles.aaa}/>
-      <View style={styles.buttonContainer}>
+    <LinearGradient
+      colors={['#FFFFFF', '#E8F5E9']}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={styles.content}>
+        <Text style={styles.welcomeText}>Bienvenue sur</Text>
+        <Text style={styles.appName}>Superette Express</Text>
+        <Text style={styles.subtitle}>Plateforme livreur</Text>
 
-        <TouchableOpacity style={styles.btn1} onPress={() => navigation.navigate('ConLivreur')}>
-            <Text style={styles.cnxtxt}>Connexion</Text>
-        </TouchableOpacity>
+        <Image 
+          source={require('../../assets/liv3.png')} 
+          style={styles.deliveryImage}
+          resizeMode="contain"
+        />
 
-        <TouchableOpacity style={styles.btn2} onPress={() => navigation.navigate('InsLivreur')}>
-            <Text style={styles.insctxt}>Inscription</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonGroup}>
+          <TouchableOpacity 
+            style={[styles.button, styles.primaryButton]}
+            onPress={() => navigation.navigate('ConLivreur')}
+          >
+            <Text style={styles.buttonTextPrimary}>Se connecter</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity 
+            style={[styles.button, styles.secondaryButton]}
+            onPress={() => navigation.navigate('InsLivreur')}
+          >
+            <Text style={styles.buttonTextSecondary}>S'inscrire</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  )
-}
+    </LinearGradient>
+  );
+};
 
 export default WelcomePageLivreur;
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor:"#fff",
-
-    },
-    txt1:{
-        fontSize:35,
-        fontWeight:'bold',
-        margin:8,
-        color:'#329171',
-        marginTop:100,
-    },
-    
-    aaa:{
-        alignSelf: 'center',
-        marginTop:120,
-        width:200,
-        height:200,
-    },
-    buttonContainer:{
-        flexDirection:'row',
-        borderWidth:2.5,
-        borderColor:'#329171',
-        width:'90%',
-        height:55,
-        borderRadius:100,
-        alignSelf:'center',
-        marginTop:180,
-    },
-    btn1:{
-        justifyContent:'center',
-        backgroundColor:'#329171',
-        alignItems:'center',
-        width:'54%',
-        height:'104%',
-        borderRadius:100,
-    },
-    cnxtxt:{
-        color:'#fff',
-        fontSize:17,
-        fontWeight:'bold',
-    },
-    btn2:{
-        justifyContent:'center',
-        alignItems:'center',
-
-    },
-    insctxt:{
-        marginLeft:30,
-        color:'#329171',
-        fontSize:17,
-        fontWeight:'bold',
-
-    }
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: height * 0.1,
+    alignItems: 'center',
+  },
+  welcomeText: {
+    fontSize: 24,
+    color: '#4CAF50',
+    fontWeight: '300',
+    textAlign: 'center',
+  },
+  appName: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#2E7D32',
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#616161',
+    marginBottom: height * 0.05,
+    textAlign: 'center',
+  },
+  deliveryImage: {
+    width: width * 0.8,
+    height: height * 0.3,
+    marginVertical: 30,
+  },
+  buttonGroup: {
+    width: '100%',
+    marginTop: 20,
+  },
+  button: {
+    paddingVertical: 15,
+    borderRadius: 30,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  primaryButton: {
+    backgroundColor: '#2E7D32',
+  },
+  secondaryButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2E7D32',
+  },
+  buttonTextPrimary: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonTextSecondary: {
+    color: '#2E7D32',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

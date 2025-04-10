@@ -1,205 +1,305 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { Alert } from 'react-native';
-import { fonts } from '../../node_modules/@react-navigation/native/lib/module/theming/fonts';
 import Octicons from 'react-native-vector-icons/Octicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const InsLivreur = ({ navigation }) => {
-    const [secureEntery, setSecureEntery] = useState(true);
-    const [selectedValue, setSelectedValue] = useState('');
-    const [nom, setNom] = useState('');
-    const [numTel, setNumTel] = useState('');
-    const [categorie, setCategorie] = useState('');
-    const [matricule, setMatricule] = useState('');
-    const [email, setEmail] = useState('');
-    const [mdp, setMdp] = useState('');
+    const [secureEntry, setSecureEntry] = useState(true);
+    const [formData, setFormData] = useState({
+        nom: '',
+        numTel: '',
+        categorie: '',
+        matricule: '',
+        email: '',
+        mdp: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
 
-   const handleSignup = async () => {
-           if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
-               Alert.alert("Erreur", "Veuillez remplir tous les champs !");
-               setNom(' ');
-               setNumTel('');
-               setCategorie('');
-               setMatricule('');
-               setEmail('');
-               setMdp('');
-               return;
-           }
-   
-           try {
-               const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/inscriptionL", {
-                   method: "POST",
-                   headers: {
-                       "Content-Type": "application/json",
-                   },
-                   body: JSON.stringify({ nom, numTel, categorie, matricule, email, mdp }),
-               });
-   
-               const data = await response.json();
-   
-               if (!response.ok) {
-                   Alert.alert("Erreur", data.message || "Inscription échouée !");
-                   setNom(' ');
-                   setNumTel('');
-                   setCategorie('');
-                   setMatricule('');
-                   setEmail('');
-                   setMdp('');
-                   return;
-               }
-   
-   
-               Alert.alert(" ", "Vous êtes maintenant inscrit!");
-               setNom(' ');
-               setNumTel('');
-               setCategorie('');
-               setMatricule('');
-               setEmail('');
-               setMdp('');
-               navigation.navigate("ConLivreur");
-           } catch (error) {
-               console.error("Erreur d'inscription :", error);
-               Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
-           }
-       };
+    const handleChange = (name, value) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
+    const handleSignup = async () => {
+        const { nom, numTel, categorie, matricule, email, mdp } = formData;
+        
+        if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
+            Alert.alert("Champs manquants", "Veuillez remplir tous les champs");
+            return;
+        }
 
+        if (!/^[0-9]{10}$/.test(numTel)) {
+            Alert.alert("Numéro invalide", "Le numéro doit contenir 10 chiffres");
+            return;
+        }
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            Alert.alert("Email invalide", "Veuillez entrer un email valide");
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/inscriptionL", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                Alert.alert("Erreur", data.message || "Inscription échouée");
+                return;
+            }
+
+            Alert.alert("Succès", "Inscription réussie !", [
+                { text: "OK", onPress: () => navigation.navigate("ConLivreur") }
+            ]);
+
+            setFormData({
+                nom: '',
+                numTel: '',
+                categorie: '',
+                matricule: '',
+                email: '',
+                mdp: ''
+            });
+
+        } catch (error) {
+            console.error("Erreur:", error);
+            Alert.alert("Erreur", "Problème de connexion au serveur");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
-        <ScrollView>
-        <View style={styles.container}>
-            <Text style={styles.txt1}>Inscription</Text>
+        <LinearGradient
+            colors={['#FFFFFF', '#E8F5E9']}
+            style={styles.container}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+        >
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.keyboardView}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <View style={styles.header}>
+                        <Text style={styles.title}>Devenir Livreur</Text>
+                        <Text style={styles.subtitle}>Rejoignez notre équipe de livraison</Text>
+                    </View>
 
-            {/*formulaire*/}
-            <View style={styles.formContainer}>
-                <View style={styles.inputContainer}>
-                    <FontAwesome name='user-o' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre nom complet'   value={nom}
-                        onChangeText={setNom} />
-                </View>
+                    <View style={styles.formContainer}>
+                        {/* Nom Complet */}
+                        <View style={styles.inputContainer}>
+                            <FontAwesome name='user-o' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Nom complet'
+                                placeholderTextColor="#939494"
+                                value={formData.nom}
+                                onChangeText={(text) => handleChange('nom', text)}
+                                autoCapitalize="words"
+                            />
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <SimpleLineIcons name='phone' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre numéro de téléphone' keyboardType='phone-pad' value={numTel}
-                        onChangeText={setNumTel} />
-                </View>
+                        {/* Numéro de Téléphone */}
+                        <View style={styles.inputContainer}>
+                            <Ionicons name='phone-portrait-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Numéro de téléphone'
+                                placeholderTextColor="#939494"
+                                keyboardType='phone-pad'
+                                value={formData.numTel}
+                                onChangeText={(text) => handleChange('numTel', text)}
+                                maxLength={10}
+                            />
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <Ionicons name='car-outline' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez la catégorie de votre véhicule' value={categorie}
-                        onChangeText={setCategorie} />
-                </View>
+                        {/* Catégorie Véhicule */}
+                        <View style={styles.inputContainer}>
+                            <Ionicons name='car-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Catégorie véhicule'
+                                placeholderTextColor="#939494"
+                                value={formData.categorie}
+                                onChangeText={(text) => handleChange('categorie', text)}
+                            />
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <Octicons name='number' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre matricule'  value={matricule}
-                        onChangeText={setMatricule} />
-                </View>
+                        {/* Matricule */}
+                        <View style={styles.inputContainer}>
+                            <MaterialCommunityIcons name='numeric' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Matricule'
+                                placeholderTextColor="#939494"
+                                value={formData.matricule}
+                                onChangeText={(text) => handleChange('matricule', text)}
+                            />
+                        </View>
 
+                        {/* Email */}
+                        <View style={styles.inputContainer}>
+                            <Ionicons name='mail-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Email'
+                                placeholderTextColor="#939494"
+                                keyboardType='email-address'
+                                value={formData.email}
+                                onChangeText={(text) => handleChange('email', text)}
+                                autoCapitalize="none"
+                            />
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <Ionicons name='mail-outline' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre E-mail' keyboardType='email-address' value={email}
-                        onChangeText={setEmail} />
-                </View>
+                        {/* Mot de passe */}
+                        <View style={styles.inputContainer}>
+                            <Ionicons name='lock-closed-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Mot de passe'
+                                placeholderTextColor="#939494"
+                                secureTextEntry={secureEntry}
+                                value={formData.mdp}
+                                onChangeText={(text) => handleChange('mdp', text)}
+                                autoCapitalize="none"
+                            />
+                            <TouchableOpacity
+                                onPress={() => setSecureEntry(prev => !prev)}
+                                style={styles.eyeIcon}
+                            >
+                                <Octicons
+                                    name={secureEntry ? 'eye-closed' : 'eye'}
+                                    size={19}
+                                    color={'#329171'}
+                                />
+                            </TouchableOpacity>
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <SimpleLineIcon name='lock' size={22} color={'#939494'} />
-                    <TextInput style={styles.textInput} placeholder='Entrez votre mot de passe' secureTextEntry={secureEntery} value={mdp}
-                        onChangeText={setMdp} />
-                    <TouchableOpacity onPress={() => { setSecureEntery((prev) => !prev); }}>
-                        <Octicons name={secureEntery ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
-                    </TouchableOpacity>
-                </View>
+                        {/* Bouton d'inscription */}
+                        <TouchableOpacity
+                            style={[styles.signupButton, isLoading && styles.disabledButton]}
+                            onPress={handleSignup}
+                            disabled={isLoading}
+                        >
+                            <Text style={styles.signupButtonText}>
+                                {isLoading ? 'Inscription en cours...' : "S'inscrire"}
+                            </Text>
+                        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.cnxButton} onPress={handleSignup}>
-                    <Text style={styles.cnxtxt}>S'inscrire</Text>
-                </TouchableOpacity>
-
-
-                <View style={styles.footerContainer}>
-                    <Text style={styles.accountText}>Vous avez déja un compte!</Text>
-                    <Text style={styles.signuptext} onPress={() => navigation.navigate('ConLivreur')}>Se connecter</Text>
-                </View>
-
-            </View>
-        </View>
-        </ScrollView>
-    )
-}
-
-export default InsLivreur;
+                        {/* Lien vers connexion */}
+                        <View style={styles.loginContainer}>
+                            <Text style={styles.loginText}>Vous avez déja un compte ? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('ConLivreur')}>
+                                <Text style={styles.loginLink}>Se connecter</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </LinearGradient>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        padding: 25,
     },
-    txt1: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: '#329171',
-        marginTop: 10,
-
+    keyboardView: {
+        flex: 1,
+    },
+    scrollContainer: {
+        paddingBottom: 30,
+    },
+    header: {
+        paddingHorizontal: 30,
+        marginTop: 50,
+        marginBottom: 30,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#2E7D32',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#616161',
     },
     formContainer: {
-        marginTop: 20,
+        paddingHorizontal: 30,
     },
     inputContainer: {
-        borderWidth: 1,
-        borderColor: '#329171',
-        borderRadius: 15,
-        height: 50,
-        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 15,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 56,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    icon: {
+        marginRight: 10,
     },
     textInput: {
         flex: 1,
-        paddingHorizontal: 15,
-        fontFamily: fonts.Ligth,
+        height: '100%',
+        color: '#333',
+        fontSize: 16,
     },
-    cnxButton: {
-        backgroundColor: '#329171',
-        borderRadius: 15,
-        marginVertical: 33,
+    eyeIcon: {
+        padding: 5,
     },
-    cnxtxt: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: 12,
-    },
-
-
-    img: {
-        width: 25,
-        height: 25,
-
-    },
-
-    footerContainer: {
-        flexDirection: 'row',
+    signupButton: {
+        backgroundColor: '#2E7D32',
+        borderRadius: 12,
+        height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 20,
-        gap: 5,
-
+        marginTop: 20,
+        shadowColor: '#2E7D32',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
     },
-    accountText: {
-        color: '#4f4f4f',
-        fontFamily: fonts.Regular,
+    disabledButton: {
+        opacity: 0.7,
     },
-    signuptext: {
-        color: '#4f4f4f',
-        fontWeight: 'bold',
-    }
+    signupButtonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    loginContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 25,
+    },
+    loginText: {
+        color: '#616161',
+        fontSize: 15,
+    },
+    loginLink: {
+        color: '#2E7D32',
+        fontSize: 15,
+        fontWeight: '600',
+    },
+});
 
-})
+export default InsLivreur;

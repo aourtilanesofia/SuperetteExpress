@@ -27,19 +27,19 @@ export const getProductById = async (req, res) => {
 
 // Ajouter un produit
 export const addProduct = async (req, res) => {
-  const { nom, prix, categorie, stock, description } = req.body;
-
+  const { nom, prix, categorie, stock, description, codeBarre } = req.body;
 
   const imageUrl = req.file ? `http://192.168.1.47:8080/uploads/${req.file.filename}` : null;
 
   try {
-
+    // Création d'un nouveau produit avec tous les champs requis
     const newProduct = new produitModel({
       nom,
       prix,
       categorie,
       stock,
       description,
+      codeBarre,  // Ajout du champ codeBarre
       image: imageUrl,
     });
 
@@ -55,11 +55,12 @@ export const addProduct = async (req, res) => {
 };
 
 
+
 // Modifier un produit
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prix, categorie, stock, description } = req.body;
+    const { nom, prix, categorie, stock, description, codeBarre } = req.body;
 
     // Si une nouvelle image est envoyée
     const imageUrl = req.file
@@ -67,22 +68,29 @@ export const updateProduct = async (req, res) => {
       : req.body.imagePath || req.body.image; // accepte imagePath s’il existe
 
     const updateFields = {};
+
+    // Ajouter les champs si ils sont définis dans la requête
     if (nom !== undefined) updateFields.nom = nom;
     if (prix !== undefined) updateFields.prix = prix;
     if (categorie !== undefined) updateFields.categorie = categorie;
     if (stock !== undefined) updateFields.stock = stock;
     if (description !== undefined) updateFields.description = description;
+    if (codeBarre !== undefined) updateFields.codeBarre = codeBarre;  // Ajout du codeBarre
     if (imageUrl !== undefined) updateFields.image = imageUrl;
 
+    // Mettre à jour le produit dans la base de données
     const updatedProduct = await produitModel.findByIdAndUpdate(
       id,
       updateFields,
       { new: true }
     );
+
+    // Vérification de l'existence de données dans la requête
     if (!req.body && !req.file) {
       return res.status(400).json({ message: "Aucune donnée envoyée" });
     }
 
+    // Si le produit n'est pas trouvé
     if (!updatedProduct) {
       return res.status(404).json({ message: "Produit non trouvé" });
     }
@@ -93,6 +101,7 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la modification du produit" });
   }
 };
+
 
 
 // Supprimer un produit

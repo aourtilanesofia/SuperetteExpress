@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         margin: 15,
     },
     btn: {
-        backgroundColor: '#329171',
+        backgroundColor: '#2E7D32',
         padding: 13,
         borderRadius: 10,
     },
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         color: '#fff',
-        fontWeight: 'bold',
+        fontWeight: '600',
         fontSize: 16,
     }
 });

@@ -1,129 +1,239 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ConConsommateur = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
+        Keyboard.dismiss();
         if (!email || !mdp) {
-            Alert.alert("Erreur", "Veuillez remplir tous les champs !");
-            setEmail('');
-            setMdp('');
+            Alert.alert("Champs requis", "Veuillez remplir tous les champs");
             return;
         }
-    
+
+        setIsLoading(true);
+        
         try {
             const response = await fetch("http://192.168.1.47:8080/api/v1/consommateur/connexion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, mdp }),
             });
-    
+
             const data = await response.json();
-            console.log("Données reçues :", data);
-    
+
             if (!response.ok || !data.consommateur || !data.token) {
-                Alert.alert("Erreur", data.message || "Connexion échouée !");
-                setEmail('');
-                setMdp('');
+                Alert.alert("Erreur", data.message || "Email ou mot de passe incorrect");
                 return;
             }
-    
-            //console.log("ID utilisateur récupéré :", data.consommateur._id);
-    
-            // Sauvegarde des informations utilisateur
-            await AsyncStorage.setItem('token', data.token);
-            await AsyncStorage.setItem('userId', data.consommateur._id);
-            await AsyncStorage.setItem('user', JSON.stringify(data.consommateur));
-            //console.log("Utilisateur mis à jour :", data.consommateur);
-    
-            Alert.alert(" ", "Bienvenue, vous êtes maintenant connecté(e) !");
-            setEmail('');
-            setMdp('');
+
+            await AsyncStorage.multiSet([
+                ['token', data.token],
+                ['userId', data.consommateur._id],
+                ['user', JSON.stringify(data.consommateur)]
+            ]);
+
             navigation.navigate("AcceuilConsommateur");
-    
+            Alert.alert("Connexion réussie", `Bienvenue ${data.consommateur.nom || ''}!`);
+
         } catch (error) {
-            console.error("Erreur de connexion :", error);
-            Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
+            console.error("Erreur de connexion:", error);
+            Alert.alert("Erreur", "Problème de connexion au serveur");
+        } finally {
+            setIsLoading(false);
         }
     };
-    
-    
-    
-
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.txt1}>Connexion</Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <LinearGradient
+                colors={['#FFFFFF', '#E8F5E9']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.keyboardView}
+                >
+                    <View style={styles.header}>
+                        <Text style={styles.title}>Content de vous revoir</Text>
+                        <Text style={styles.subtitle}>Connectez-vous pour accéder à votre compte</Text>
+                    </View>
 
-            {/* Formulaire */}
-            <View style={styles.formContainer}>
-                <View style={styles.inputContainer}>
-                    <Ionicons name='mail-outline' size={22} color={'#939494'} />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder='Entrez votre E-mail'
-                        keyboardType='email-address'
-                        value={email}
-                        onChangeText={setEmail}
-                        autoComplete={'email'}
-                    />
-                </View>
+                    <View style={styles.formContainer}>
+                        {/* Email Input */}
+                        <View style={styles.inputContainer}>
+                            <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Adresse email'
+                                placeholderTextColor="#939494"
+                                keyboardType='email-address'
+                                value={email}
+                                onChangeText={setEmail}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                            />
+                        </View>
 
-                <View style={styles.inputContainer}>
-                    <SimpleLineIcon name='lock' size={22} color={'#939494'} />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder='Entrez votre mot de passe'
-                        secureTextEntry={secureEntry}
-                        value={mdp}
-                        onChangeText={setMdp}
-                    />
-                    <TouchableOpacity onPress={() => setSecureEntry(prev => !prev)}>
-                        <Octicons name={secureEntry ? 'eye-closed' : 'eye'} size={19} color={'#939494'} />
-                    </TouchableOpacity>
-                </View>
+                        {/* Password Input */}
+                        <View style={styles.inputContainer}>
+                            <SimpleLineIcons name='lock' size={22} color={'#329171'} style={styles.icon} />
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Mot de passe'
+                                placeholderTextColor="#939494"
+                                secureTextEntry={secureEntry}
+                                value={mdp}
+                                onChangeText={setMdp}
+                                autoCapitalize="none"
+                            />
+                            <TouchableOpacity 
+                                onPress={() => setSecureEntry(prev => !prev)}
+                                style={styles.eyeIcon}
+                            >
+                                <Octicons 
+                                    name={secureEntry ? 'eye-closed' : 'eye'} 
+                                    size={19} 
+                                    color={'#329171'} 
+                                />
+                            </TouchableOpacity>
+                        </View>
 
-                <TouchableOpacity style={styles.cnxButton} onPress={handleLogin}>
-                    <Text style={styles.cnxtxt}>Se connecter</Text>
-                </TouchableOpacity>
+                        {/* Forgot Password */}
+                        <TouchableOpacity style={styles.forgotPassword}>
+                            <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
+                        </TouchableOpacity>
 
-                <View style={styles.footerContainer}>
-                    <Text style={styles.accountText}>Vous n'avez pas un compte?</Text>
-                    <Text style={styles.signuptext} onPress={() => navigation.navigate('InsConsommateur')}>S'inscrire</Text>
-                </View>
-            </View>
-        </View>
+                        {/* Login Button */}
+                        <TouchableOpacity 
+                            style={[styles.loginButton, isLoading && styles.disabledButton]}
+                            onPress={handleLogin}
+                            disabled={isLoading}
+                        >
+                            <Text style={styles.loginButtonText}>
+                                {isLoading ? 'Connexion...' : 'Se connecter'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* Sign Up Link */}
+                        <View style={styles.signupContainer}>
+                            <Text style={styles.signupText}>Vous n'avez pas un compte ? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('InsConsommateur')}>
+                                <Text style={styles.signupLink}>S'inscrire</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </LinearGradient>
+        </TouchableWithoutFeedback>
     );
 };
 
-export default ConConsommateur;
-
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff', padding: 25 },
-    txt1: { fontSize: 30, fontWeight: 'bold', color: '#329171', marginTop: 70 },
-    formContainer: { marginTop: 100 },
+    container: {
+        flex: 1,
+    },
+    keyboardView: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    header: {
+        paddingHorizontal: 30,
+        marginBottom: 40,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#2E7D32',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#616161',
+    },
+    formContainer: {
+        paddingHorizontal: 30,
+    },
     inputContainer: {
-        borderWidth: 1,
-        borderColor: '#329171',
-        borderRadius: 15,
-        height: 50,
-        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 15
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 56,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    textInput: { flex: 1, paddingHorizontal: 15 },
-    cnxButton: { backgroundColor: '#329171', borderRadius: 15, marginVertical: 33 },
-    cnxtxt: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center', padding: 12 },
-    footerContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 20 },
-    accountText: { color: '#4f4f4f' },
-    signuptext: { color: '#4f4f4f', fontWeight: 'bold' }
+    icon: {
+        marginRight: 10,
+    },
+    textInput: {
+        flex: 1,
+        height: '100%',
+        color: '#333',
+        fontSize: 16,
+    },
+    eyeIcon: {
+        padding: 5,
+    },
+    forgotPassword: {
+        alignSelf: 'flex-end',
+        marginBottom: 25,
+    },
+    forgotPasswordText: {
+        color: '#329171',
+        fontSize: 14,
+    },
+    loginButton: {
+        backgroundColor: '#2E7D32',
+        borderRadius: 12,
+        height: 56,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#2E7D32',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    disabledButton: {
+        opacity: 0.7,
+    },
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    signupContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 25,
+    },
+    signupText: {
+        color: '#616161',
+        fontSize: 15,
+    },
+    signupLink: {
+        color: '#2E7D32',
+        fontSize: 15,
+        fontWeight: '600',
+    },
 });
+
+export default ConConsommateur;

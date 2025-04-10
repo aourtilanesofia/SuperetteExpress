@@ -38,8 +38,8 @@ const ModifierCategories = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
     input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 10, borderColor:'#9E9E9E' },
-    button: { backgroundColor: '#4CAF50', padding: 10, borderRadius: 10, alignItems: 'center' ,marginTop:26},
-    buttonText: { color: '#fff', fontWeight: 'bold' , fontSize:16},
+    button: { backgroundColor: '#2E7D32', padding: 10, borderRadius: 10, alignItems: 'center' ,marginTop:26},
+    buttonText: { color: '#fff', fontWeight: '600' , fontSize:16},
     txt:{fontSize:16, fontWeight:'bold',marginBottom:17, marginTop:20}
 });
 
