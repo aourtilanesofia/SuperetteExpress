@@ -105,10 +105,7 @@ const ConLivreur = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Forgot Password */}
-                    <TouchableOpacity style={styles.forgotPassword}>
-                        <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
-                    </TouchableOpacity>
+                   
 
                     {/* Login Button */}
                     <TouchableOpacity 
@@ -208,6 +205,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
+        marginTop:35,
     },
     disabledButton: {
         opacity: 0.7,

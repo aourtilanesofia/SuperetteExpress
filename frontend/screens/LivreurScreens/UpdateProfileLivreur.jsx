@@ -1,183 +1,320 @@
-
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
-import { UserData } from '../../Data/UserData';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
 
-const UpdateProfile = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [numTel, setnumTel] = useState('');
-    const [categorie, setCategorie] = useState('');
-    const [matricule, setMatricule] = useState('');
-    const [mdp, setMDP] = useState('');
+const UpdateProfileLivreur = ({ navigation }) => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        numTel: '',
+        categorie: '',
+        matricule: '',
+        mdp: '',
+        newPassword: ''
+    });
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation();
 
-    // Charger les données du profil depuis AsyncStorage
     useEffect(() => {
         const loadProfile = async () => {
-            const userData = await AsyncStorage.getItem('user');
-            if (userData) {
-                const user = JSON.parse(userData);
-                setName(user.nom || '');
-                setEmail(user.email || '');
-                setnumTel(user.numTel ? user.numTel.toString() : '');
-                setCategorie(user.categorie || '');
-                setMatricule(user.matricule || ''); 
-                setMDP(user.mdp || '')
+            try {
+                const userData = await AsyncStorage.getItem('user');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    setFormData({
+                        name: user.nom || '',
+                        email: user.email || '',
+                        numTel: user.numTel ? user.numTel.toString() : '',
+                        categorie: user.categorie || '',
+                        matricule: user.matricule || '',
+                        mdp: '',
+                        newPassword: ''
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
             }
         };
         loadProfile();
     }, []);
 
-    // Fonction pour mettre à jour le profil
+    const handleChange = (name, value) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
     const handleUpdateProfile = async () => {
         try {
+            setIsLoading(true);
             const token = await AsyncStorage.getItem('token');
             if (!token) {
-                alert('Utilisateur non authentifié');
+                Alert.alert(t('erreur'), t('non_authentifie'));
                 return;
             }
-    
-            if (!name || !email || !numTel || !categorie || !matricule ||!mdp) {
-                alert("Veuillez remplir tous les champs !");
+
+            if (!formData.name || !formData.email || !formData.numTel || !formData.categorie || !formData.matricule) {
+                Alert.alert(t('champs_requis'), t('remplir_tous_champs'));
                 return;
             }
-    
-            // Mise à jour des informations du profil
+
+            const updateData = {
+                nom: formData.name,
+                email: formData.email,
+                numTel: formData.numTel.toString(),
+                categorie: formData.categorie,
+                matricule: formData.matricule,
+                ...(formData.newPassword && { mdp: formData.newPassword })
+            };
+
             const response = await fetch('http://192.168.1.47:8080/api/v1/livreur/profile-updateL', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ nom: name, email, numTel: numTel.toString(), categorie,matricule,mdp }),
+                body: JSON.stringify(updateData),
             });
-    
+
             const data = await response.json();
             if (!response.ok) {
-                alert(data.message || "Erreur lors de la mise à jour");
-                return;
+                throw new Error(data.message || t('erreur_mise_a_jour'));
             }
-    
-            // Sauvegarder les nouvelles infos en local
-            await AsyncStorage.setItem('user', JSON.stringify({ nom: name, email, numTel, categorie,matricule,mdp }));
-    
-            // Afficher l'alerte de succès après la mise à jour du profil
-            alert("Mise à jour effectuée avec succès. !");
-    
-            // Mettre à jour le mot de passe si un nouveau mot de passe est saisi
-            
-    
+
+            await AsyncStorage.setItem('user', JSON.stringify({
+                ...JSON.parse(await AsyncStorage.getItem('user')),
+                nom: formData.name,
+                email: formData.email,
+                numTel: formData.numTel,
+                categorie: formData.categorie,
+                matricule: formData.matricule
+            }));
+
+            Alert.alert(t('succes'), t('mise_a_jour_reussie'), [
+                { text: "OK", onPress: () => navigation.goBack() }
+            ]);
+
         } catch (error) {
-            console.error("Erreur :", error);
-            alert("Impossible de mettre à jour le profil");
+            console.error("Update error:", error);
+            Alert.alert(t('erreur'), error.message || t('erreur_mise_a_jour'));
+        } finally {
+            setIsLoading(false);
         }
     };
-    
 
     return (
         <LayoutLivreur>
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <View style={styles.container}>
-                <Image source={{ uri: UserData[0].profilePic }} style={styles.img} />
+            <LinearGradient
+                colors={['#FFFFFF', '#E8F5E9']}
+                style={styles.gradient}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <View style={styles.container}>
+                        <View style={styles.profileHeader}>
+                            <View style={styles.avatarContainer}>
+                                <Image 
+                                    source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} 
+                                    style={styles.avatar} 
+                                />
+                                <TouchableOpacity style={styles.editIcon}>
+                                    <Icon name="edit" size={24} color="#FFFFFF" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={name} onChangeText={setName} placeholder="Nom" />
-                    </View>
+                        <View style={styles.formContainer}>
+                            <View style={styles.inputContainer}>
+                                <Icon name="person" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.name}
+                                    onChangeText={(text) => handleChange('name', text)}
+                                    placeholder={t('nom')}
+                                    placeholderTextColor="#9E9E9E"
+                                />
+                            </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={email} onChangeText={setEmail} placeholder="Email" keyboardType='email-address'/>
-                    </View>
+                            <View style={styles.inputContainer}>
+                                <Icon name="email" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.email}
+                                    onChangeText={(text) => handleChange('email', text)}
+                                    placeholder="Email"
+                                    placeholderTextColor="#9E9E9E"
+                                    keyboardType='email-address'
+                                    autoCapitalize="none"
+                                />
+                            </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={numTel} onChangeText={setnumTel} placeholder="Numéro de téléphone" keyboardType='phone-pad'/>
-                    </View>
+                            <View style={styles.inputContainer}>
+                                <Icon name="phone" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.numTel}
+                                    onChangeText={(text) => handleChange('numTel', text)}
+                                    placeholder={t('telephone')}
+                                    placeholderTextColor="#9E9E9E"
+                                    keyboardType='phone-pad'
+                                />
+                            </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={categorie} onChangeText={setCategorie} placeholder="Adresse" />
-                    </View>
+                            <View style={styles.inputContainer}>
+                                <Icon name="directions-car" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.categorie}
+                                    onChangeText={(text) => handleChange('categorie', text)}
+                                    placeholder={t('Catégorie_de_véhicule')}
+                                    placeholderTextColor="#9E9E9E"
+                                />
+                            </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.textInput} value={matricule} onChangeText={setMatricule} placeholder="Matricule" />
-                    </View>
+                            <View style={styles.inputContainer}>
+                                <Icon name="badge" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.matricule}
+                                    onChangeText={(text) => handleChange('matricule', text)}
+                                    placeholder={t('Matricule')}
+                                    placeholderTextColor="#9E9E9E"
+                                />
+                            </View>
 
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            value={mdp}
-                            onChangeText={setMDP}
-                            placeholder="Nouveau mot de passe"
-                            secureTextEntry={!isPasswordVisible}
-                        />
-                        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                            <Octicons
-                                name={isPasswordVisible ? "eye" : "eye-closed"}
-                                size={20}
-                                color="gray"
-                                style={styles.icon}
-                            />
-                        </TouchableOpacity>
+                            <View style={styles.inputContainer}>
+                                <Icon name="lock" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.newPassword}
+                                    onChangeText={(text) => handleChange('newPassword', text)}
+                                    placeholder={t('Nouveau mot de passe')}
+                                    placeholderTextColor="#9E9E9E"
+                                    secureTextEntry={!isPasswordVisible}
+                                />
+                                <TouchableOpacity 
+                                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <Octicons
+                                        name={isPasswordVisible ? "eye" : "eye-closed"}
+                                        size={20}
+                                        color="#2E7D32"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            <TouchableOpacity 
+                                style={styles.saveButton}
+                                onPress={handleUpdateProfile}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator color="#FFFFFF" />
+                                ) : (
+                                    <Text style={styles.saveButtonText}>{t('valider')}</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
                     </View>
- 
-                    <TouchableOpacity style={styles.cnxButton} onPress={handleUpdateProfile}>
-                        <Text style={styles.cnxtxt}>{t('valider')}</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </LinearGradient>
         </LayoutLivreur>
     );
 };
 
-export default UpdateProfile;
-
 const styles = StyleSheet.create({
-    container: {
-        marginVertical: 5,
-        margin: 20,
+    gradient: {
+        flex: 1,
     },
-    img: {
-        height: 100,
+    scrollContainer: {
+        flexGrow: 1,
+    },
+    container: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingBottom: 30,
+    },
+    profileHeader: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    avatarContainer: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#F5F5F5',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 15,
+        position: 'relative',
+        marginTop: 35,
+    },
+    avatar: {
         width: '100%',
-        resizeMode: 'contain',
+        height: '100%',
+        borderRadius: 60,
+    },
+    editIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#2E7D32',
+        borderRadius: 20,
+        padding: 5,
+    },
+    formContainer: {
         marginTop: 10,
     },
     inputContainer: {
-        borderWidth: 1,
-        borderColor: '#9E9E9E',
-        borderRadius: 10,
-        height: 50,
-        paddingHorizontal: 13,
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 15,
-        marginTop: 25,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 56,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    inputIcon: {
+        marginRight: 10,
     },
     textInput: {
         flex: 1,
-        paddingHorizontal: 15,
+        height: '100%',
+        color: '#333',
+        fontSize: 16,
     },
-    cnxButton: {
+    eyeIcon: {
+        padding: 10,
+    },
+    saveButton: {
         backgroundColor: '#2E7D32',
-        borderRadius: 10,
-        marginVertical: 20,
+        borderRadius: 12,
+        height: 56,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        shadowColor: '#2E7D32',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
     },
-    cnxtxt: {
-        color: '#fff',
+    saveButtonText: {
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
-        textAlign: 'center',
-        padding: 12,
-    },
-    icon: {
-        position: 'absolute',
-        right: 1,
-        top: "50%",
-        transform: [{ translateY: -35 }]
     },
 });
+
+export default UpdateProfileLivreur;

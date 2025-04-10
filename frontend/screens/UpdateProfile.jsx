@@ -114,11 +114,9 @@ const UpdateProfile = ({ navigation }) => {
                     <View style={styles.container}>
                         <View style={styles.profileHeader}>
                             <View style={styles.avatarContainer}>
-                                {profilePic ? (
-                                    <Image source={{ uri: profilePic }} style={styles.avatar} />
-                                ) : (
-                                    <Icon name="account-circle" size={100} color="#2E7D32" />
-                                )}
+                                
+                                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} style={styles.avatar} />
+                                
                                 <TouchableOpacity style={styles.editIcon}>
                                     <Icon name="edit" size={24} color="#FFFFFF" />
                                 </TouchableOpacity>
@@ -179,7 +177,7 @@ const UpdateProfile = ({ navigation }) => {
                                     style={styles.textInput}
                                     value={formData.newPassword}
                                     onChangeText={(text) => handleChange('newPassword', text)}
-                                    placeholder={t('nouveau_mot_de_passe')}
+                                    placeholder={t('Nouveau mot de passe')}
                                     placeholderTextColor="#9E9E9E"
                                     secureTextEntry={!isPasswordVisible}
                                 />
@@ -239,7 +237,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
         position: 'relative',
-        marginTop:15,
+        marginTop:35,
     },
     avatar: {
         width: '100%',

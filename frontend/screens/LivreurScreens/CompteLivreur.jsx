@@ -1,144 +1,230 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
-import { UserData } from '../../Data/UserData';
 import { useTranslation } from 'react-i18next';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Compte = ({ navigation }) => {
+const CompteLivreur = ({ navigation }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
- 
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const storedUser = await AsyncStorage.getItem('user');
                 if (storedUser) {
-                 setUser(JSON.parse(storedUser));
-                } else {
-                    Alert.alert("Erreur", "Aucune donnée utilisateur trouvée.");
+                    setUser(JSON.parse(storedUser));
                 }
             } catch (error) {
                 console.error("Erreur lors de la récupération des données :", error);
-                Alert.alert("Erreur", "Impossible de charger les informations.");
+                Alert.alert(t('erreur'), t('impossible_charger_info'));
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchUser();
+        fetchUser(); 
     }, []);
+
+    if (loading) {
+        return (
+            <LayoutLivreur>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#2E7D32" />
+                </View>
+            </LayoutLivreur>
+        );
+    }
 
     if (!user) {
         return (
             <LayoutLivreur>
-                <View style={styles.container}>
-                    <Text>Chargement...</Text>
+                <View style={styles.errorContainer}>
+                    <Icon name="error-outline" size={50} color="#FF3B30" />
+                    <Text style={styles.errorText}>{t('aucune_donnee_utilisateur')}</Text>
                 </View>
             </LayoutLivreur>
-        ); 
+        );
     }
 
     return (
         <LayoutLivreur>
-            <View style={styles.container}>
-            <Image source={{ uri: UserData[0].profilePic }} style={styles.img} />
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    
-                    <Text style={styles.name}>{t('Bienvenue')} {user.nom} 👋</Text>
-                </View>
-
-                <View style={{ marginTop: 40 }}>
-                    <View style={styles.line} />
-
-                    <View style={styles.vw}>
-                        <Text style={styles.txt1}>{t('email')}:</Text>
-                        <Text style={styles.txt2}>{user.email}</Text>
+            <LinearGradient
+                colors={['#FFFFFF', '#E8F5E9']}
+                style={styles.gradient}
+            >
+                <View style={styles.container}>
+                    <View style={styles.profileHeader}>
+                        <View style={styles.avatarContainer}>
+                            <Image 
+                                source={user.profilePic ? { uri: user.profilePic } : { uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} 
+                                style={styles.avatar}
+                            />
+                        </View>
+                        <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
-                    <View style={styles.line} />
+                    <View style={styles.profileInfo}>
+                        <View style={styles.infoItem}>
+                            <Icon name="email" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('email')}</Text>
+                                <Text style={styles.infoValue}>{user.email}</Text>
+                            </View>
+                        </View>
 
-                    <View style={styles.vw}>
-                        <Text style={styles.txt1}>{t('num')}:</Text>
-                        <Text style={styles.txt2}>{user.numTel}</Text>
+                        <View style={styles.separator} />
+
+                        <View style={styles.infoItem}>
+                            <Icon name="phone" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('num')}</Text>
+                                <Text style={styles.infoValue}>{user.numTel}</Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.separator} />
+
+                        <View style={styles.infoItem}>
+                            <Icon name="directions-car" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('Catégorie_de_véhicule')}</Text>
+                                <Text style={styles.infoValue}>{user.categorie}</Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.separator} />
+
+                        <View style={styles.infoItem}>
+                            <Icon name="badge" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('Matricule')}</Text>
+                                <Text style={styles.infoValue}>{user.matricule}</Text>
+                            </View>
+                        </View>
                     </View>
 
-                    <View style={styles.line} />
-
-                    <View style={styles.vw}>
-                        <Text style={styles.txt1}>{t('Catégorie_de_véhicule')}:</Text>
-                        <Text style={styles.txt2}>{user.categorie}</Text>
-                    </View>
-
-                    <View style={styles.line} />
-
-                    <View style={styles.vw}>
-                        <Text style={styles.txt1}>{t('Matricule')}:</Text>
-                        <Text style={styles.txt2}>{user.matricule}</Text>
-                    </View>
-
-                    <View style={styles.line} />
-
-                    
-                </View>
-
-                <View style={styles.footer}>
-                    <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('UpdateProfileLivreur')}>
-                        <Text style={styles.txtbtn}>{t('Modifier_le_profil')}</Text>
+                    <TouchableOpacity 
+                        style={styles.editButton}
+                        onPress={() => navigation.navigate('UpdateProfileLivreur')}
+                    >
+                        <Text style={styles.editButtonText}>{t('Modifier_le_profil')}</Text>
+                        <Icon name="edit" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </LinearGradient>
         </LayoutLivreur>
     );
 };
 
-export default Compte;
-
 const styles = StyleSheet.create({
-    container: {
-        marginVertical: 20,
-    },
-    img: {
-        height: 100,
-        width: '100%',
-        resizeMode: 'contain',
-        marginTop: 17,
-    },
-    name: {
-        marginTop: 15,
-        fontSize: 16,
-    },
-    line: {
-        borderBottomWidth: 1,
-        borderBottomColor: 'lightgrey',
-        marginVertical: 10,
-        width: '100%',
-    },
-    vw: {
-        flexDirection: 'row',
-        padding: 15,
-    },
-    txt1: {
-        fontWeight: 'bold',
-        fontSize: 15,
+    gradient: {
         flex: 1,
     },
-    txt2: {
-        marginLeft: 45,
+    container: {
+        flex: 1,
+        padding: 20,
     },
-    footer: {
-        marginTop: 40,
-        margin: 15,
-    },
-    btn: {
-        backgroundColor: '#2E7D32',
-        padding: 13,
-        borderRadius: 10,
-    },
-    txtbtn: {
+    loadingContainer: {
+        flex: 1,
         justifyContent: 'center',
-        textAlign: 'center',
         alignItems: 'center',
-        color: '#fff',
-        fontWeight: '600',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        marginTop: 20,
         fontSize: 16,
-    }
+        color: '#FF3B30',
+    },
+    profileHeader: {
+        alignItems: 'center',
+        marginBottom: 30,
+    },
+    avatarContainer: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#E0E0E0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 15,
+        overflow: 'hidden',
+        marginTop: 25,
+        //borderWidth: 2,
+        //borderColor: '#2E7D32',
+    },
+    avatar: {
+        width: '100%',
+        height: '100%',
+    },
+    welcomeText: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#000',
+        marginTop: 10,
+    },
+    profileInfo: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 15,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    infoItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 15,
+    },
+    icon: {
+        marginRight: 15,
+    },
+    infoTextContainer: {
+        flex: 1,
+    },
+    infoLabel: {
+        fontSize: 14,
+        color: '#616161',
+        marginBottom: 5,
+    },
+    infoValue: {
+        fontSize: 16,
+        color: '#212121',
+        fontWeight: '500',
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#EEEEEE',
+    },
+    editButton: {
+        flexDirection: 'row',
+        backgroundColor: '#2E7D32',
+        padding: 15,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 30,
+        shadowColor: '#2E7D32',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
+    },
+    editButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
+        marginRight: 10,
+    },
 });
+
+export default CompteLivreur;
