@@ -14,7 +14,7 @@ const AjouterCategories = ({ navigation }) => {
             return;
         }
         try {
-            await fetch('http://192.168.1.47:8080/api/categories/add', {
+            await fetch('http://192.168.1.9:8080/api/categories/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })

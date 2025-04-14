@@ -6,7 +6,7 @@ import { LogBox } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from '@expo/vector-icons';
 
-const backendUrl = "http://192.168.1.47:8080";
+const backendUrl = "http://192.168.1.9:8080";
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 const ProduitsDetails = () => {

@@ -252,4 +252,26 @@ export const toggleStatus = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+  // Récupérer un consommateur par son ID
+  export const getConsommateurByIdController = async (req, res) => {
+    try {
+      if (!req.params.id) {
+        return res.status(400).json({ message: "ID manquant dans la requête" });
+      }
+  
+      const consommateur = await consommateurModel.findById(req.params.id);
+      if (!consommateur) {
+        return res.status(404).json({ message: "Consommateur non trouvé" });
+      }
+      
+      res.json({
+        nom: consommateur.nom,
+        telephone: consommateur.numTel
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Erreur serveur", error });
+    }
+  };
+  
   
