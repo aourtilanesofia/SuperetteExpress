@@ -6,6 +6,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const UpdateProfileLivreur = ({ navigation }) => {
     const [formData, setFormData] = useState({
@@ -175,7 +176,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
                             </View>
 
                             <View style={styles.inputContainer}>
-                                <Icon name="badge" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                <MaterialCommunityIcons name='numeric' size={20} color={'#2E7D32'} style={styles.icon} />
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.matricule}

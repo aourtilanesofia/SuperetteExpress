@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
 
-const backendUrl = "http://192.168.1.47:8080";
+const backendUrl = "http://192.168.1.9:8080";
 
 const AjouterProduit = ({ navigation }) => {
   const [nom, setNom] = useState("");
@@ -62,10 +62,7 @@ const AjouterProduit = ({ navigation }) => {
       return;
     }
 
-    if (isNaN(codeBarre)) {
-      Alert.alert("Erreur", "Le code barre doit contenir uniquement des chiffres !");
-      return;
-    }
+    
 
     // Créer un FormData pour envoyer l'image et les autres données
     const formData = new FormData();

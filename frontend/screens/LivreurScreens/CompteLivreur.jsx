@@ -5,6 +5,7 @@ import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CompteLivreur = ({ navigation }) => {
     const [user, setUser] = useState(null);
@@ -99,7 +100,7 @@ const CompteLivreur = ({ navigation }) => {
                         <View style={styles.separator} />
 
                         <View style={styles.infoItem}>
-                            <Icon name="badge" size={24} color="#2E7D32" style={styles.icon} />
+                            <MaterialCommunityIcons name='numeric' size={20} color={'#2E7D32'} style={styles.icon} />
                             <View style={styles.infoTextContainer}>
                                 <Text style={styles.infoLabel}>{t('Matricule')}</Text>
                                 <Text style={styles.infoValue}>{user.matricule}</Text>
