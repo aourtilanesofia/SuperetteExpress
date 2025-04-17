@@ -11,7 +11,6 @@ import WelcomePage from './screens/WelcomePage';
 import WelcomePageLivreur from '../frontend/screens/LivreurScreens/WelcomePageLivreur';
 import ConLivreur from '../frontend/screens/LivreurScreens/ConLivreur';
 import InsLivreur from '../frontend/screens/LivreurScreens/InsLivreur';
-import ConCommerçant from './screens/AdminScreens/ConCommerçant';
 import AcceuilConsommateur from './screens/AcceuilConsommateur';
 import ProduitsDetails from './screens/ProduitsDetails';
 import Compte from './screens/Compte';
@@ -21,34 +20,40 @@ import AcceuilLivreur from './screens/LivreurScreens/AcceuilLivreur';
 import CompteLivreur from './screens/LivreurScreens/CompteLivreur';
 import UpdateProfileLivreur from './screens/LivreurScreens/UpdateProfileLivreur';
 import AutresOptionsLivreur from './screens/LivreurScreens/AutresOptionsLivreur';
-import AcceuilCommerçant from './screens/AdminScreens/AcceuilCommerçant';
-import GestiondesUtilisateurs from './screens/AdminScreens/GestiondesUtilisateurs';
-import ListeDesClients from './screens/AdminScreens/ListeDesClients';
-import ListeDesLivreurs from './screens/AdminScreens/ListeDesLivreurs';
-import GestionDesCategories from './screens/AdminScreens/GestionDesCategories';
-import AjouterCategories from './screens/AdminScreens/AjouterCategories';
+import AcceuilCommerçant from './screens/CommercantScreens/AcceuilCommercant';
+import ListeDesClients from './screens/AdministrateurScreens/ListeDesClients';
+import ListeDesLivreurs from './screens/AdministrateurScreens/ListeDesLivreurs';
+import GestionDesCategories from './screens/CommercantScreens/GestionDesCategories';
+import AjouterCategories from './screens/CommercantScreens/AjouterCategories';
 import Panier from './screens/Panier';
 import Valider from './screens/Valider';
 import ListeDesCommandes from './screens/ListeDesCommandes';
-import ModifierCategories from "./screens/AdminScreens/ModifierCategories";
-import GestiondesProduits from './screens/AdminScreens/GestiondesProduits';
-import NotificationsAdmin from './screens/AdminScreens/NotificationsAdmin';
-import AjouterProduit from "./screens/AdminScreens/AjouterProduit";
-import ModifierProduit from "./screens/AdminScreens/ModifierProduit";
+import ModifierCategories from "./screens/CommercantScreens/ModifierCategories";
+import GestiondesProduits from './screens/CommercantScreens/GestiondesProduits';
+import NotificationsAdmin from './screens/AdministrateurScreens/NotificationsAdmin';
+import AjouterProduit from "./screens/CommercantScreens/AjouterProduit";
+import ModifierProduit from "./screens/CommercantScreens/ModifierProduit";
 import LanguageSelection from './screens/LanguageSelection';
 import ProduitsParCategorie from './screens/ProduitsParCategorie';
 import CommandeDetails from './screens/CommandeDetails';
-import GestionDesCommandes from './screens/AdminScreens/GestionDesCommandes';
-import CommandeDetailsAdmin from './screens/AdminScreens/CommandeDetailsAdmin';
+import GestionDesCommandes from './screens/CommercantScreens/GestionDesCommandes';
+import CommandeDetailsAdmin from './screens/CommercantScreens/CommandeDetailsAdmin';
 import Paiement from './screens/Paiement';
 import NotificationsConsommateur from './screens/NotificationsConsommateur';
 import BarcodeScanner from './screens/BarcodeScanner';
-import VideoRecette from './screens/VideoRecette';
+import ConnAdmin from './screens/AdministrateurScreens/ConnAdmin';
+import InsCommercant from './screens/CommercantScreens/InsCommercant';
+import ConCommercant from './screens/CommercantScreens/ConCommercant';
+import AcceuilAdmin from './screens/AdministrateurScreens/AcceuilAdmin';
+import ListeDesCommercants from './screens/AdministrateurScreens/ListeDesCommercants';
+import CompteCommercant from './screens/CommercantScreens/CompteCommercant';
+import UpdateProfilCommercant from './screens/CommercantScreens/UpdateProfilCommercant';
+import NotificationCommercant from './screens/CommercantScreens/NotificationCommercant';
 //routes
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer> 
       <Stack.Navigator>
 
         <Stack.Screen name='SplashScreen' component={SplashScreen} options={{ headerShown: false, }} />
@@ -59,7 +64,6 @@ export default function App() {
         <Stack.Screen name='InsConsommateur' component={InsConsommateur} options={{ headerTitle: '' }} />
         <Stack.Screen name='ConLivreur' component={ConLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='InsLivreur' component={InsLivreur} options={{ headerTitle: '' }} />
-        <Stack.Screen name='ConCommerçant' component={ConCommerçant} options={{ headerShown: false, }} />
         <Stack.Screen name='AcceuilConsommateur' component={AcceuilConsommateur} options={{ headerShown: false, }} />
         <Stack.Screen name='ProduitsDetails' component={ProduitsDetails} options={{ headerTitle: '' }} />
         <Stack.Screen name='Compte' component={Compte} options={{ headerTitle: '' }} />
@@ -70,7 +74,6 @@ export default function App() {
         <Stack.Screen name='CompteLivreur' component={CompteLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='UpdateProfileLivreur' component={UpdateProfileLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name='AcceuilCommerçant' component={AcceuilCommerçant} options={{ headerShown: false, }} />
-        <Stack.Screen name='GestiondesUtilisateurs' component={GestiondesUtilisateurs} options={{ headerTitle: '' }} />
         <Stack.Screen name='GestiondesProduits' component={GestiondesProduits} options={{ headerTitle: '' }} />
         <Stack.Screen name="GestionDesCategories" component={GestionDesCategories} options={{ headerTitle: '' }} />
         <Stack.Screen name='ListeDesClients' component={ListeDesClients} options={{ headerTitle: '' }} />
@@ -91,7 +94,14 @@ export default function App() {
         <Stack.Screen name="Paiement" component={Paiement} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
         <Stack.Screen name='BarcodeScanner' component={BarcodeScanner} options={{ headerTitle: '' }} />
-        <Stack.Screen name='VideoRecette' component={VideoRecette} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ConnAdmin' component={ConnAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name='InsCommercant' component={InsCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ConCommercant' component={ConCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name='AcceuilAdmin' component={AcceuilAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ListeDesCommercants' component={ListeDesCommercants} options={{ headerTitle: '' }} />
+        <Stack.Screen name='CompteCommercant' component={CompteCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name='UpdateProfilCommercant' component={UpdateProfilCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name='NotificationCommercant' component={NotificationCommercant} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

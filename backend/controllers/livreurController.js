@@ -236,3 +236,21 @@ export const deleteLivreur = async (req, res) => {
     }
 };
 
+//Récupérer le nombre des livreurs
+export const getLivreurCountController = async (req, res) => {
+    try {
+        const count = await livreurModel.countDocuments();
+        res.status(200).json({
+            success: true,
+            count,
+        });
+    } catch (error) {
+        console.error("Erreur lors de la récupération du nombre de livreurs :", error);
+        res.status(500).json({
+            success: false,
+            message: "Erreur serveur",
+            error,
+        });
+    }
+};
+

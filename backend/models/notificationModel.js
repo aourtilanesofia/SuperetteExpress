@@ -23,7 +23,7 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    role: { type: String, enum: ["livreur", "client", "administrateur"], required: true },
+    role: { type: String, enum: ["livreur", "client", "administrateur","commercant"], required: true },
     
 });
 

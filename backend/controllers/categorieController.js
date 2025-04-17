@@ -22,6 +22,16 @@ export const getCategories = async (req, res) => {
     }
 };
 
+// Récupérer le nombre total de catégories
+export const getCategorieCount = async (req, res) => {
+    try {
+        const count = await CategorieModel.countDocuments();
+        res.status(200).json({ count }); // Retourne le nombre total de catégories
+    } catch (error) {
+        res.status(500).json({ message: 'Erreur serveur', error });
+    }
+};
+
 // Modifier une catégorie
 export const updateCategorie = async (req, res) => {
     try {
