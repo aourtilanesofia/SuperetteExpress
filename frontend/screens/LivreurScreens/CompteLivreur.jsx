@@ -6,29 +6,33 @@ import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const CompteLivreur = ({ navigation }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { t } = useTranslation();
+    const { t } = useTranslation(); 
 
-    useEffect(() => {
-        const fetchUser = async () => {
+    useFocusEffect(
+        React.useCallback(() => {
+          const fetchUser = async () => {
             try {
-                const storedUser = await AsyncStorage.getItem('user');
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-                }
+              setLoading(true);
+              const userData = await AsyncStorage.getItem('user');
+              if (userData) {
+                setUser(JSON.parse(userData));
+              }
             } catch (error) {
-                console.error("Erreur lors de la récupération des données :", error);
-                Alert.alert(t('erreur'), t('impossible_charger_info'));
+              Alert.alert('Erreur', "impossible de charger l'information");
             } finally {
-                setLoading(false);
+              setLoading(false);
             }
-        };
-
-        fetchUser(); 
-    }, []);
+          };
+      
+          fetchUser();
+        }, [])
+      );
 
     if (loading) {
         return (

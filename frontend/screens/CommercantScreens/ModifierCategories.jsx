@@ -1,52 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,ScrollView  } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-const AjouterCategories = ({ navigation }) => {
-    const [nom, setName] = useState('');
-    const [image, setImage] = useState('');
+const ModifierCategories = ({ route, navigation }) => {
+    const { category } = route.params;
+    const [nom, setName] = useState(category.nom);
+    const [image, setImage] = useState(category.image);
     const { t } = useTranslation();
 
-    const handleAdd = async () => {
-        if (!nom || !image) {
-
-            Alert.alert("Erreur","Veuillez remplir tous les champs !");
-            return;
-        }
+    const handleUpdate = async () => {
         try {
-            await fetch('http://192.168.1.9:8080/api/categories/add', {
-                method: 'POST',
+            await fetch(`http://192.168.1.42:8080/api/categories/update/${category._id}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })
             });
-            Alert.alert(' ','Catégorie ajoutée avec succés!');
+            Alert.alert(' ','Mise à jour effectuée avec succès!');
             navigation.goBack();
         } catch (error) {
-            console.error("Erreur lors de l'ajout", error);
+            console.error("Erreur lors de la mise à jour", error);
         }
     };
- 
+
     return (
-        
         <View style={styles.container}>
             <Text style={styles.txt}>{t('Nom_de_la_catégorie')} :</Text>
             <TextInput style={styles.input} value={nom} onChangeText={setName} />
             <Text style={styles.txt}>{t('URL_de_image')} :</Text>
             <TextInput style={styles.input} value={image} onChangeText={setImage} />
-            <TouchableOpacity style={styles.button} onPress={handleAdd}>
-                <Text style={styles.buttonText}>{t('ajouter')}</Text>
+            <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                <Text style={styles.buttonText}>{t('Mettre_à_jour')}</Text>
             </TouchableOpacity>
         </View>
-    
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
-    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 10 , borderColor:'#9E9E9E'},
+    input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 10, borderColor:'#9E9E9E' },
     button: { backgroundColor: '#2E7D32', padding: 10, borderRadius: 10, alignItems: 'center' ,marginTop:26},
-    buttonText: { color: '#fff', fontWeight: '600',fontSize:16 },
+    buttonText: { color: '#fff', fontWeight: '600' , fontSize:16},
     txt:{fontSize:16, fontWeight:'bold',marginBottom:17, marginTop:20}
 });
 
-export default AjouterCategories;
+export default ModifierCategories;

@@ -64,14 +64,6 @@ const AcceuilConsommateur = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 80 }}
       />
 
-      {/* Bouton flottant pour scanner le code-barres */}
-      <TouchableOpacity
-        style={styles.floatingButtonScan}
-        onPress={() => navigation.navigate("BarcodeScanner")} // Navigation vers la page de scan
-      >
-        <AntDesign name="scan1" size={28} color="#fff" />
-      </TouchableOpacity>
-
       {/* Bouton flottant pour remonter en haut */}
       {showScrollTop && (
         <TouchableOpacity

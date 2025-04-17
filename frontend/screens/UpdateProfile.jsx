@@ -70,7 +70,7 @@ const UpdateProfile = ({ navigation }) => {
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
-            const response = await fetch('http://192.168.1.9:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.1.42:8080/api/v1/consommateur/profile-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const UpdateProfile = ({ navigation }) => {
 
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || t('erreur_mise_a_jour'));
+                throw new Error(data.message || 'Erreur de mise a jour');
             }
 
             await AsyncStorage.setItem('user', JSON.stringify({
@@ -92,13 +92,13 @@ const UpdateProfile = ({ navigation }) => {
                 adresse: formData.adr
             }));
 
-            Alert.alert(t('succes'), t('mise_a_jour_reussie'), [
+            Alert.alert(t('succes'), t('Mise à jour reussie'), [
                 { text: "OK", onPress: () => navigation.goBack() }
             ]);
 
         } catch (error) {
             console.error("Update error:", error);
-            Alert.alert(t('erreur'), error.message || t('erreur_mise_a_jour'));
+            Alert.alert(t('erreur'), error.message || t('Erreur de mise a jour'));
         } finally {
             setIsLoading(false);
         }
@@ -114,9 +114,9 @@ const UpdateProfile = ({ navigation }) => {
                     <View style={styles.container}>
                         <View style={styles.profileHeader}>
                             <View style={styles.avatarContainer}>
-                                
-                                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} style={styles.avatar} />
-                                
+
+                                <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} style={styles.avatar} />
+
                                 <TouchableOpacity style={styles.editIcon}>
                                     <Icon name="edit" size={24} color="#FFFFFF" />
                                 </TouchableOpacity>
@@ -181,7 +181,7 @@ const UpdateProfile = ({ navigation }) => {
                                     placeholderTextColor="#9E9E9E"
                                     secureTextEntry={!isPasswordVisible}
                                 />
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                                     style={styles.eyeIcon}
                                 >
@@ -193,7 +193,7 @@ const UpdateProfile = ({ navigation }) => {
                                 </TouchableOpacity>
                             </View>
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.saveButton}
                                 onPress={handleUpdateProfile}
                                 disabled={isLoading}
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
         position: 'relative',
-        marginTop:35,
+        marginTop: 35,
     },
     avatar: {
         width: '100%',

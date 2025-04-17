@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 
-const backendUrl = "http://192.168.1.9:8080";
+const backendUrl = "http://192.168.1.42:8080";
 
 const Categories = () => {  // Ajout de navigation
   const [categories, setCategories] = useState([]);

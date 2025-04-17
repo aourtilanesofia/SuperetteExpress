@@ -4,7 +4,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 
-const backendUrl = "http://192.168.1.9:8080";
+const backendUrl = "http://192.168.1.42:8080";
 
 const GestiondesProduits = () => {
   const navigation = useNavigation();

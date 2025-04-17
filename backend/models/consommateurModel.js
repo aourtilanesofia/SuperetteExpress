@@ -5,11 +5,11 @@ import JWT from "jsonwebtoken";
 const consommateurSchema = new mongoose.Schema(
   {
     nom: {
-      type: String,
+      type: String, 
       required: [true, "Le champ est obligatoire"],
     },
     numTel: {
-      type: Number,
+      type: String,
       required: [true, "Le champ est obligatoire"],
     },
     adresse: {

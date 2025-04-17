@@ -18,7 +18,7 @@ const GestionDesCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://192.168.1.9:8080/api/categories');
+            const response = await fetch('http://192.168.1.42:8080/api/categories');
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -36,7 +36,7 @@ const GestionDesCategories = () => {
                     text: "Supprimer",
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.1.9:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+                            await fetch(`http://192.168.1.42:8080/api/categories/delete/${id}`, { method: 'DELETE' });
                             fetchCategories();
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);
@@ -59,7 +59,7 @@ const GestionDesCategories = () => {
                     <View style={styles.categoryItem}>
 
                         <Image 
-                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.1.9:8080${item.image}` }} 
+                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.1.42:8080${item.image}` }} 
                             style={styles.image} 
                             resizeMode="contain"
                             onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}

@@ -1,56 +1,73 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const ConCommerçant = ({ navigation }) => {
+const ConCommercant = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
     const [email, setEmail] = useState('');
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
+ 
     const handleLogin = async () => {
+        Keyboard.dismiss();
+        if (!email || !mdp) {
+            Alert.alert("Informations requises", "Veuillez saisir votre email et mot de passe professionnels");
+            return;
+        }
+
         setIsLoading(true);
         
         try {
-            if (email === "admin@gmail.com" && mdp === "admin123") {
-                await AsyncStorage.multiSet([
-                    ['userRole', 'admin'],
-                    ['userEmail', email]
-                ]);
-                
-                navigation.navigate("AcceuilCommerçant");
-                Alert.alert("Connexion réussie", "Bienvenue dans votre espace administrateur");
-            } else {
-                Alert.alert("Accès refusé", "Identifiants incorrects");
+            const response = await fetch("http://192.168.1.42:8080/api/v1/commercant/connexion", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, mdp }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.commercant || !data.token) {
+                Alert.alert("Accès refusé", data.message || "Identifiants incorrects. Veuillez réessayer.");
+                return;
             }
+
+            await AsyncStorage.multiSet([
+                ['token', data.token],
+                ['userId', data.commercant._id],
+                ['user', JSON.stringify(data.commercant)]
+            ]);
+            console.log("Token enregistré :", data.token);
+
+            navigation.navigate("AcceuilCommerçant");
+            Alert.alert("Connexion validée", `Bienvenue dans votre espace professionnel ${data.commercant.nom || ''}!`);
+
         } catch (error) {
             console.error("Erreur de connexion:", error);
-            Alert.alert("Erreur", "Problème de connexion");
+            Alert.alert("Erreur technique", "Service temporairement indisponible. Merci de réessayer ultérieurement.");
         } finally {
             setIsLoading(false);
-            setEmail('');
-            setMdp('');
         }
     };
 
     return (
-        <LinearGradient
-            colors={['#FFFFFF', '#E8F5E9']}
-            style={styles.container}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-        >
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <LinearGradient
+                colors={['#FFFFFF', '#E8F5E9']}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
             >
-                <View style={styles.content}>
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.keyboardView}
+                >
                     <View style={styles.header}>
-                        <Text style={styles.title}>Espace Commerçant</Text>
-                        <Text style={styles.subtitle}>Accès réservé aux administrateurs</Text>
+                        <Text style={styles.title}>Espace Professionnel</Text>
+                        <Text style={styles.subtitle}>Accédez à votre tableau de bord commerçant</Text>
                     </View>
 
                     <View style={styles.formContainer}>
@@ -59,19 +76,19 @@ const ConCommerçant = ({ navigation }) => {
                             <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
-                                placeholder='Email administrateur'
+                                placeholder='Email professionnel'
                                 placeholderTextColor="#939494"
                                 keyboardType='email-address'
                                 value={email}
                                 onChangeText={setEmail}
                                 autoCapitalize="none"
-                                autoComplete="email"
+                                autoCorrect={false}
                             />
                         </View>
 
                         {/* Password Input */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='lock-closed-outline' size={22} color={'#329171'} style={styles.icon} />
+                            <SimpleLineIcons name='lock' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
                                 placeholder='Mot de passe'
@@ -100,15 +117,24 @@ const ConCommerçant = ({ navigation }) => {
                             disabled={isLoading}
                         >
                             <Text style={styles.loginButtonText}>
-                                {isLoading ? 'Connexion...' : 'Accéder au tableau de bord'}
+                                {isLoading ? 'Connexion en cours...' : 'Accéder à mon espace'}
                             </Text>
                         </TouchableOpacity>
+
+                        {/* Sign Up Link */}
+                        <View style={styles.signupContainer}>
+                            <Text style={styles.signupText}>Vous n'avez pas un compte ? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('InsCommercant')}>
+                                <Text style={styles.signupLink}>S'inscrire</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-            </KeyboardAvoidingView>
-        </LinearGradient>
+                </KeyboardAvoidingView>
+            </LinearGradient>
+        </TouchableWithoutFeedback>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -118,12 +144,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-    content: {
-        paddingHorizontal: 30,
-    },
     header: {
+        paddingHorizontal: 30,
         marginBottom: 40,
-        alignItems: 'center',
     },
     title: {
         fontSize: 28,
@@ -134,10 +157,9 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 16,
         color: '#616161',
-        textAlign: 'center',
     },
     formContainer: {
-        marginTop: 20,
+        paddingHorizontal: 30,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -167,6 +189,14 @@ const styles = StyleSheet.create({
     eyeIcon: {
         padding: 5,
     },
+    forgotPassword: {
+        alignSelf: 'flex-end',
+        marginBottom: 25,
+    },
+    forgotPasswordText: {
+        color: '#329171',
+        fontSize: 14,
+    },
     loginButton: {
         backgroundColor: '#2E7D32',
         borderRadius: 12,
@@ -178,15 +208,30 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
+        marginTop:35,
     },
     disabledButton: {
         opacity: 0.7,
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    signupContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 25,
+    },
+    signupText: {
+        color: '#616161',
+        fontSize: 15,
+    },
+    signupLink: {
+        color: '#2E7D32',
+        fontSize: 15,
         fontWeight: '600',
     },
 });
 
-export default ConCommerçant;
+export default ConCommercant;

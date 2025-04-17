@@ -9,7 +9,7 @@ const livreurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
     },
     numTel: {
-      type: Number,
+      type: String,
       required: [true, "Le champ est obligatoire"],
     },
     categorie: {

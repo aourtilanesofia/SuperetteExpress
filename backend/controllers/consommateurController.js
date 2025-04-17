@@ -3,7 +3,7 @@ import consommateurModel from "../models/consommateurModel.js";
 import Notification from '../models/NotificationModel.js';
 
 // INSCRIPTION
-export const inscriptionController = async (req, res) => {
+export const inscriptionController = async (req, res) => { 
     try {
         const { nom, numTel, adresse, email, mdp } = req.body;
  
@@ -273,5 +273,56 @@ export const toggleStatus = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur", error });
     }
   };
+
+ 
+// Récupérer le nombre de consommateurs actifs
+export const getActiveConsommateurCountController = async (req, res) => {
+    try {
+        // Recherche des consommateurs actifs
+        const activeCount = await consommateurModel.countDocuments({ isActive: true });
+
+        // Affichage pour débogage
+        console.log("Nombre de consommateurs actifs :", activeCount);
+
+        res.status(200).json({
+            success: true,
+            count: activeCount,  // Renvoie le nombre de consommateurs actifs
+        });
+    } catch (error) {
+        console.error("Erreur lors de la récupération du nombre de consommateurs actifs :", error);
+        res.status(500).json({
+            success: false,
+            message: "Erreur serveur",
+            error: error.message || error,  // Affichage du message d'erreur exact
+        });
+    }
+};
+
+//Récupérer le nombre de consommateurs désactifs 
+
+export const getNotActiveConsommateurCountController = async (req, res) => {
+    try {
+        // Recherche des consommateurs actifs
+        const notactiveCount = await consommateurModel.countDocuments({ isActive: false });
+
+        // Affichage pour débogage
+        console.log("Nombre de consommateurs non actifs :", notactiveCount);
+
+        res.status(200).json({
+            success: true,
+            count: notactiveCount,  
+        });
+    } catch (error) {
+        console.error("Erreur lors de la récupération du nombre de consommateurs non actifs :", error);
+        res.status(500).json({
+            success: false,
+            message: "Erreur serveur",
+            error: error.message || error,  
+        });
+    }
+};
+
+
+
   
   

@@ -82,7 +82,7 @@ export const addOrder = async (req, res) => {
     const notification = new Notification({
       message: `${user.nom} vient de passer une commande.`,
       isRead: false,
-      role: "administrateur"
+      role: "commercant"
     });
 
     await notification.save();
@@ -214,4 +214,28 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
+export const getTodayOrdersCount = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const count = await CommandeModel.countDocuments({
+      $or: [
+        { createdAt: { $gte: today, $lt: tomorrow } },
+        { date: { $gte: today, $lt: tomorrow } }
+      ]
+    });
+
+    res.status(200).json({ count });
+  } catch (error) {
+    console.error("Erreur lors du comptage des commandes du jour :", error);
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
+
+
+ 
