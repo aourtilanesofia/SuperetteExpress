@@ -5,8 +5,12 @@ import React from 'react'
 const FirstScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.btnAdmin} onPress={() => navigation.navigate('ConCommerçant')}>
+       <TouchableOpacity style={styles.btnAdmin} onPress={() => navigation.navigate('ConnAdmin')}>
         <Text style={styles.txtadmin}>Administrateur</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.btnAdmin} onPress={() => navigation.navigate('ConCommercant')}>
+        <Text style={styles.txtadmin}>Commerçant</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.btnCons} onPress={() => navigation.navigate('WelcomePage')}>

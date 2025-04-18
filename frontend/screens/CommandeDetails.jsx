@@ -11,6 +11,7 @@ const CommandeDetails = ({ route, navigation }) => {
     const annulerCommande = async () => {
         try {
             const response = await fetch(`http://192.168.228.149:8080/api/commandes/cancel/${commande._id}`, {
+
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
             });

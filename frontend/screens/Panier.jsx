@@ -76,6 +76,7 @@ const Panier = () => {
             };
 
             const response = await fetch("http://192.168.228.149:8080/api/commandes/add", {
+
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newOrder)

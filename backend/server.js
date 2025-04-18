@@ -21,6 +21,7 @@ import produitRoutes from "./routes/produitRoutes.js";
 import panierRoutes from "./routes/panierRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import recetteRoutes from './routes/recetteRoutes.js';
+import commercantRoutes from './routes/commercantRoutes.js';
 
 //Configuration dot env
 dotenv.config();
@@ -72,16 +73,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 //routes
-app.use('/api/v1', testRouter);
+app.use('/api/v1', testRouter); 
 app.use('/api/v1/consommateur', consommateurRoutes);
 app.use('/api/v1/livreur', livreurRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/categories', categorieRoutes);
 app.use("/assets", express.static("assets"));
 app.use("/api/produits", produitRoutes);
-app.use("/panier", panierRoutes);
+app.use("/panier", panierRoutes); 
 app.use("/api/commandes", orderRoutes);
 app.use('/api/recettes', recetteRoutes);
+app.use('/api/v1/commercant', commercantRoutes);
 
 
 

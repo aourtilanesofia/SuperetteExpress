@@ -36,7 +36,9 @@ const AutresOptions = ({ navigation }) => {
                                 alert('Vous devez être connecté pour supprimer votre compte!');
                                 return;
                             }
+
                             const response = await fetch('http://192.168.228.149:8080/api/v1/consommateur/delete-account', {
+
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,

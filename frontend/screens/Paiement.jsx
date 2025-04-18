@@ -33,7 +33,9 @@ const Paiement = ({ route }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+
         const response = await fetch(`http://192.168.228.149:8080/api/v1/consommateur/${commande.userId}`);
+
 
         // Vérifier le statut de la réponse
         if (!response.ok) {

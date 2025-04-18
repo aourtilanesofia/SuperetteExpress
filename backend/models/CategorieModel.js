@@ -8,9 +8,10 @@ const categorieSchema = new mongoose.Schema({
     image: { type: String,
     required: true 
 }, // URL de l'image de la catégorie
-}, { timestamps: true });
+}, { timestamps: true,
+ });
 
-const CategorieModel = mongoose.model("Categorie", categorieSchema);
+const CategorieModel = mongoose.model("Categorie", categorieSchema,"Categorie");
 
 
 export default CategorieModel;

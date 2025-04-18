@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons"; // Import de l'icône poubel
 
 const CartItem = ({ item, onRemove, onQuantityChange }) => {
   const [qty, setQty] = useState(item.qty !== undefined ? item.qty : 1);
+
   const backendUrl = "http://192.168.228.149:8080";
 
   useEffect(() => {

@@ -5,29 +5,32 @@ import Layout from '../components/Layout/Layout';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Compte = ({ navigation }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
-
-    useEffect(() => {
-        const fetchUser = async () => {
+ 
+    useFocusEffect(
+        React.useCallback(() => {
+          const fetchUser = async () => {
             try {
-                const storedUser = await AsyncStorage.getItem('user');
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-                }
+              setLoading(true);
+              const userData = await AsyncStorage.getItem('user');
+              if (userData) {
+                setUser(JSON.parse(userData));
+              }
             } catch (error) {
-                console.error("Erreur lors de la récupération des données :", error);
-                Alert.alert(t('erreur'), t('impossible_charger_info'));
+              Alert.alert('Erreur', "impossible de charger l'information");
             } finally {
-                setLoading(false);
+              setLoading(false);
             }
-        };
-
-        fetchUser(); 
-    }, []);
+          };
+      
+          fetchUser();
+        }, [])
+      );
 
     if (loading) {
         return (
@@ -44,7 +47,7 @@ const Compte = ({ navigation }) => {
             <Layout>
                 <View style={styles.errorContainer}>
                     <Icon name="error-outline" size={50} color="#FF3B30" />
-                    <Text style={styles.errorText}>{t('aucune_donnee_utilisateur')}</Text>
+                    <Text style={styles.errorText}>Aucune donnée utilisateur</Text>
                 </View>
             </Layout>
         );

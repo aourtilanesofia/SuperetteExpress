@@ -5,7 +5,9 @@ import { io } from 'socket.io-client';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const socket = io("http://192.168.228.149:8080");
+
 
 const NotificationsConsommateur = () => {
   const [notifications, setNotifications] = useState([]);
@@ -24,7 +26,9 @@ const NotificationsConsommateur = () => {
   useEffect(() => {
     if (!userId) return;
 
+
     fetch(`http://192.168.228.149:8080/api/v1/notifications/${userId}`)
+
       .then((res) => res.json())
       .then((data) => {
         //console.log("Données reçues de l'API notifications:", data);
@@ -52,7 +56,9 @@ const NotificationsConsommateur = () => {
   }, [userId]);
 
   const markAsRead = (id) => {
+
     fetch(`http://192.168.228.149:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
+
       .then(() => {
         setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -60,7 +66,9 @@ const NotificationsConsommateur = () => {
   };
 
   const deleteNotification = (id) => {
+
     fetch(`http://192.168.228.149:8080/api/v1/notifications/${id}`, { method: "DELETE" })
+
       .then(() => {
         setNotifications((prev) => prev.filter(n => n._id !== id));
       });

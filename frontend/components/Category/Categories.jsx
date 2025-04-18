@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const backendUrl = "http://192.168.228.149:8080";
 
+
 const Categories = () => {  // Ajout de navigation
   const [categories, setCategories] = useState([]);
   const navigation = useNavigation();
