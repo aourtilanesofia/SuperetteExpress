@@ -5,7 +5,11 @@ import { useTranslation } from "react-i18next";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 
+<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCommandes.jsx
+const socket = io("http://192.168.228.149:8080");
+=======
 const socket = io("http://192.168.1.42:8080");
+>>>>>>> main:frontend/screens/CommercantScreens/GestionDesCommandes.jsx
 
 const GestionDesCommandes = () => {
     const { t } = useTranslation();
@@ -16,7 +20,11 @@ const GestionDesCommandes = () => {
 
     const fetchCommandes = async () => {
         try {
+<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCommandes.jsx
+            const response = await fetch("http://192.168.228.149:8080/api/commandes/");
+=======
             const response = await fetch("http://192.168.1.42:8080/api/commandes/");
+>>>>>>> main:frontend/screens/CommercantScreens/GestionDesCommandes.jsx
             const data = await response.json();
             if (response.ok) {
                 setCommandes(data.reverse());

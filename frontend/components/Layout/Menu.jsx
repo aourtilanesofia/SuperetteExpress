@@ -45,7 +45,8 @@ const recupererTotalPanier = async () => {
         return;
       }
 
-      const response = await fetch(`http://192.168.1.42:8080/api/v1/notifications/${userId}`);
+      const response = await fetch(`http://192.168.228.149:8080/api/v1/notifications/${userId}`);
+
       const data = await response.json();
 
       console.log("Données reçues des notifications :", data); // Debug

@@ -17,7 +17,11 @@ const CommandeDetailsAdmin = ({ route }) => {
         }
 
         try {
+<<<<<<< HEAD:frontend/screens/AdminScreens/CommandeDetailsAdmin.jsx
+            const response = await fetch(`http://192.168.228.149:8080/api/commandes/${commande._id}`, {
+=======
             const response = await fetch(`http://192.168.1.42:8080/api/commandes/${commande._id}`, {
+>>>>>>> main:frontend/screens/CommercantScreens/CommandeDetailsAdmin.jsx
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

@@ -41,15 +41,18 @@ import CommandeDetailsAdmin from './screens/CommercantScreens/CommandeDetailsAdm
 import Paiement from './screens/Paiement';
 import NotificationsConsommateur from './screens/NotificationsConsommateur';
 import BarcodeScanner from './screens/BarcodeScanner';
-import ConnAdmin from './screens/AdministrateurScreens/ConnAdmin';
-import InsCommercant from './screens/CommercantScreens/InsCommercant';
-import ConCommercant from './screens/CommercantScreens/ConCommercant';
-import AcceuilAdmin from './screens/AdministrateurScreens/AcceuilAdmin';
-import ListeDesCommercants from './screens/AdministrateurScreens/ListeDesCommercants';
-import CompteCommercant from './screens/CommercantScreens/CompteCommercant';
-import UpdateProfilCommercant from './screens/CommercantScreens/UpdateProfilCommercant';
-import NotificationCommercant from './screens/CommercantScreens/NotificationCommercant';
-//routes
+import VideoRecette from './screens/VideoRecette';
+import ModePaiement from './screens/ModePaiement';
+import PaiementEspece from './screens/PaiementEspece';
+import Confirmation from './screens/Confirmation';
+import PaiementCIB from './screens/PaiementCIB';
+import PaiementDahabiya from './screens/PaiementDahabiya';
+
+
+
+
+
+
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
@@ -94,14 +97,12 @@ export default function App() {
         <Stack.Screen name="Paiement" component={Paiement} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
         <Stack.Screen name='BarcodeScanner' component={BarcodeScanner} options={{ headerTitle: '' }} />
-        <Stack.Screen name='ConnAdmin' component={ConnAdmin} options={{ headerTitle: '' }} />
-        <Stack.Screen name='InsCommercant' component={InsCommercant} options={{ headerTitle: '' }} />
-        <Stack.Screen name='ConCommercant' component={ConCommercant} options={{ headerTitle: '' }} />
-        <Stack.Screen name='AcceuilAdmin' component={AcceuilAdmin} options={{ headerTitle: '' }} />
-        <Stack.Screen name='ListeDesCommercants' component={ListeDesCommercants} options={{ headerTitle: '' }} />
-        <Stack.Screen name='CompteCommercant' component={CompteCommercant} options={{ headerTitle: '' }} />
-        <Stack.Screen name='UpdateProfilCommercant' component={UpdateProfilCommercant} options={{ headerTitle: '' }} />
-        <Stack.Screen name='NotificationCommercant' component={NotificationCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name='VideoRecette' component={VideoRecette} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ModePaiement" component={ModePaiement} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementEspece" component={PaiementEspece} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Confirmation" component={Confirmation} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementCIB" component={PaiementCIB} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementDahabiya" component={PaiementDahabiya} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

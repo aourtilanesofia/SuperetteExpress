@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, Button, Image, ActivityIndicator } from 'react-native';
 
 export default function BarcodeScanner() {
-    const backendUrl = "http://192.168.1.42:8080";
+
+    const backendUrl = "http://192.168.228.149:8080";
+
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedData, setScannedData] = useState(null);
   const [product, setProduct] = useState(null);
@@ -34,7 +36,9 @@ export default function BarcodeScanner() {
     setError(null);
 
     try {
-      const response = await fetch(`http://192.168.1.42:8080/api/produits/codebarre/${data}`);
+
+      const response = await fetch(`http://192.168.228.149:8080/api/produits/codebarre/${data}`);
+
       if (!response.ok) throw new Error('Produit non trouvé');
       const produit = await response.json();
       setProduct(produit);

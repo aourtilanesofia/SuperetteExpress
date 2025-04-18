@@ -14,7 +14,11 @@ const AjouterCategories = ({ navigation }) => {
             return;
         }
         try {
+<<<<<<< HEAD:frontend/screens/AdminScreens/AjouterCategories.jsx
+            await fetch('http://192.168.228.149:8080/api/categories/add', {
+=======
             await fetch('http://192.168.1.42:8080/api/categories/add', {
+>>>>>>> main:frontend/screens/CommercantScreens/AjouterCategories.jsx
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })
