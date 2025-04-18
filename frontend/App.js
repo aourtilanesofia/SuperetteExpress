@@ -44,6 +44,16 @@ import Paiement from './screens/Paiement';
 import NotificationsConsommateur from './screens/NotificationsConsommateur';
 import BarcodeScanner from './screens/BarcodeScanner';
 import VideoRecette from './screens/VideoRecette';
+import ModePaiement from './screens/ModePaiement';
+import PaiementEspece from './screens/PaiementEspece';
+import Confirmation from './screens/Confirmation';
+import PaiementCIB from './screens/PaiementCIB';
+import PaiementDahabiya from './screens/PaiementDahabiya';
+
+
+
+
+
 //routes
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -92,6 +102,11 @@ export default function App() {
         <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
         <Stack.Screen name='BarcodeScanner' component={BarcodeScanner} options={{ headerTitle: '' }} />
         <Stack.Screen name='VideoRecette' component={VideoRecette} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ModePaiement" component={ModePaiement} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementEspece" component={PaiementEspece} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Confirmation" component={Confirmation} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementCIB" component={PaiementCIB} options={{ headerTitle: '' }} />
+        <Stack.Screen name="PaiementDahabiya" component={PaiementDahabiya} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

@@ -43,7 +43,7 @@ const InsLivreur = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.47:8080/api/v1/livreur/inscriptionL", {
+            const response = await fetch("http://192.168.228.149:8080/api/v1/livreur/inscriptionL", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

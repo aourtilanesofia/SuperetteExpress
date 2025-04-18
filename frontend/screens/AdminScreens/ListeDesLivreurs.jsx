@@ -14,7 +14,7 @@ const ListeDesLivreurs = () => {
 
   const fetchLivreurs = async () => {
     try {
-      const response = await fetch("http://192.168.1.9:8080/api/v1/livreur/tousLivreurs");
+      const response = await fetch("http://192.168.228.149:8080/api/v1/livreur/tousLivreurs");
       const data = await response.json();
       
       //console.log("Données reçues :", data); // Debugging
@@ -39,7 +39,7 @@ const ListeDesLivreurs = () => {
         onPress: async () => {
           try {
             console.log("Suppression ID :", id);
-            await fetch(`http://192.168.1.9:8080/api/v1/livreur/refuser/${id}`, { method: "DELETE" });
+            await fetch(`http://192.168.228.149:8080/api/v1/livreur/refuser/${id}`, { method: "DELETE" });
             setLivreurs(livreurs.filter((livreur) => livreur._id !== id ));
           } catch (error) {
             console.error("Erreur suppression :", error);
@@ -58,7 +58,7 @@ const ListeDesLivreurs = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.9:8080/api/v1/livreur/valider/${id}`, {
+      const response = await fetch(`http://192.168.228.149:8080/api/v1/livreur/valider/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.1.9:8080");
+const socket = io("http://192.168.228.149:8080");
 
 const GestionDesCommandes = () => {
     const { t } = useTranslation();
@@ -16,7 +16,7 @@ const GestionDesCommandes = () => {
 
     const fetchCommandes = async () => {
         try {
-            const response = await fetch("http://192.168.1.9:8080/api/commandes/");
+            const response = await fetch("http://192.168.228.149:8080/api/commandes/");
             const data = await response.json();
             if (response.ok) {
                 setCommandes(data.reverse());

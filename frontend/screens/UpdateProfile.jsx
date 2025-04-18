@@ -70,7 +70,7 @@ const UpdateProfile = ({ navigation }) => {
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
-            const response = await fetch('http://192.168.1.9:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.228.149:8080/api/v1/consommateur/profile-update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

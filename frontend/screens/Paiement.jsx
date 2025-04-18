@@ -6,8 +6,10 @@ import * as Location from "expo-location";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import Layout from "../components/Layout/Layout";
+import { useNavigation } from "@react-navigation/native";
 
 const Paiement = ({ route }) => {
+  const navigation = useNavigation();
   const { commande } = route.params;
   const prixLivraison = 180;
   const totalNet = commande.total + prixLivraison;
@@ -31,7 +33,7 @@ const Paiement = ({ route }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://192.168.1.9:8080/api/v1/consommateur/${commande.userId}`);
+        const response = await fetch(`http://192.168.228.149:8080/api/v1/consommateur/${commande.userId}`);
 
         // Vérifier le statut de la réponse
         if (!response.ok) {
@@ -218,9 +220,18 @@ const Paiement = ({ route }) => {
         </View>
 
         {/* Bouton Passer commande */}
-        <TouchableOpacity style={styles.commanderButton} activeOpacity={0.9}>
-          <Text style={styles.commanderButtonText}>Valider la commande</Text>
-        </TouchableOpacity>
+        <TouchableOpacity 
+  style={styles.commanderButton} 
+  activeOpacity={0.9}
+  onPress={() => navigation.navigate('ModePaiement', { 
+    total: totalNet, // Montant total
+    adresse: adresse, // Adresse de livraison (depuis ton state)
+    nomClient: nomClient, // Nom du client (depuis ton state)
+    telephoneClient: telephoneClient // Téléphone (depuis ton state)
+  })}
+>
+  <Text style={styles.commanderButtonText}>Valider la commande</Text>
+</TouchableOpacity>
 
         {/* Modals (le contenu reste exactement le même) */}
         <Modal
