@@ -54,7 +54,7 @@ const Confirmation = ({ navigation, route }) => {
       {/* Boutons d'action */}
       <TouchableOpacity 
         style={styles.primaryButton}
-        onPress={() => navigation.navigate('Accueil')}
+        onPress={() => navigation.navigate('AcceuilConsommateur')}
       >
         <Text style={styles.buttonText}>Retour à l'accueil</Text>
       </TouchableOpacity>

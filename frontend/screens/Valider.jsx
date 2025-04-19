@@ -38,7 +38,7 @@ const Valider = () => {
                 //console.log("Données envoyées :", JSON.stringify(dataToSend, null, 2));
 
 
-                const response = await fetch(`http://192.168.228.149:8080/api/commandes/add`, {
+                const response = await fetch(`http://192.168.1.42:8080/api/commandes/add`, {
 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

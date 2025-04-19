@@ -34,7 +34,7 @@ const Paiement = ({ route }) => {
     const fetchUser = async () => {
       try {
 
-        const response = await fetch(`http://192.168.228.149:8080/api/v1/consommateur/${commande.userId}`);
+        const response = await fetch(`http://192.168.1.42:8080/api/v1/consommateur/${commande.userId}`);
 
 
         // Vérifier le statut de la réponse
@@ -232,7 +232,7 @@ const Paiement = ({ route }) => {
     telephoneClient: telephoneClient // Téléphone (depuis ton state)
   })}
 >
-  <Text style={styles.commanderButtonText}>Valider la commande</Text>
+  <Text style={styles.commanderButtonText}>Valider</Text>
 </TouchableOpacity>
 
         {/* Modals (le contenu reste exactement le même) */}

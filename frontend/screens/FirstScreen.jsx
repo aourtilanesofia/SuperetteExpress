@@ -9,7 +9,7 @@ const FirstScreen = ({ navigation }) => {
         <Text style={styles.txtadmin}>Administrateur</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.btnAdmin} onPress={() => navigation.navigate('ConCommercant')}>
+      <TouchableOpacity style={styles.btnAdmin} onPress={() => navigation.navigate('WelcomePageCommercant')}>
         <Text style={styles.txtadmin}>Commerçant</Text>
       </TouchableOpacity>
 

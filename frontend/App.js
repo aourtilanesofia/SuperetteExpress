@@ -47,6 +47,15 @@ import PaiementEspece from './screens/PaiementEspece';
 import Confirmation from './screens/Confirmation';
 import PaiementCIB from './screens/PaiementCIB';
 import PaiementDahabiya from './screens/PaiementDahabiya';
+import ConnAdmin from './screens/AdministrateurScreens/ConnAdmin';
+import AcceuilAdmin from './screens/AdministrateurScreens/AcceuilAdmin';
+import ListeDesCommercants from './screens/AdministrateurScreens/ListeDesCommercants';
+import ConCommercant from './screens/CommercantScreens/ConCommercant';
+import InsCommercant from './screens/CommercantScreens/InsCommercant';
+import NotificationCommercant from './screens/CommercantScreens/NotificationCommercant';
+import CompteCommercant from './screens/CommercantScreens/CompteCommercant';
+import UpdateProfilCommercant from './screens/CommercantScreens/UpdateProfilCommercant';
+import WelcomePageCommercant from './screens/CommercantScreens/WelcomePageCommercant';
 
 
 
@@ -103,6 +112,15 @@ export default function App() {
         <Stack.Screen name="Confirmation" component={Confirmation} options={{ headerTitle: '' }} />
         <Stack.Screen name="PaiementCIB" component={PaiementCIB} options={{ headerTitle: '' }} />
         <Stack.Screen name="PaiementDahabiya" component={PaiementDahabiya} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ConnAdmin" component={ConnAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name="AcceuilAdmin" component={AcceuilAdmin} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ListeDesCommercants" component={ListeDesCommercants} options={{ headerTitle: '' }} />
+        <Stack.Screen name="ConCommercant" component={ConCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name="InsCommercant" component={InsCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name="NotificationCommercant" component={NotificationCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name="CompteCommercant" component={CompteCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name="UpdateProfilCommercant" component={UpdateProfilCommercant} options={{ headerTitle: '' }} />
+        <Stack.Screen name="WelcomePageCommercant" component={WelcomePageCommercant} options={{ headerShown: false, }} />
       </Stack.Navigator>
     </NavigationContainer>
 
