@@ -4,11 +4,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
 
-<<<<<<< HEAD:frontend/screens/AdminScreens/AjouterProduit.jsx
-const backendUrl = "http://192.168.228.149:8080";
-=======
+
 const backendUrl = "http://192.168.1.42:8080";
->>>>>>> main:frontend/screens/CommercantScreens/AjouterProduit.jsx
 
 const AjouterProduit = ({ navigation }) => {
   const [nom, setNom] = useState("");

@@ -11,7 +11,7 @@ const categorieSchema = new mongoose.Schema({
 }, { timestamps: true,
  });
 
-const CategorieModel = mongoose.model("Categorie", categorieSchema,"Categorie");
+const CategorieModel = mongoose.model("Categorie", categorieSchema);
 
 
 export default CategorieModel;

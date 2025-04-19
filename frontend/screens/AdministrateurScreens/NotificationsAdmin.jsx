@@ -4,22 +4,18 @@ import LayoutAdmin from '../../components/LayoutAdmin/LayoutAdmin';
 import { io } from 'socket.io-client';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-<<<<<<< HEAD:frontend/screens/AdminScreens/NotificationsAdmin.jsx
-const socket = io("http://192.168.228.149:8080"); // Remplace par l'URL de ton backend
-=======
+
 const socket = io("http://192.168.1.42:8080"); // Remplace par l'URL de ton backend
->>>>>>> main:frontend/screens/AdministrateurScreens/NotificationsAdmin.jsx
+
 
 const NotificationsAdmin = () => {
   const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
   
     useEffect(() => {
-<<<<<<< HEAD:frontend/screens/AdminScreens/NotificationsAdmin.jsx
-      fetch("http://192.168.228.149:8080/api/v1/notifications")
-=======
+
       fetch("http://192.168.1.42:8080/api/v1/notifications")
->>>>>>> main:frontend/screens/AdministrateurScreens/NotificationsAdmin.jsx
+
         .then((res) => res.json())
         .then((data) => {
           const filteredNotifications = data.filter(n => n.role === "administrateur");
@@ -40,11 +36,9 @@ const NotificationsAdmin = () => {
     }, []);
   
     const markAsRead = (id) => {
-<<<<<<< HEAD:frontend/screens/AdminScreens/NotificationsAdmin.jsx
-      fetch(`http://192.168.228.149:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
-=======
+
       fetch(`http://192.168.1.42:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
->>>>>>> main:frontend/screens/AdministrateurScreens/NotificationsAdmin.jsx
+
         .then(() => {
           setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
           setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -52,12 +46,9 @@ const NotificationsAdmin = () => {
     };
   
     const deleteNotification = (id) => {
-<<<<<<< HEAD:frontend/screens/AdminScreens/NotificationsAdmin.jsx
-      fetch(`http://192.168.228.149:8080/api/v1/notifications/${id}`, { method: "DELETE" })
-=======
+
       fetch(`http://192.168.1.42:8080/api/v1/notifications/${id}`, { method: "DELETE" })
->>>>>>> main:frontend/screens/AdministrateurScreens/NotificationsAdmin.jsx
-        .then(() => {
+      .then(() => {
           setNotifications((prev) => prev.filter(n => n._id !== id));
         });
     };

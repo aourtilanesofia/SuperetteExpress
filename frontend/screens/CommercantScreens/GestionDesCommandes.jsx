@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
-import LayoutAdmin from "../../components/LayoutAdmin/LayoutAdmin";
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import { useTranslation } from "react-i18next";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 
-<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCommandes.jsx
-const socket = io("http://192.168.228.149:8080");
-=======
+
 const socket = io("http://192.168.1.42:8080");
->>>>>>> main:frontend/screens/CommercantScreens/GestionDesCommandes.jsx
+
 
 const GestionDesCommandes = () => {
     const { t } = useTranslation();
@@ -20,11 +18,8 @@ const GestionDesCommandes = () => {
 
     const fetchCommandes = async () => {
         try {
-<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCommandes.jsx
-            const response = await fetch("http://192.168.228.149:8080/api/commandes/");
-=======
+
             const response = await fetch("http://192.168.1.42:8080/api/commandes/");
->>>>>>> main:frontend/screens/CommercantScreens/GestionDesCommandes.jsx
             const data = await response.json();
             if (response.ok) {
                 setCommandes(data.reverse());
@@ -76,7 +71,7 @@ const GestionDesCommandes = () => {
     };
 
     return (
-        <LayoutAdmin>
+        <>
             <Text style={styles.txtdash}>{t("listedescommandes")}</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#329171" />
@@ -85,7 +80,7 @@ const GestionDesCommandes = () => {
             ) : (
                 <FlatList
                     style={styles.container}
-                    contentContainerStyle={{ paddingBottom: 55 }}
+                    contentContainerStyle={{ paddingBottom: 40 }}
                     data={commandes}
                     keyExtractor={(item) => item._id}
                     renderItem={({ item }) => (
@@ -110,7 +105,7 @@ const GestionDesCommandes = () => {
                     )}
                 />
             )}
-        </LayoutAdmin>
+        </>
     );
 };
 
@@ -120,9 +115,10 @@ const styles = StyleSheet.create({
     txtdash: {
         fontSize: 20,
         fontWeight: "bold",
-        marginBottom: 15,
+        marginBottom: 10,
         textAlign: "left",
         marginLeft: 17,
+        marginTop:25,
     },
     card: {
         backgroundColor: "#fff",

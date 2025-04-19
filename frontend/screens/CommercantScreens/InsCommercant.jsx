@@ -177,7 +177,7 @@ const InsCommercant = ({ navigation }) => {
                             disabled={isLoading}
                         >
                             <Text style={styles.signupButtonText}>
-                                {isLoading ? 'Création en cours...' : 'Valider mon inscription'}
+                                {isLoading ? 'Création en cours...' : "S'inscrire"}
                             </Text>
                         </TouchableOpacity>
 

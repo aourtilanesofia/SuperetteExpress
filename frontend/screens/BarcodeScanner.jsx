@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, View, StyleSheet, Button, Image, ActivityIndica
 
 export default function BarcodeScanner() {
 
-    const backendUrl = "http://192.168.228.149:8080";
+    const backendUrl = "http://192.168.1.42:8080";
 
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedData, setScannedData] = useState(null);
@@ -37,7 +37,7 @@ export default function BarcodeScanner() {
 
     try {
 
-      const response = await fetch(`http://192.168.228.149:8080/api/produits/codebarre/${data}`);
+      const response = await fetch(`http://192.168.1.42:8080/api/produits/codebarre/${data}`);
 
       if (!response.ok) throw new Error('Produit non trouvé');
       const produit = await response.json();

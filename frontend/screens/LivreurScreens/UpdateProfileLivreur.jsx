@@ -73,7 +73,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
             };
 
 
-            const response = await fetch('http://192.168.228.149:8080/api/v1/livreur/profile-updateL', {
+            const response = await fetch('http://192.168.1.42:8080/api/v1/livreur/profile-updateL', {
 
                 method: 'PUT',
                 headers: {

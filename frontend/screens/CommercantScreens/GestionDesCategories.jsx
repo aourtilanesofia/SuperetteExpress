@@ -18,11 +18,9 @@ const GestionDesCategories = () => {
 
     const fetchCategories = async () => {
         try {
-<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCategories.jsx
-            const response = await fetch('http://192.168.228.149:8080/api/categories');
-=======
+
+
             const response = await fetch('http://192.168.1.42:8080/api/categories');
->>>>>>> main:frontend/screens/CommercantScreens/GestionDesCategories.jsx
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -40,11 +38,9 @@ const GestionDesCategories = () => {
                     text: "Supprimer",
                     onPress: async () => {
                         try {
-<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCategories.jsx
-                            await fetch(`http://192.168.228.149:8080/api/categories/delete/${id}`, { method: 'DELETE' });
-=======
+
                             await fetch(`http://192.168.1.42:8080/api/categories/delete/${id}`, { method: 'DELETE' });
->>>>>>> main:frontend/screens/CommercantScreens/GestionDesCategories.jsx
+
                             fetchCategories();
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);
@@ -67,11 +63,9 @@ const GestionDesCategories = () => {
                     <View style={styles.categoryItem}>
 
                         <Image 
-<<<<<<< HEAD:frontend/screens/AdminScreens/GestionDesCategories.jsx
-                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.228.149:8080${item.image}` }} 
-=======
+
                             source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.1.42:8080${item.image}` }} 
->>>>>>> main:frontend/screens/CommercantScreens/GestionDesCategories.jsx
+
                             style={styles.image} 
                             resizeMode="contain"
                             onError={(error) => console.log("Erreur de chargement de l'image", error.nativeEvent)}

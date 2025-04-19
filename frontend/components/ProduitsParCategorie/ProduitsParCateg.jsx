@@ -5,7 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 
 
-const backendUrl = "http://192.168.228.149:8080";
+const backendUrl = "http://192.168.1.42:8080";
 
 
 const ProduitsParCateg = ({searchText} ) => { 
