@@ -12,7 +12,25 @@ const commandeSchema = new mongoose.Schema({
   ],
   total: { type: Number, required: true },
   statut: { type: String, default: "En attente" }, 
-  date: { type: Date, default: Date.now }
+  paiement: {
+    type: String,
+    enum: ['Payée', 'Non', 'En attente de paiement'],
+    default: 'Non'
+  },
+  destination: {
+    adresse: { type: String },
+    infoSup: { type: String }
+  },
+  date: { type: Date, default: Date.now },
+  livraison: {
+    type: String,
+    enum: ["En attente", "En cours", "Livré", "Non Livré"],
+    default: "En attente"
+  },
+  positionLivreur: {
+    lat: { type: Number },
+    lng: { type: Number }
+  }
 }, {
   timestamps: true // Ajout correct ici
 });

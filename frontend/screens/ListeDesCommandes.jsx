@@ -9,7 +9,7 @@ const ListeDesCommandes = () => {
     const [commandes, setCommandes] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
 
     const supprimerCommande = (idCommande) => {
         setCommandes((prevCommandes) => prevCommandes.filter((commande) => commande._id !== idCommande));
@@ -23,14 +23,12 @@ const ListeDesCommandes = () => {
                     console.log("Aucun utilisateur connecté");
                     setLoading(false);
                     return;
-                } 
+                }
 
-                const response = await fetch(`http://192.168.1.42:8080/api/commandes/user/${userId}`);
-
+                const response = await fetch(`http://192.168.1.9:8080/api/commandes/user/${userId}`);
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Trier par date décroissante (les plus récentes en haut)
                     const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
                     setCommandes(sortedData);
                 } else {
@@ -55,7 +53,7 @@ const ListeDesCommandes = () => {
     };
 
     return (
-        <Layout> 
+        <Layout>
             <View style={styles.container}>
                 {loading ? (
                     <ActivityIndicator size="large" color="#ff9800" />
@@ -69,10 +67,37 @@ const ListeDesCommandes = () => {
                             keyExtractor={(item) => item._id}
                             contentContainerStyle={{ paddingBottom: 50 }}
                             renderItem={({ item }) => {
-                                const statusColor = item.statut === "Confirmée" ? "green"
-                                    : item.statut === "Annulée" ? "red"
-                                        : "#ff9800"; // En attente
+                                // Déterminer la couleur et le texte à afficher pour le statut
+                                let statusColor = "#ff9800"; // Par défaut, en attente
+                                let statusText = item.statut;
+
+                                if (item.paiement === "Payée" || item.paiement === "En attente de paiement") {
+                                    // Afficher uniquement le statut de paiement, pas de statut de commande
+                                    statusText = item.paiement;
+                                    statusColor = item.paiement === "Payée" ? "green" : "#ff9800"; // Vert pour Payée, Orange pour En attente
+                                } else if (item.statut === "Confirmée") {
+                                    statusColor = "green"; // Confirmée reste en vert
+                                } else if (item.statut === "Annulée") {
+                                    statusColor = "red"; // Annulée en rouge
+                                }
+
                                 const isDisabled = item.statut === "Annulée";
+
+                                // Affichage du bouton de paiement uniquement si la commande n'est pas payée ou annulée
+                                const paiementStatut = (item.paiement === "Payée" || item.paiement === "En attente de paiement") ? (
+                                    <Text style={[styles.status, { color: "blue" }]}>
+                                        {statusText}
+                                    </Text>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.paiementButton, isDisabled && styles.disabledButton]}
+                                        onPress={() => handlePaiement(item.statut, item)}
+                                        disabled={isDisabled}
+                                    >
+                                        <Text style={styles.paiementButtonText}>{t("Paiement")}</Text>
+                                    </TouchableOpacity>
+                                );
+
                                 return (
                                     <TouchableOpacity
                                         style={styles.card}
@@ -87,16 +112,13 @@ const ListeDesCommandes = () => {
                                         </View>
                                         <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
                                         <View style={styles.v1}>
-                                            <Text style={[styles.status, { color: statusColor }]}>
-                                                {item.statut}
-                                            </Text>
-                                            <TouchableOpacity
-                                                style={[styles.paiementButton, isDisabled && styles.disabledButton]}
-                                                onPress={() => handlePaiement(item.statut, item)}
-                                                disabled={isDisabled}
-                                            >
-                                                <Text style={styles.paiementButtonText}>{t("Paiement")}</Text>
-                                            </TouchableOpacity>
+                                            {/* Ne pas afficher le statut de commande pour les commandes "Payée" ou "En attente de paiement" */}
+                                            {item.paiement !== "Payée" && item.paiement !== "En attente de paiement" && (
+                                                <Text style={[styles.status, { color: statusColor }]}>
+                                                    {statusText}
+                                                </Text>
+                                            )}
+                                            {paiementStatut}
                                         </View>
                                     </TouchableOpacity>
                                 );
@@ -108,8 +130,6 @@ const ListeDesCommandes = () => {
         </Layout>
     );
 };
-
-export default ListeDesCommandes;
 
 const styles = StyleSheet.create({
     container: { 
@@ -170,7 +190,6 @@ const styles = StyleSheet.create({
     paiementButtonText: {
         color: "#fff",
         fontSize: 14,
-        //fontWeight: "bold",
         textAlign: 'center',
     },
     disabledButton: {
@@ -183,3 +202,5 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
 });
+
+export default ListeDesCommandes;

@@ -1,3 +1,4 @@
+
 import './i18n';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
@@ -56,8 +57,12 @@ import NotificationCommercant from './screens/CommercantScreens/NotificationComm
 import CompteCommercant from './screens/CommercantScreens/CompteCommercant';
 import UpdateProfilCommercant from './screens/CommercantScreens/UpdateProfilCommercant';
 import WelcomePageCommercant from './screens/CommercantScreens/WelcomePageCommercant';
-
-
+import ListeCommandeALivre from './screens/LivreurScreens/ListeCommandeALivre';
+import DetailsCommandeALivre from './screens/LivreurScreens/DetailsCommandeALivre';
+import MiseAjoueEtatDeCommande from './screens/LivreurScreens/MiseAjoueEtatDeCommande';
+import NotificationsLivreur from './screens/LivreurScreens/NotificationsLivreur';
+import TrackCommande from './screens/TrackCommande';
+import ChatBot from './screens/ChatBot';
 
 
 
@@ -121,6 +126,12 @@ export default function App() {
         <Stack.Screen name="CompteCommercant" component={CompteCommercant} options={{ headerTitle: '' }} />
         <Stack.Screen name="UpdateProfilCommercant" component={UpdateProfilCommercant} options={{ headerTitle: '' }} />
         <Stack.Screen name="WelcomePageCommercant" component={WelcomePageCommercant} options={{ headerShown: false, }} />
+        <Stack.Screen name="ListeCommandeALivre" component={ListeCommandeALivre} options={{ headerTitle: '' }} />
+        <Stack.Screen name="DetailsCommandeALivre" component={DetailsCommandeALivre} options={{ headerTitle: '' }} />
+        <Stack.Screen name="MiseAjoueEtatDeCommande" component={MiseAjoueEtatDeCommande} options={{ headerTitle: '' }} />
+        <Stack.Screen name="NotificationsLivreur" component={NotificationsLivreur} options={{ headerTitle: '' }} />
+        <Stack.Screen name="TrackCommande" component={TrackCommande} options={{ headerTitle: '' }} />
+        <Stack.Screen name='ChatBot' component={ChatBot} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

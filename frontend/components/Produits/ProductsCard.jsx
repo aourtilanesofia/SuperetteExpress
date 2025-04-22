@@ -6,7 +6,7 @@ import { Modal } from 'react-native';
 import { useTranslation } from "react-i18next";
 
 
-const backendUrl = "http://192.168.1.42:8080";
+const backendUrl = "http://192.168.1.9:8080";
 
 
 const ProductsCard = ({ p }) => {
@@ -60,7 +60,7 @@ const ProductsCard = ({ p }) => {
 if (ingredients.length > 0) {
   try {
 
-    const response = await fetch(`http://192.168.1.42:8080/api/recettes/recherche`, {
+    const response = await fetch(`http://192.168.1.9:8080/api/recettes/recherche`, {
 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

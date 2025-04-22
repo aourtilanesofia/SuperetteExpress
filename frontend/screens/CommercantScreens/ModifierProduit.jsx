@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 
 
-const backendUrl = "http://192.168.1.42:8080";
+const backendUrl = "http://192.168.1.9:8080";
 
 
 const ModifierProduit = ({ route, navigation }) => {
@@ -127,13 +127,6 @@ const ModifierProduit = ({ route, navigation }) => {
       Alert.alert('Erreur', "Impossible de télécharger l'image");
     }
   };
-  
-  
-
-
-
-
-
 
   const handleModifier = async () => {
     // Fonction pour normaliser l'URL de l'image

@@ -21,6 +21,7 @@ const Paiement = ({ route }) => {
   const [optionsLivraison, setOptionsLivraison] = useState("Pas de frais supplémentaires");
   const [destinataire, setDestinataire] = useState("+213 656 71 35 75");
 
+
   const handleTextChange = (text) => {
     console.log('Numéro de téléphone:', text);
     setTelephoneClient(text);
@@ -34,7 +35,7 @@ const Paiement = ({ route }) => {
     const fetchUser = async () => {
       try {
 
-        const response = await fetch(`http://192.168.1.42:8080/api/v1/consommateur/${commande.userId}`);
+        const response = await fetch(`http://192.168.1.9:8080/api/v1/consommateur/${commande.userId}`);
 
 
         // Vérifier le statut de la réponse
@@ -59,7 +60,7 @@ const Paiement = ({ route }) => {
   }, [commande.userId]);
 
   // États pour les modals
-  const [activeModal, setActiveModal] = useState(null); // 'adresse', 'position', 'options', 'destinataire'
+  const [activeModal, setActiveModal] = useState(null);
 
   // États pour la carte
   const [region, setRegion] = useState({
@@ -141,6 +142,44 @@ const Paiement = ({ route }) => {
     }
   };
 
+  const handleValider = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/livraison/${commande.numeroCommande}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numeroCommande: commande.numeroCommande,
+          adresse: adresse,
+          infoSupplementaire: infoSupplementaire,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erreur serveur :", data.message);
+        return;
+      }
+
+      console.log("Commande mise à jour :", data.commande);
+
+      navigation.navigate("ModePaiement", {
+        total: totalNet,
+        adresse: adresse,
+        nomClient: nomClient,
+        telephoneClient: telephoneClient,
+        infoSupplementaire: infoSupplementaire,
+        numeroCommande: commande.numeroCommande,
+      });
+
+    } catch (err) {
+      console.error("Erreur réseau :", err.message);
+    }
+  };
+
+
 
   return (
     <Layout>
@@ -215,26 +254,20 @@ const Paiement = ({ route }) => {
               <Text style={styles.facturationValue}>180.00 DA</Text>
             </View>
             <View style={[styles.facturationRow, styles.totalRow]}>
-              <Text style={styles.totalLabel}>Total net</Text>
+              <Text style={styles.totalLabel}>Total Net</Text>
               <Text style={styles.totalValue}>{totalNet}.00 DA</Text>
             </View>
           </View>
         </View>
 
         {/* Bouton Passer commande */}
-        <TouchableOpacity 
-  style={styles.commanderButton} 
-  activeOpacity={0.9}
-  onPress={() => navigation.navigate('ModePaiement', { 
-    total: totalNet, // Montant total
-    adresse: adresse, // Adresse de livraison (depuis ton state)
-    nomClient: nomClient, // Nom du client (depuis ton state)
-    telephoneClient: telephoneClient // Téléphone (depuis ton state)
-  })}
->
-  <Text style={styles.commanderButtonText}>Valider</Text>
-</TouchableOpacity>
-
+        <TouchableOpacity
+          style={styles.commanderButton}
+          activeOpacity={0.9}
+          onPress={handleValider}
+        >
+          <Text style={styles.commanderButtonText}>Valider</Text>
+        </TouchableOpacity>
         {/* Modals (le contenu reste exactement le même) */}
         <Modal
           animationType="slide"
@@ -446,7 +479,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
     paddingHorizontal: 16,
-    marginTop:25,
+    marginTop: 25,
   },
   optionCard: {
     backgroundColor: '#FFF',

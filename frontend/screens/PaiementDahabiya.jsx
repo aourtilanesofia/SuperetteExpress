@@ -13,63 +13,78 @@ const PaiementDahabiya = () => {
   const [cardName, setCardName] = useState('');
   const [cvv, setCvv] = useState('');
 
-  const params = route.params || {};
+  const params = route.params || {}; 
+  const commande = route.params;
   const total = params.total || '0.00';
   const adresse = params.adresse || 'Adresse non spécifiée';
   const nomClient = params.nomClient || 'Nom non renseigné';
   const telephoneClient = params.telephoneClient || 'Téléphone non renseigné';
+  const numeroCommande = params.numeroCommande || 'Aucun numéro de commande';
+  const infoSupplementaire = params.infoSupplementaire || 'Aucune information splémentaire';
 
-  const [orderNumber] = useState(() => {
-    const now = new Date();
-    return (
-      now.getFullYear().toString().slice(2) +
-      (now.getMonth() + 1).toString().padStart(2, '0') +
-      now.getDate().toString().padStart(2, '0') +
-      Math.floor(1000 + Math.random() * 9000)
-    );
-  });
 
-  const handlePayment = () => {
-    if (
-      !cardNumber || !expiryMonth || !expiryYear || !cardName || !cvv
-    ) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
-      return;
-    }
+  const handlePayment = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ paiement: "Payée",
+          paymentMethod: 'Carte' })
+      });
   
-    if (!/^\d{16}$/.test(cardNumber)) {
-      Alert.alert('Erreur', 'Le numéro de la carte doit contenir 16 chiffres.');
-      return;
-    }
-  
-    if (!/^\d{2}$/.test(expiryMonth) || Number(expiryMonth) < 1 || Number(expiryMonth) > 12) {
-      Alert.alert('Erreur', 'Le mois doit être entre 01 et 12.');
-      return;
-    }
-  
-    if (!/^\d{4}$/.test(expiryYear)) {
-      Alert.alert('Erreur', "L'année d'expiration doit contenir 4 chiffres.");
-      return;
-    }
-  
-    if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(cardName)) {
-      Alert.alert('Erreur', 'Le nom ne doit contenir que des lettres.');
-      return;
-    }
-  
-    if (!/^\d{3}$/.test(cvv)) {
-      Alert.alert('Erreur', 'Le code CVC2/CVV2 doit contenir 3 chiffres.');
-      return;
-    }
+      const data = await response.json();
+      console.log('Réponse backend:', data);
 
-    navigation.navigate('Confirmation', {
-      commandeId: orderNumber,
-      total,
-      adresse,
-      nomClient,
-      telephoneClient,
-      paymentMethod: 'Carte Dahabiya'
-    });
+      if (
+        !cardNumber || !expiryMonth || !expiryYear || !cardName || !cvv
+      ) {
+        Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+        return;
+      }
+    
+      if (!/^\d{16}$/.test(cardNumber)) {
+        Alert.alert('Erreur', 'Le numéro de la carte doit contenir 16 chiffres.');
+        return;
+      }
+    
+      if (!/^\d{2}$/.test(expiryMonth) || Number(expiryMonth) < 1 || Number(expiryMonth) > 12) {
+        Alert.alert('Erreur', 'Le mois doit être entre 01 et 12.');
+        return;
+      }
+    
+      if (!/^\d{4}$/.test(expiryYear)) {
+        Alert.alert('Erreur', "L'année d'expiration doit contenir 4 chiffres.");
+        return;
+      }
+    
+      if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(cardName)) {
+        Alert.alert('Erreur', 'Le nom ne doit contenir que des lettres.');
+        return;
+      }
+    
+      if (!/^\d{3}$/.test(cvv)) {
+        Alert.alert('Erreur', 'Le code CVC2/CVV2 doit contenir 3 chiffres.');
+        return;
+      }
+  
+      navigation.navigate('Confirmation', {
+        commandeId: numeroCommande,
+        total,
+        adresse,
+        nomClient,
+        telephoneClient,
+        paymentMethod: 'Carte Dahabiya',
+        numeroCommande,
+        infoSupplementaire
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du paiement:', error);
+      
+    }
+    
   };
 
   return (
@@ -84,7 +99,7 @@ const PaiementDahabiya = () => {
           <Text style={styles.tableHeader}>TOTAL</Text>
         </View>
         <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>#{orderNumber}</Text>
+          <Text style={styles.tableCell}>#{numeroCommande}</Text>
           <Text style={styles.tableCell}>{total} DZD</Text>
         </View>
       </View>

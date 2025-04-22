@@ -30,8 +30,7 @@ const livreurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
-    isValidated: { type: Boolean, default: false }
-
+    isValidated: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

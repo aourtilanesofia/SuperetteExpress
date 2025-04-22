@@ -15,7 +15,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récupérer le nombre des commerçants
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/commercant/count")
+    fetch("http://192.168.1.9:8080/api/v1/commercant/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -32,7 +32,7 @@ const AcceuilAdmin = ({ navigation }) => {
   //Récupérer le nombre des consommateurs actifs
 
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/consommateur/activeConsommateurs/count")
+    fetch("http://192.168.1.9:8080/api/v1/consommateur/activeConsommateurs/count")
       .then(response => response.json())
       .then(data => {
         console.log("Réponse reçue :", data);
@@ -49,7 +49,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récuperer le nombre des consommateurs non actifs
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/consommateur/nonactiveConsommateurs/count")
+    fetch("http://192.168.1.9:8080/api/v1/consommateur/nonactiveConsommateurs/count")
       .then(response => response.json())
       .then(data => {
         console.log("Réponse reçue :", data);
@@ -66,7 +66,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récupérer le nombre des livreurs
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/livreur/count")
+    fetch("http://192.168.1.9:8080/api/v1/livreur/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -102,18 +102,7 @@ const AcceuilAdmin = ({ navigation }) => {
       nav: 'ListeDesLivreurs',
       color: '#2196F3'
     },
-    /*{
-      title: t('Statistiques'),
-      icon: <AntDesign name="linechart" style={styles.icone} />,
-      nav: 'StatsAdmin',
-      color: '#FF9800'
-    },
-    {
-      title: t('Paramètres'),
-      icon: <AntDesign name="setting" style={styles.icone} />,
-      nav: 'ParametresAdmin',
-      color: '#9C27B0'
-    }*/
+    
   ];
 
   return (
@@ -165,17 +154,6 @@ const AcceuilAdmin = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/*<View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>124</Text>
-            <Text style={styles.statLabel}>{t('Clients_actifs')}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>28</Text>
-            <Text style={styles.statLabel}>{t('Livreurs_disponibles')}</Text>
-          </View>
-        </View>*/}
       </ScrollView>
     </LayoutAdmin>
   );

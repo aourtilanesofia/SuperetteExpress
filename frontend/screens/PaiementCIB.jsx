@@ -4,7 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 
 
 const PaiementCIB = ({ navigation, route }) => {
-  const { total = 0, adresse, nomClient, telephoneClient } = route.params || {};
+    
+  const {commande = route.params, total = 0, adresse, nomClient, telephoneClient,numeroCommande= null,infoSupplementaire } = route.params || {};
   const [cardNumber, setCardNumber] = useState('');
   const [expirationMonth, setExpirationMonth] = useState('');
   const [expirationYear, setExpirationYear] = useState('');
@@ -12,58 +13,68 @@ const PaiementCIB = ({ navigation, route }) => {
   const [cvv, setCvv] = useState('');
 
 
-  const [orderNumber] = useState(() => {
-    const now = new Date();
-    return (
-      now.getFullYear().toString().slice(2) + // ex: "25"
-      (now.getMonth() + 1).toString().padStart(2, '0') + // ex: "04"
-      now.getDate().toString().padStart(2, '0') + // ex: "17"
-      Math.floor(1000 + Math.random() * 9000) // ex: "2345"
-    ); // => exemple : "2504172345"
-  });
-  
 
-  const handleValidation = () => {
-    if (!cardNumber || cardNumber.length < 16) {
-      alert("Numéro de carte invalide ou manquant.");
-      return;
-    }
-  
-    if (!expirationMonth) {
-      alert("Veuillez sélectionner le mois d'expiration.");
-      return;
-    }
-  
-    if (!expirationYear) {
-      alert("Veuillez sélectionner l'année d'expiration.");
-      return;
-    }
-  
-    if (!fullName.trim()) {
-      alert("Le nom complet est requis.");
-      return;
-    }
-  
-    if (!/^[A-Za-zÀ-ÿ\s]+$/.test(fullName)) {
-      alert("Le nom complet ne doit contenir que des lettres.");
-      return;
-    }
-  
-    if (!cvv || cvv.length < 3) {
-      alert("Code CVV invalide ou manquant.");
-      return;
-    }
+  const handleValidation = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ paiement: "Payée",
+          paymentMethod: 'Carte' })
+      });
+   
+      const data = await response.json();
+      console.log('Réponse backend:', data);
 
-    alert('Paiement CIB effectué');
-
-    navigation.navigate('Confirmation', {
-      total,
-      adresse,
-      nomClient,
-      telephoneClient,
-      paymentMethod: 'Carte CIB',
-      commandeId: 'CMD-' + orderNumber
-    });
+      if (!cardNumber || cardNumber.length < 16) {
+        alert("Numéro de carte invalide ou manquant.");
+        return;
+      }
+    
+      if (!expirationMonth) {
+        alert("Veuillez sélectionner le mois d'expiration.");
+        return;
+      }
+    
+      if (!expirationYear) {
+        alert("Veuillez sélectionner l'année d'expiration.");
+        return;
+      }
+    
+      if (!fullName.trim()) {
+        alert("Le nom complet est requis.");
+        return;
+      } 
+    
+      if (!/^[A-Za-zÀ-ÿ\s]+$/.test(fullName)) {
+        alert("Le nom complet ne doit contenir que des lettres.");
+        return;
+      }
+    
+      if (!cvv || cvv.length < 3) {
+        alert("Code CVV invalide ou manquant.");
+        return;
+      }
+  
+      alert('Paiement CIB effectué');
+  
+      navigation.navigate('Confirmation', {
+        total,
+        adresse,
+        nomClient,
+        telephoneClient,
+        paymentMethod: 'Carte CIB',
+        numeroCommande,
+        infoSupplementaire
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du paiement:', error);
+      
+    }
+   
   };  
   
 
@@ -71,7 +82,7 @@ const PaiementCIB = ({ navigation, route }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Paiement par carte CIB</Text>
       <View style={styles.section}>
-        <Text style={styles.label}>Commande N°: {orderNumber}</Text>
+        <Text style={styles.label}>Commande N°: {numeroCommande}</Text>
         <Text style={styles.label}>Total: {total} DZD</Text>
       </View>
 

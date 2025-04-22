@@ -18,7 +18,7 @@ const CommandeDetailsAdmin = ({ route }) => {
 
         try {
 
-            const response = await fetch(`http://192.168.1.42:8080/api/commandes/${commande._id}`, {
+            const response = await fetch(`http://192.168.1.9:8080/api/commandes/${commande._id}`, {
 
                 method: "PUT",
                 headers: {
@@ -41,7 +41,7 @@ const CommandeDetailsAdmin = ({ route }) => {
     };
 
     return (
-        <LayoutAdmin>
+        <>
             <View style={styles.container}>
                 <Text style={styles.title}>{t("commande")}: {commande.numeroCommande}</Text>
                 <Text style={styles.client}>{t("client")} : {commande.userId ? commande.userId.nom : "Inconnu"}</Text>
@@ -86,7 +86,7 @@ const CommandeDetailsAdmin = ({ route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </LayoutAdmin>
+        </>
     );
 };
 
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 10,
         textAlign: "center",
+        marginTop:40,
     },
     client: {
         fontSize: 16,
