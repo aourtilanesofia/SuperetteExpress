@@ -31,7 +31,7 @@ const AcceuilConsommateur = ({ navigation }) => {
         <TouchableOpacity style={styles.btn1} onPress={() => navigation.navigate("AutresOptions")}>
           <AntDesign name="bars" style={styles.plus} size={28} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("ChatBot")}>
           <MaterialCommunityIcons name="chat-question-outline" size={28} style={{ color: "#ffff" }} />
         </TouchableOpacity>
       </View>

@@ -4,12 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Title } from 'react-native-paper';
 
 const ModePaiement = ({ navigation, route }) => {
+  console.log('Info supplémentaire reçue:', infoSupplementaire);
   const { 
-    total = 5406.00,
+    total = 5406.00, 
     adresse = "Adresse non spécifiée",
     nomClient = "Nom non renseigné",
-    telephoneClient = "Téléphone non renseigné"
+    telephoneClient = "Téléphone non renseigné",
+    infoSupplementaire = 'Aucune information supplémentaire', // Même nom que dans Paiement.js
+    numeroCommande = null,
   } = route.params || {};
+  console.log('Params reçus dans ModePaiement:', route.params);
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -21,17 +25,22 @@ const ModePaiement = ({ navigation, route }) => {
         total,
         adresse,
         nomClient,
-        telephoneClient
+        telephoneClient,
+        infoSupplementaire,
+        numeroCommande,
       });
     } else if (typeCarte === 'DAHABIYA') {
       navigation.navigate('PaiementDahabiya', {
         total,
         adresse,
         nomClient,
-        telephoneClient
-      });
+        telephoneClient,
+        infoSupplementaire,
+        numeroCommande,
+      }); 
     }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.container}>
@@ -44,6 +53,7 @@ const ModePaiement = ({ navigation, route }) => {
           <Title style={styles.cardTitle}>Choisir un mode de paiement</Title>
 
           <View style={styles.paymentOptions}>
+            
             <TouchableOpacity 
               style={[styles.paymentButton, styles.buttonElevation]}
               onPress={() => navigation.navigate('PaiementEspece', { 
@@ -51,7 +61,9 @@ const ModePaiement = ({ navigation, route }) => {
                 adresse,
                 nomClient,
                 telephoneClient,
-                paymentMethod: 'Espèce' 
+                infoSupplementaire,
+                numeroCommande,
+                paymentMethod: 'Espèce'
               })}
             >
               <View style={styles.buttonContent}>

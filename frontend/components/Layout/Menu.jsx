@@ -45,7 +45,7 @@ const recupererTotalPanier = async () => {
         return;
       }
 
-      const response = await fetch(`http://192.168.1.42:8080/api/v1/notifications/${userId}`);
+      const response = await fetch(`http://192.168.1.9:8080/api/v1/notifications/${userId}`);
 
       const data = await response.json();
 
@@ -103,8 +103,8 @@ const recupererTotalPanier = async () => {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuContainer}>
-        <SimpleLineIcons name='location-pin' style={[styles.icon, route.name === " " && styles.active]} size={25} />
+      <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('TrackCommande')}>
+        <SimpleLineIcons name='location-pin' style={[styles.icon, route.name === "TrackCommande" && styles.active]} size={25} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('ListeDesCommandes')}>

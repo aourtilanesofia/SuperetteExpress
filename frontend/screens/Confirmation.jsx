@@ -1,19 +1,41 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
 
 const Confirmation = ({ navigation, route }) => {
   // Récupération des données de la commande
-  const params = route.params || {};
+  const params = route.params || {}; 
   const {
     total = params.total || '0 DA',
     adresse = params.adresse || 'Adresse non spécifiée',
+    infoSupplementaire = params.infoSupplementaire || ' ',
     nomClient = params.nomClient || 'Nom non renseigné',
     telephoneClient = params.telephoneClient || 'Téléphone non renseigné',
     paymentMethod = params.paymentMethod || 'Méthode inconnue',
-    commandeId = params.commandeId || 'CMD-' + Math.floor(Math.random() * 10000)
+    numeroCommande = params.numeroCommande || 'Null',
   } = params;
 
+  useEffect(() => {
+    const saveOrderData = async () => {
+      const orderKey = `commande_${numeroCommande}`;  // Création d'une clé unique pour chaque commande
+      const orderData = {
+        total: total.toString(),
+        adresse: adresse,
+        nomClient: nomClient,
+        telephoneClient: telephoneClient,
+        infoSupplementaire: infoSupplementaire,
+      };
+  
+      // Sauvegarder les données de la commande dans AsyncStorage sous une clé unique
+      await AsyncStorage.setItem(orderKey, JSON.stringify(orderData));
+    };
+  
+    saveOrderData();
+  }, [total, adresse, nomClient, telephoneClient, infoSupplementaire, numeroCommande]);
+  
+ 
   return (
     <View style={styles.container}>
       {/* Icône de confirmation */}
@@ -31,7 +53,7 @@ const Confirmation = ({ navigation, route }) => {
 
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>N° Commande:</Text>
-          <Text style={styles.detailValue}>#{commandeId}</Text>
+          <Text style={styles.detailValue}>#{numeroCommande}</Text>
         </View>
 
         <View style={styles.detailRow}>
@@ -47,7 +69,7 @@ const Confirmation = ({ navigation, route }) => {
         <View style={styles.separator} />
 
         <Text style={styles.sectionTitle}>Livraison à</Text>
-        <Text style={styles.address}>{adresse}</Text>
+        <Text style={styles.address}>{adresse} - {infoSupplementaire}</Text>
         <Text style={styles.clientInfo}>{nomClient} - {telephoneClient}</Text>
       </View>
 

@@ -10,14 +10,14 @@ const AcceuilCommerçant = ({ navigation }) => {
   const [categorieCount, setCategorieCount] = useState(null);
   const [productCount, setProductCount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); 
   const [todayOrdersCount, setTodayOrdersCount] = useState(null);
 
 
   useEffect(() => {
     const fetchCategorieCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.42:8080/api/categories/count');
+        const response = await fetch('http://192.168.1.9:8080/api/categories/count');
         if (!response.ok) {
           throw new Error('Erreur de récupération des données');
         }
@@ -36,7 +36,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchProductsCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.42:8080/api/produits/count');
+        const response = await fetch('http://192.168.1.9:8080/api/produits/count');
         const text = await response.text();
         console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
         const data = JSON.parse(text); // ← Si HTML, ça va planter ici
@@ -55,7 +55,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchTodayOrdersCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.42:8080/api/commandes/count/today');
+        const response = await fetch('http://192.168.1.9:8080/api/commandes/count/today');
         if (!response.ok) throw new Error('Erreur de récupération des commandes');
         const data = await response.json();
         setTodayOrdersCount(data.count);
@@ -91,24 +91,7 @@ const AcceuilCommerçant = ({ navigation }) => {
       nav: 'GestionDesCommandes',
       color: '#FF9800'
     },
-    /*{
-      title: t('Statistiques'),
-      icon: <AntDesign name="linechart" style={styles.icone} />,
-      nav: 'StatsCommercant',
-      color: '#9C27B0'
-    },
-    {
-      title: t('Promotions'),
-      icon: <FontAwesome name="percent" style={styles.icone} />,
-      nav: 'GestionPromotions',
-      color: '#E91E63'
-    },
-    {
-      title: t('Avis_clients'),
-      icon: <AntDesign name="staro" style={styles.icone} />,
-      nav: 'AvisClients',
-      color: '#607D8B'
-    }*/
+   
   ];
 
   return (

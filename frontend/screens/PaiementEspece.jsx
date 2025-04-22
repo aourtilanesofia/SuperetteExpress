@@ -4,23 +4,61 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const PaiementEspece = ({ navigation, route }) => {
- // Extraction avec valeurs par défaut
- const { 
-    total = '0 DA', 
+  // Extraction avec valeurs par défaut
+  
+  const {
+    commande = route.params,
+    total = '0 DA',
     adresse = 'Adresse non spécifiée',
-    nomClient = 'Nom non renseigné', 
-    telephoneClient = 'Téléphone non renseigné' 
+    nomClient = 'Nom non renseigné',
+    telephoneClient = 'Téléphone non renseigné',
+    infoSupplementaire = ' ',
+    numeroCommande= null,
   } = route.params || {};
 
-   const [orderNumber] = useState(() => {
-      const now = new Date();
-      return (
-        now.getFullYear().toString().slice(2) + // ex: "25"
-        (now.getMonth() + 1).toString().padStart(2, '0') + // ex: "04"
-        now.getDate().toString().padStart(2, '0') + // ex: "17"
-        Math.floor(1000 + Math.random() * 9000) // ex: "2345"
-      ); // => exemple : "2504172345"
-    });
+  //console.log('Commande reçue:', commande);
+  console.log('Params reçus dans PaiementEspece:', route.params);
+  const [orderNumber] = useState(() => {
+    const now = new Date();
+    return (
+      now.getFullYear().toString().slice(2) + // ex: "25"
+      (now.getMonth() + 1).toString().padStart(2, '0') + // ex: "04"
+      now.getDate().toString().padStart(2, '0') + // ex: "17"
+      Math.floor(1000 + Math.random() * 9000) // ex: "2345"
+    ); // => exemple : "2504172345"
+  });
+
+  const handleConfirmation = async () => {
+
+    try {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ paiement: "En attente de paiement",
+          paymentMethod: 'Espèce'
+         })
+      });
+  
+      const data = await response.json();
+      console.log('Réponse backend:', data);
+  
+      navigation.navigate('Confirmation', {
+        total,
+        adresse,
+        nomClient,
+        telephoneClient,
+        paymentMethod: 'En Espèce',
+        infoSupplementaire,
+        numeroCommande,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du paiement:', error);
+    }
+  };
+  
+  
 
   return (
     <View style={styles.container}>
@@ -36,6 +74,9 @@ const PaiementEspece = ({ navigation, route }) => {
 
         <Text style={styles.sectionTitle}>Adresse :</Text>
         <Text style={styles.addressText}>{adresse}</Text>
+        {infoSupplementaire && infoSupplementaire.trim() !== '' && (
+          <Text style={styles.addressText}>{infoSupplementaire}</Text>
+        )}
 
         <View style={styles.noteBox}>
           <Text style={styles.noteText}>
@@ -45,19 +86,25 @@ const PaiementEspece = ({ navigation, route }) => {
       </View>
 
       {/* Bouton de confirmation */}
-      <TouchableOpacity 
-        style={styles.confirmButton}
-        onPress={() => navigation.navigate('Confirmation', { 
-            total: total,
-            adresse: adresse,
-            nomClient: nomClient,
-            telephoneClient: telephoneClient,
-            paymentMethod: 'En Espèce',
-            commandeId: 'CMD-' + + orderNumber 
-          })}
-      >
-        <Text style={styles.confirmButtonText}>Valider</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.confirmButton}
+  onPress={async () => {
+    await handleConfirmation(); // mise à jour dans la base de données
+
+    navigation.navigate('Confirmation', {
+      total: total,
+      adresse: adresse,
+      nomClient: nomClient,
+      telephoneClient: telephoneClient,
+      paymentMethod: 'En Espèce',
+      infoSupplementaire: infoSupplementaire,
+      numeroCommande,
+    });
+  }}
+>
+  <Text style={styles.confirmButtonText}>Valider</Text>
+</TouchableOpacity>
+
     </View>
   );
 };
@@ -67,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
     padding: 20,
+    marginTop: 100,
     //justifyContent: 'center',
   },
   header: {

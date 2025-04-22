@@ -6,20 +6,20 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 
 
-const socket = io("http://192.168.1.42:8080");
+const socket = io("http://192.168.1.9:8080");
 
 
 const GestionDesCommandes = () => {
     const { t } = useTranslation();
     const [commandes, setCommandes] = useState([]);
-    const [loading, setLoading] = useState(true); 
-    const [newCommandes, setNewCommandes] = useState([]); 
+    const [loading, setLoading] = useState(true);
+    const [newCommandes, setNewCommandes] = useState([]);
     const navigation = useNavigation();
 
     const fetchCommandes = async () => {
         try {
 
-            const response = await fetch("http://192.168.1.42:8080/api/commandes/");
+            const response = await fetch("http://192.168.1.9:8080/api/commandes/");
             const data = await response.json();
             if (response.ok) {
                 setCommandes(data.reverse());
@@ -48,7 +48,7 @@ const GestionDesCommandes = () => {
         socket.on("nouvelleCommande", (nouvelleCommande) => {
             //console.log("Nouvelle commande reçue via WebSocket:", nouvelleCommande); 
             setCommandes((prev) => [nouvelleCommande, ...prev]);
-    
+
             setNewCommandes((prev) => {
                 //console.log("Nouvelles commandes avant ajout:", prev);
                 if (!prev.includes(nouvelleCommande._id)) {
@@ -59,7 +59,7 @@ const GestionDesCommandes = () => {
                 return prev;
             });
         });
-     
+
         return () => socket.off("nouvelleCommande");
     }, []);
 
@@ -76,7 +76,7 @@ const GestionDesCommandes = () => {
             {loading ? (
                 <ActivityIndicator size="large" color="#329171" />
             ) : commandes.length === 0 ? (
-                <Text style={styles.noCommandes}>{t("Aucune commande")}</Text> 
+                <Text style={styles.noCommandes}>{t("Aucune commande")}</Text>
             ) : (
                 <FlatList
                     style={styles.container}
@@ -88,7 +88,7 @@ const GestionDesCommandes = () => {
                             style={[styles.card, newCommandes.includes(item._id) && styles.newCommande]}
                             onPress={() => handlePressCommande(item)}
                         >
-                            {newCommandes.includes(item._id) && <Text style={styles.badge}>Nouveau</Text>}  
+                            {newCommandes.includes(item._id) && <Text style={styles.badge}>Nouveau</Text>}
                             <Text style={styles.commandeId}>{t("commande")} {item.numeroCommande}</Text>
                             <Text>{t("client")} : {item.userId ? item.userId.nom : "Inconnu"}</Text>
                             <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
@@ -96,11 +96,26 @@ const GestionDesCommandes = () => {
                             <Text
                                 style={[
                                     styles.statut,
-                                    { color: item.statut === "Confirmée" ? "green" : item.statut === "Annulée" ? "red" : "orange" },
+                                    {
+                                        color:
+                                            item.paiement === "Payée" || item.paiement === "En attente de paiement"
+                                                ? "blue"
+                                                : item.statut === "Confirmée"
+                                                    ? "green"
+                                                    : item.statut === "Annulée"
+                                                        ? "red"
+                                                        : "#ff9800",
+                                    },
                                 ]}
                             >
-                                {item.statut}
+                                {item.paiement === "Payée" || item.paiement === "En attente de paiement"
+                                    ? item.paiement
+                                    : item.statut}
                             </Text>
+
+
+
+
                         </TouchableOpacity>
                     )}
                 />
@@ -118,7 +133,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: "left",
         marginLeft: 17,
-        marginTop:25,
+        marginTop: 25,
     },
     card: {
         backgroundColor: "#fff",
@@ -129,11 +144,11 @@ const styles = StyleSheet.create({
         margin: 15,
         position: "relative",
     },
-    newCommande: { 
+    newCommande: {
         borderColor: "green",
         borderWidth: 2,
     },
-    badge: { 
+    badge: {
         position: "absolute",
         top: -8,
         right: -8,
@@ -145,7 +160,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "bold",
         zIndex: 1,
-    
+
     },
     commandeId: {
         fontSize: 15,

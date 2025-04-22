@@ -254,3 +254,21 @@ export const getLivreurCountController = async (req, res) => {
     }
 };
 
+export const updateLocation = async (req, res) => {
+    const { commandeId, latitude, longitude } = req.body;
+  
+    await livreurModel.create({
+      commandeId,
+      livreurId: req.user._id, // ID du livreur authentifié
+      coordinates: { latitude, longitude }
+    });
+  
+    // Diffusion en temps réel via Socket.io
+    io.to(`commande_${commandeId}`).emit('location_update', {
+      latitude,
+      longitude
+    });
+  
+    res.status(200).json({ success: true });
+  };
+
