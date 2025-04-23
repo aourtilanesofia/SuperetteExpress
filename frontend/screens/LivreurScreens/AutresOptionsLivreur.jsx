@@ -12,7 +12,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
     const { t } = useTranslation();
 
     const handleLanguagePress = () => {
-        navigation.navigate('LanguageSelection'); // Aller à l'écran de sélection de langue
+        navigation.navigate('LanguageSelectionLiv'); // Aller à l'écran de sélection de langue
       };
 
     const handleDelete = async () => {

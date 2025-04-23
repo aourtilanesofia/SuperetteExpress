@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, FlatList, ActivityIndicator, TouchableOpacity, 
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import LayoutAdmin from './../../components/LayoutAdmin/LayoutAdmin';
 
 const ListeDesClients = () => {
   const [clients, setClients] = useState([]);
@@ -66,6 +67,7 @@ const ListeDesClients = () => {
   }
 
   return (
+    <LayoutAdmin>
     <View style={styles.container}>
       <Text style={styles.title}>{t('Liste_des_clients')}</Text>
       
@@ -85,7 +87,7 @@ const ListeDesClients = () => {
                 onPress={() => deleteClient(item._id)}
               >
                 <Ionicons name="trash-outline" size={18} color="white" />
-                <Text style={styles.buttonText}>Supprimer</Text>
+                <Text style={styles.buttonText}>{t('supprimer')}</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
@@ -101,7 +103,7 @@ const ListeDesClients = () => {
                   color="white" 
                 />
                 <Text style={styles.buttonText}>
-                  {item.isActive ? "Désactiver" : "Activer"}
+                  {item.isActive ? t('dasact') : t('act')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -110,6 +112,7 @@ const ListeDesClients = () => {
         contentContainerStyle={styles.listContent}
       />
     </View>
+    </LayoutAdmin>
   );
 };
 

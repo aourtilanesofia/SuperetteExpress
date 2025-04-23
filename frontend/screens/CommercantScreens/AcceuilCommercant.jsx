@@ -38,7 +38,7 @@ const AcceuilCommerçant = ({ navigation }) => {
       try {
         const response = await fetch('http://192.168.1.9:8080/api/produits/count');
         const text = await response.text();
-        console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
+        //console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
         const data = JSON.parse(text); // ← Si HTML, ça va planter ici
         setProductCount(data.count);
       } catch (err) {
@@ -103,8 +103,8 @@ const AcceuilCommerçant = ({ navigation }) => {
           style={styles.header}
           imageStyle={styles.headerImage}
         >
-          <Text style={styles.welcomeText}>Bienvenue Commerçant</Text>
-          <Text style={styles.subHeader}>Gestion de votre commerce</Text>
+          <Text style={styles.welcomeText}>{t('bienvenueComm')}</Text>
+          <Text style={styles.subHeader}>{t('gestionCommerca')}</Text>
         </ImageBackground>
 
         {/* Cartes de fonctionnalités */}
@@ -136,15 +136,15 @@ const AcceuilCommerçant = ({ navigation }) => {
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{categorieCount}</Text>
-            <Text style={styles.statLabel}>Catégories</Text>
+            <Text style={styles.statLabel}>{t('cat')}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{productCount}</Text>
-            <Text style={styles.statLabel}>Produits</Text>
+            <Text style={styles.statLabel}>{t('produit')}</Text>
           </View>
           <View style={styles.statCardLast}>
             <Text style={styles.statNumber}>{todayOrdersCount}</Text>
-            <Text style={styles.statLabel}>Commandes aujourd'hui</Text>
+            <Text style={styles.statLabel}>{t('commandejour')}</Text>
           </View>
         </View>
       </ScrollView>

@@ -6,7 +6,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { recupererTotalPanier } from '../../screens/Panier';
+import { recupererTotalPanier } from '../../screens/ConsommateurScreens/Panier';
 
 const Menu = () => {
   const route = useRoute();

@@ -40,7 +40,7 @@ const ConCommercant = ({ navigation }) => {
                 ['userId', data.commercant._id],
                 ['user', JSON.stringify(data.commercant)]
             ]);
-            console.log("Token enregistré :", data.token);
+            //console.log("Token enregistré :", data.token);
 
             navigation.navigate("AcceuilCommerçant");
             Alert.alert("Connexion validée", `Bienvenue dans votre espace professionnel ${data.commercant.nom || ''}!`);

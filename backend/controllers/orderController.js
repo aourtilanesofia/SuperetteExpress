@@ -175,8 +175,8 @@ export const updateOrderStatus = async (req, res) => {
     // Création de la notification
     const notificationMessage =
       statut === "Confirmée"
-        ? `Votre commande numéro ${order.numeroCommande} a été confirmée.`
-        : `Votre commande numéro ${order.numeroCommande} a été annulée.`;
+        ? `Votre commande numéro #${order.numeroCommande} a été confirmée.`
+        : `Votre commande numéro #${order.numeroCommande} a été annulée.`;
 
     //console.log("User ID associé à la commande :", order.userId);
 
@@ -289,7 +289,7 @@ export const mettreAJourPaiement = async (req, res) => {
 
     // Notification pour le livreur
     const notificationLivreur = new Notification({
-      message: `Une nouvelle commande à livrer: la commande #${order.numeroCommande}.`,
+      message: `Une nouvelle commande à livrer: la commande N° #${order.numeroCommande}.`,
       isRead: false,
       role: "livreur",
       livreurId: new mongoose.Types.ObjectId(order.livreurId), // Assure-toi que `order.livreurId` existe
@@ -403,7 +403,7 @@ export const updateLivraisonCommande = async (req, res) => {
     }
 
     // Créer une notification pour le client
-    const notificationMessage = `Votre commande numéro ${updatedOrder.numeroCommande} est en cours de livraison`;
+    const notificationMessage = `Votre commande numéro #${updatedOrder.numeroCommande} est en cours de livraison`;
 
     const notification = new Notification({
       message: notificationMessage,
@@ -419,7 +419,7 @@ export const updateLivraisonCommande = async (req, res) => {
       const io = req.app.get("io");
       io.emit(`notification_${updatedOrder.userId}`, notification);
     }
- 
+
 
     return res.status(200).json({
       success: true,
@@ -441,13 +441,8 @@ export const updateLivraisonCommande = async (req, res) => {
 
 
 export const ModifierCommande = async (req, res) => {
-  console.log('=== DEBUT MODIFICATION ===');
-  console.log('ID reçu:', req.params.id);
-  console.log('Corps reçu:', req.body);
-
   try {
     const commande = await CommandeModel.findById(req.params.id);
-    console.log('Commande trouvée:', commande);
 
     if (!commande) {
       console.log('Commande non trouvée');
@@ -467,7 +462,27 @@ export const ModifierCommande = async (req, res) => {
     }
 
     const savedCommande = await commande.save();
-    console.log('Commande sauvegardée:', savedCommande);
+
+    // Notification après la sauvegarde
+    const notificationMessage =
+  savedCommande.livraison === 'Livré'
+    ? `La commande numéro #${savedCommande.numeroCommande} est livrée.`
+    : savedCommande.livraison === 'Non Livré'
+      ? `Votre commande numéro #${savedCommande.numeroCommande} a été annulée.`
+      : `La commande numéro #${savedCommande.numeroCommande} n'est pas livrée.`;
+    const notification = new Notification({
+      message: notificationMessage,
+      isRead: false,
+      role: "commercant",
+      consommateurId: new mongoose.Types.ObjectId(savedCommande.userId),
+    });
+
+    await notification.save();
+
+    if (req.app.get("io")) {
+      const io = req.app.get("io");
+      io.emit(`notification_${savedCommande.userId}`, notification);
+    }
 
     res.status(200).json({
       success: true,
@@ -480,10 +495,11 @@ export const ModifierCommande = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
-      stack: error.stack // Ajout de la stack trace
+      stack: error.stack
     });
   }
 };
+
 
 
 export const getTodayStats = async (req, res) => {
@@ -542,8 +558,7 @@ export const getTodayOrdersLiv = async (req, res) => {
     const endOfDay = new Date(startOfDay);
     endOfDay.setUTCDate(startOfDay.getUTCDate() + 1);
 
-    console.log("Date de début:", startOfDay);
-    console.log("Date de fin:", endOfDay);
+
 
     // Debug : afficher quelques documents pour vérification
     const sampleDocs = await CommandeModel.find({
@@ -553,7 +568,7 @@ export const getTodayOrdersLiv = async (req, res) => {
       ]
     }).limit(5);
 
-    console.log("Exemples de documents trouvés:", sampleDocs);
+
 
     const count = await CommandeModel.countDocuments({
       $and: [
@@ -569,7 +584,7 @@ export const getTodayOrdersLiv = async (req, res) => {
       ]
     });
 
-    console.log("Nombre de commandes trouvées:", count);
+
 
     res.status(200).json({ count });
   } catch (error) {
@@ -608,7 +623,7 @@ export const updatePositionLivreur = async (req, res) => {
 
 export const getDerniereLocalisation = async (req, res) => {
   try {
-    console.log("Tentative de récupération de la dernière commande...");
+
     const derniereCommande = await CommandeModel.findOne({
       positionLivreur: { $exists: true }
     })
@@ -620,7 +635,7 @@ export const getDerniereLocalisation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Aucune position de livreur trouvée' })
     }
 
-    console.log("Commande trouvée:", derniereCommande);
+
     const { lat, lng } = derniereCommande.positionLivreur || {}
 
     if (!lat || !lng) {
@@ -640,7 +655,7 @@ export const getDerniereLocalisation = async (req, res) => {
 
 export const countCommandesLivrees = async (req, res) => {
   try {
-    const count = await CommandeModel.countDocuments({ 
+    const count = await CommandeModel.countDocuments({
       livraison: "Livré",
       // Optionnel : filtrer par période
       // createdAt: { $gte: new Date('2023-01-01') }
@@ -676,9 +691,9 @@ export const countCommandesNonLivrees = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: "Erreur serveur" 
+      error: "Erreur serveur"
     });
   }
 };
@@ -691,9 +706,9 @@ export const countCommandesEnAttente = async (req, res) => {
       statut: { $ne: "Annulé" }
     });
 
-    res.status(200).json({ 
-      success: true, 
-      count 
+    res.status(200).json({
+      success: true,
+      count
     });
   } catch (error) {
     console.error("Erreur:", error);
@@ -709,7 +724,22 @@ export const countCommandesEnAttente = async (req, res) => {
 
 export const countAllStatuts = async (req, res) => {
   try {
+    // Date du jour (minuit à aujourd'hui)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
     const results = await CommandeModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: todayStart,
+            $lte: todayEnd
+          }
+        }
+      },
       {
         $group: {
           _id: "$livraison",

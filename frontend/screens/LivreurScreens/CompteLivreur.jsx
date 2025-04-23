@@ -49,7 +49,7 @@ const CompteLivreur = ({ navigation }) => {
             <LayoutLivreur>
                 <View style={styles.errorContainer}>
                     <Icon name="error-outline" size={50} color="#FF3B30" />
-                    <Text style={styles.errorText}>{t('aucune_donnee_utilisateur')}</Text>
+                    <Text style={styles.errorText}>{t('Aucune donnee utilisateur')}</Text>
                 </View>
             </LayoutLivreur>
         );

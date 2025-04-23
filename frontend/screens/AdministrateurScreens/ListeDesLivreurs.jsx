@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, FlatList, ActivityIndicator, TouchableOpacity, 
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import LayoutAdmin from './../../components/LayoutAdmin/LayoutAdmin';
 
 const ListeDesLivreurs = () => { 
   const [livreurs, setLivreurs] = useState([]);
@@ -84,6 +85,7 @@ const ListeDesLivreurs = () => {
   }
 
   return (
+    <LayoutAdmin>
     <View style={styles.container}>
       <Text style={styles.title}>{t('Liste_des_livreurs')}</Text>
       
@@ -110,7 +112,7 @@ const ListeDesLivreurs = () => {
                   onPress={() => validerLivreur(item._id)}
                 >
                   <Ionicons name="checkmark-outline" size={18} color="white" />
-                  <Text style={styles.buttonText}>Valider</Text>
+                  <Text style={styles.buttonText}>{t("valider")}</Text>
                 </TouchableOpacity>
               )}
               
@@ -119,7 +121,7 @@ const ListeDesLivreurs = () => {
                 onPress={() => deleteLivreur(item._id)}
               >
                 <Ionicons name="trash-outline" size={18} color="white" />
-                <Text style={styles.buttonText}>Supprimer</Text>
+                <Text style={styles.buttonText}>{t('supprimer')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -133,6 +135,7 @@ const ListeDesLivreurs = () => {
         }
       />
     </View>
+    </LayoutAdmin>
   );
 };
 

@@ -113,7 +113,7 @@ if (ingredients.length > 0) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t("Votre sélection")}</Text>
+            <Text style={styles.modalHeader}>{t("vos")}</Text>
             
             <View style={styles.modalProductContainer}>
               <Image
@@ -129,7 +129,7 @@ if (ingredients.length > 0) {
             </View>
 
             <View style={styles.quantityContainer}>
-              <Text style={styles.quantityLabel}>{t("Quantité")}:</Text>
+              <Text style={styles.quantityLabel}>{t("qte")}:</Text>
               <View style={styles.quantityControls}>
                 <TouchableOpacity 
                   style={[styles.quantityButton, quantite === 1 && styles.disabledButton]} 
@@ -151,7 +151,7 @@ if (ingredients.length > 0) {
             </View>
 
             <View style={styles.totalContainer}>
-              <Text style={styles.totalLabel}>{t("Total")}:</Text>
+              <Text style={styles.totalLabel}>{t("total")}:</Text>
               <Text style={styles.totalPrice}>{p.prix * quantite} DA</Text>
             </View>
 
@@ -167,7 +167,7 @@ if (ingredients.length > 0) {
                 style={[styles.modalButton, styles.confirmButton]} 
                 onPress={confirmerAjoutAuPanier}
               >
-                <Text style={styles.modalButtonText}>{t("Confirmer")}</Text>
+                <Text style={styles.modalButtonText}>{t("confirmer")}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -35,7 +35,7 @@ const AcceuilAdmin = ({ navigation }) => {
     fetch("http://192.168.1.9:8080/api/v1/consommateur/activeConsommateurs/count")
       .then(response => response.json())
       .then(data => {
-        console.log("Réponse reçue :", data);
+        //console.log("Réponse reçue :", data);
         if (data.success) {
           setNombreConsommateursActifs(data.count);  
         } else {
@@ -52,7 +52,7 @@ const AcceuilAdmin = ({ navigation }) => {
     fetch("http://192.168.1.9:8080/api/v1/consommateur/nonactiveConsommateurs/count")
       .then(response => response.json())
       .then(data => {
-        console.log("Réponse reçue :", data);
+        //console.log("Réponse reçue :", data);
         if (data.success) {
           setNombreConsommateursNotActifs(data.count);  
         } else {
@@ -85,7 +85,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   const menuItems = [
     {
-      title: t('Liste_des_commercant'),
+      title: t('listComm'),
       icon: <Entypo name="shop" style={styles.icone} />,
       nav: 'ListeDesCommercants',
       color: '#4CAF50'
@@ -117,7 +117,7 @@ const AcceuilAdmin = ({ navigation }) => {
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreCommercants}</Text>
-              <Text style={styles.statLabel}>Commerçants</Text>
+              <Text style={styles.statLabel}>{t('commercant')}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreConsommateursActifs}</Text>
@@ -128,7 +128,7 @@ const AcceuilAdmin = ({ navigation }) => {
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreConsommateursNotActifs}</Text>
-              <Text style={styles.statLabel}>Clients désactifs</Text>
+              <Text style={styles.statLabel}>{t('clientDes')}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreLivreurs}</Text>

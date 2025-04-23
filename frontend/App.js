@@ -6,17 +6,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from './screens/SplashScreen';
 import FirstScreen from './screens/FirstScreen';
-import ConConsommateur from './screens/ConConsommateur';
-import InsConsommateur from './screens/InsConsommateur';
-import WelcomePage from './screens/WelcomePage';
+import ConConsommateur from './screens/ConsommateurScreens/ConConsommateur';
+import InsConsommateur from './screens/ConsommateurScreens/InsConsommateur';
+import WelcomePage from './screens/ConsommateurScreens/WelcomePage';
 import WelcomePageLivreur from '../frontend/screens/LivreurScreens/WelcomePageLivreur';
 import ConLivreur from '../frontend/screens/LivreurScreens/ConLivreur';
 import InsLivreur from '../frontend/screens/LivreurScreens/InsLivreur';
-import AcceuilConsommateur from './screens/AcceuilConsommateur';
-import ProduitsDetails from './screens/ProduitsDetails';
-import Compte from './screens/Compte';
-import UpdateProfile from './screens/UpdateProfile';
-import AutresOptions from './screens/AutresOptions';
+import AcceuilConsommateur from './screens/ConsommateurScreens/AcceuilConsommateur';
+import ProduitsDetails from './screens/ConsommateurScreens/ProduitsDetails';
+import Compte from './screens/ConsommateurScreens/Compte';
+import UpdateProfile from './screens/ConsommateurScreens/UpdateProfile';
+import AutresOptions from './screens/ConsommateurScreens/AutresOptions';
 import AcceuilLivreur from './screens/LivreurScreens/AcceuilLivreur';
 import CompteLivreur from './screens/LivreurScreens/CompteLivreur';
 import UpdateProfileLivreur from './screens/LivreurScreens/UpdateProfileLivreur';
@@ -26,28 +26,27 @@ import ListeDesClients from './screens/AdministrateurScreens/ListeDesClients';
 import ListeDesLivreurs from './screens/AdministrateurScreens/ListeDesLivreurs';
 import GestionDesCategories from './screens/CommercantScreens/GestionDesCategories';
 import AjouterCategories from './screens/CommercantScreens/AjouterCategories';
-import Panier from './screens/Panier';
-import Valider from './screens/Valider';
-import ListeDesCommandes from './screens/ListeDesCommandes';
+import Panier from './screens/ConsommateurScreens/Panier';
+import Valider from './screens/ConsommateurScreens/Valider';
+import ListeDesCommandes from './screens/ConsommateurScreens/ListeDesCommandes';
 import ModifierCategories from "./screens/CommercantScreens/ModifierCategories";
 import GestiondesProduits from './screens/CommercantScreens/GestiondesProduits';
 import NotificationsAdmin from './screens/AdministrateurScreens/NotificationsAdmin';
 import AjouterProduit from "./screens/CommercantScreens/AjouterProduit";
 import ModifierProduit from "./screens/CommercantScreens/ModifierProduit";
-import LanguageSelection from './screens/LanguageSelection';
-import ProduitsParCategorie from './screens/ProduitsParCategorie';
-import CommandeDetails from './screens/CommandeDetails';
+import LanguageSelection from './screens/ConsommateurScreens/LanguageSelection';
+import ProduitsParCategorie from './screens/ConsommateurScreens/ProduitsParCategorie';
+import CommandeDetails from './screens/ConsommateurScreens/CommandeDetails';
 import GestionDesCommandes from './screens/CommercantScreens/GestionDesCommandes';
 import CommandeDetailsAdmin from './screens/CommercantScreens/CommandeDetailsAdmin';
-import Paiement from './screens/Paiement';
-import NotificationsConsommateur from './screens/NotificationsConsommateur';
-import BarcodeScanner from './screens/BarcodeScanner';
-import VideoRecette from './screens/VideoRecette';
-import ModePaiement from './screens/ModePaiement';
-import PaiementEspece from './screens/PaiementEspece';
-import Confirmation from './screens/Confirmation';
-import PaiementCIB from './screens/PaiementCIB';
-import PaiementDahabiya from './screens/PaiementDahabiya';
+import Paiement from './screens/ConsommateurScreens/Paiement';
+import NotificationsConsommateur from './screens/ConsommateurScreens/NotificationsConsommateur';
+import BarcodeScanner from './screens/ConsommateurScreens/BarcodeScanner';
+import ModePaiement from './screens/ConsommateurScreens/ModePaiement';
+import PaiementEspece from './screens/ConsommateurScreens/PaiementEspece';
+import Confirmation from './screens/ConsommateurScreens/Confirmation';
+import PaiementCIB from './screens/ConsommateurScreens/PaiementCIB';
+import PaiementDahabiya from './screens/ConsommateurScreens/PaiementDahabiya';
 import ConnAdmin from './screens/AdministrateurScreens/ConnAdmin';
 import AcceuilAdmin from './screens/AdministrateurScreens/AcceuilAdmin';
 import ListeDesCommercants from './screens/AdministrateurScreens/ListeDesCommercants';
@@ -61,9 +60,11 @@ import ListeCommandeALivre from './screens/LivreurScreens/ListeCommandeALivre';
 import DetailsCommandeALivre from './screens/LivreurScreens/DetailsCommandeALivre';
 import MiseAjoueEtatDeCommande from './screens/LivreurScreens/MiseAjoueEtatDeCommande';
 import NotificationsLivreur from './screens/LivreurScreens/NotificationsLivreur';
-import TrackCommande from './screens/TrackCommande';
-import ChatBot from './screens/ChatBot';
-
+import TrackCommande from './screens/ConsommateurScreens/TrackCommande';
+import ChatBot from './screens/ConsommateurScreens/ChatBot';
+import LanguageSelectionLiv from './screens/LivreurScreens/LanguageSelectionLiv';
+import LanguageSelectionComm from './screens/CommercantScreens/LanguageSelectionComm';
+import LanguageSelectionAdmin from './screens/AdministrateurScreens/LanguageSelectionAdmin';
 
 
 
@@ -111,7 +112,6 @@ export default function App() {
         <Stack.Screen name="Paiement" component={Paiement} options={{ headerTitle: '' }} />
         <Stack.Screen name='NotificationsConsommateur' component={NotificationsConsommateur} options={{ headerTitle: '' }} />
         <Stack.Screen name='BarcodeScanner' component={BarcodeScanner} options={{ headerTitle: '' }} />
-        <Stack.Screen name='VideoRecette' component={VideoRecette} options={{ headerTitle: '' }} />
         <Stack.Screen name="ModePaiement" component={ModePaiement} options={{ headerTitle: '' }} />
         <Stack.Screen name="PaiementEspece" component={PaiementEspece} options={{ headerTitle: '' }} />
         <Stack.Screen name="Confirmation" component={Confirmation} options={{ headerTitle: '' }} />
@@ -132,6 +132,9 @@ export default function App() {
         <Stack.Screen name="NotificationsLivreur" component={NotificationsLivreur} options={{ headerTitle: '' }} />
         <Stack.Screen name="TrackCommande" component={TrackCommande} options={{ headerTitle: '' }} />
         <Stack.Screen name='ChatBot' component={ChatBot} options={{ headerTitle: '' }} />
+        <Stack.Screen name='LanguageSelectionLiv' component={LanguageSelectionLiv} options={{ headerTitle: '' }} />
+        <Stack.Screen name='LanguageSelectionComm' component={LanguageSelectionComm} options={{ headerTitle: '' }} />
+        <Stack.Screen name='LanguageSelectionAdmin' component={LanguageSelectionAdmin} options={{ headerTitle: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
 

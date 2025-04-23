@@ -52,6 +52,12 @@ const DetailsCommandeALivre = ({ route }) => {
 
 
     const updateLivraisonStatus = async () => {
+        // Vérifier d'abord si la commande est déjà livrée
+        if (commande.livraison === "Livré") {
+            Alert.alert("Erreur", "Commande déjà livrée !");
+            return;
+        }
+    
         setLoading(true);
         try {
             console.log("Tentative de mise à jour pour la commande:", commande._id);
@@ -67,7 +73,6 @@ const DetailsCommandeALivre = ({ route }) => {
             });
     
             const result = await response.json();
-            console.log("Réponse complète du serveur:", result);
     
             if (!response.ok) {
                 throw new Error(result.message || "Échec de la mise à jour");
@@ -115,11 +120,11 @@ const DetailsCommandeALivre = ({ route }) => {
                 Alert.alert(" ", `${t("commande")} ${nouveauStatut} !`);
                 navigation.goBack();
             } else {
-                Alert.alert(t("erreur"), t("echec_mise_a_jour_statut"));
+                Alert.alert(t("erreur"), t("Echec mise a jour statut"));
             }
         } catch (error) {
             console.error("Erreur de connexion :", error);
-            Alert.alert(t("erreur"), t("connexion_serveur_impossible"));
+            Alert.alert(t("erreur"), t("Connexion serveur impossible"));
         } finally {
             setLoading(false);
         }
@@ -158,14 +163,14 @@ const DetailsCommandeALivre = ({ route }) => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.container}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>Détails de la commande</Text>
+                        <Text style={styles.title}>{t('detailComm')}</Text>
 
                     </View>
 
                     <View style={styles.infoCard}>
                         <View style={styles.cardHeader}>
                             <Text style={styles.orderNumber}>
-                                Commande #{commande.numeroCommande}
+                                {t('Commande')} #{commande.numeroCommande}
                             </Text>
                             <View style={styles.dateContainer}>
                                 <Icon name="event" size={16} color="#6E6E6E" />
@@ -178,13 +183,13 @@ const DetailsCommandeALivre = ({ route }) => {
                         <View style={styles.divider} />
 
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Informations client</Text>
+                            <Text style={styles.sectionTitle}>{t('infoclient')}</Text>
                             <View style={styles.infoRow}>
                                 <View style={styles.iconContainer}>
                                     <Icon name="person" size={20} color="#2E7D32" />
                                 </View>
                                 <View>
-                                    <Text style={styles.infoLabel}>Nom</Text>
+                                    <Text style={styles.infoLabel}>{t('nom')}</Text>
                                     <Text style={styles.infoText}>
                                         {nomClient || (commande.userId?.nom ?? t("inconnu"))}
                                     </Text>
@@ -196,7 +201,7 @@ const DetailsCommandeALivre = ({ route }) => {
                                     <Icon name="phone" size={20} color="#2E7D32" />
                                 </View>
                                 <View>
-                                    <Text style={styles.infoLabel}>Téléphone</Text>
+                                    <Text style={styles.infoLabel}>{t('num')}</Text>
                                     <Text style={styles.infoText}>
                                         {telephoneClient || t("non_specifie")}
                                     </Text>
@@ -205,7 +210,7 @@ const DetailsCommandeALivre = ({ route }) => {
                         </View>
 
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Adresse de livraison</Text>
+                            <Text style={styles.sectionTitle}>{t('adeLiv')}</Text>
                             <View style={styles.infoRow}>
                                 <View style={styles.iconContainer}>
                                     <Icon name="place" size={20} color="#2E7D32" />
@@ -223,7 +228,7 @@ const DetailsCommandeALivre = ({ route }) => {
                                         <Icon name="info" size={20} color="#2E7D32" />
                                     </View>
                                     <View>
-                                        <Text style={styles.infoLabel}>Informations supplémentaires</Text>
+                                        <Text style={styles.infoLabel}>{t('infosup')}</Text>
                                         <Text style={styles.infoText}>
                                             {infoSupplementaire}
                                         </Text>
@@ -237,7 +242,7 @@ const DetailsCommandeALivre = ({ route }) => {
 
             <View style={styles.footer}>
                 <View style={styles.totalContainer}>
-                    <Text style={styles.totalLabel}>Total à payer</Text>
+                    <Text style={styles.totalLabel}>{t('totalapayer')}</Text>
                     <Text style={styles.totalValue}>{totalnet} DA</Text>
                 </View>
 
@@ -251,7 +256,7 @@ const DetailsCommandeALivre = ({ route }) => {
                     disabled={loading}
                 >
                     <Icon name="directions-bike" size={20} color="#FFF" />
-                    <Text style={styles.buttonText}>Démarrer la livraison</Text>
+                    <Text style={styles.buttonText}>{t('demmareliv')}</Text>
                 </TouchableOpacity>
             </View>
         </LayoutLivreur>

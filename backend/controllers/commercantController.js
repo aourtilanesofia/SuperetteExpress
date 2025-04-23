@@ -142,8 +142,7 @@ export const updateCommercantProfileController = async (req, res) => {
         const { nom, email, numTel, adresseBoutique, mdp } = req.body;
 
         const commercant = await commercantModel.findById(new mongoose.Types.ObjectId(req.user._id));
-
-        console.log("User trouvé :", commercant); // Doit retourner un objet utilisateur
+ 
         if (!commercant) {
             return res.status(404).json({ success: false, message: "Commerçant non trouvé" });
         }

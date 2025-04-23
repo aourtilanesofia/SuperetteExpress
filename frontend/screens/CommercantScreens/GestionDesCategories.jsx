@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -53,12 +54,13 @@ const GestionDesCategories = () => {
     };
 
     return (
+        <LayoutCommercant>
         <View style={styles.container}>
             <Text style={styles.title}>{t('Liste_des_catégories')}</Text>
             <FlatList
                 data={categories}
                 keyExtractor={(item) => item._id}
-                contentContainerStyle={{ paddingBottom: 40 }}
+                contentContainerStyle={{ paddingBottom: 90 }}
                 renderItem={({ item }) => (
                     <View style={styles.categoryItem}>
 
@@ -94,6 +96,7 @@ const GestionDesCategories = () => {
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
+        </LayoutCommercant>
     );
 };
 
@@ -107,7 +110,7 @@ const styles = StyleSheet.create({
     buttonText: { color: '#fff', fontWeight: '600' },
     addButton: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 55,
         right: 20,
         backgroundColor: '#007BFF',
         width: 60,
