@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ScrollView } from "react-native";
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
@@ -104,6 +105,7 @@ const AjouterProduit = ({ navigation }) => {
   };
 
   return (
+    <LayoutCommercant>
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Text style={styles.title}>{t("ajouterproduit")}</Text>
@@ -140,7 +142,7 @@ const AjouterProduit = ({ navigation }) => {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>{t("Code Barre")} :</Text>
+          <Text style={styles.label}>{t("codebarre")} :</Text>
           <TextInput 
             style={styles.input} 
             value={codeBarre} 
@@ -171,6 +173,7 @@ const AjouterProduit = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </LayoutCommercant>
   );
 };
 
@@ -201,7 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  btnAjouter: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 30, },
+  btnAjouter: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center" },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 
   pickerContainer: {

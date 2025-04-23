@@ -13,6 +13,7 @@ import {
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
+import { useTranslation } from "react-i18next";
 
 const CustomButton = ({ onPress, title, backgroundColor = '#2196F3', disabled = false }) => (
   <TouchableOpacity
@@ -33,6 +34,7 @@ const MiseAjoueEtatDeCommande = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [disabledButtons, setDisabledButtons] = useState({});
+   const { t } = useTranslation();
 
   const fetchCommandes = async () => {
     setLoading(true);
@@ -132,10 +134,10 @@ const MiseAjoueEtatDeCommande = () => {
 
     return (
       <View style={styles.card}>
-        <Text style={styles.commandeId}>Commande #{item.numeroCommande}</Text>
+        <Text style={styles.commandeId}>{t('Commande')} #{item.numeroCommande}</Text>
 
         <View style={styles.infoRow}>
-          <Icon name="person" size={16} color="#555" />
+          <Icon name="person" size={16} color="#555" /> 
           <Text> {utilisateur.nom || 'Client inconnu'}</Text>
         </View>
 
@@ -176,14 +178,14 @@ const MiseAjoueEtatDeCommande = () => {
         )}
 
         <CustomButton
-          title="Envoyer position"
+          title={t('envoyerpos')}
           backgroundColor="#FF9800"
           onPress={() => envoyerPosition(item._id)}
         />
 
         <View style={styles.buttonContainer}>
           <CustomButton
-            title="Livré"
+            title={t('livre')}
             backgroundColor="#4CAF50"
             onPress={() => {
               setDisabledButtons(prev => ({ ...prev, [item._id]: true }));
@@ -193,7 +195,7 @@ const MiseAjoueEtatDeCommande = () => {
           />
 
           <CustomButton
-            title="Non Livré"
+            title={t('nonlivre')}
             backgroundColor="#F44336"
             onPress={() => {
               setDisabledButtons(prev => ({ ...prev, [item._id]: true }));
@@ -209,7 +211,7 @@ const MiseAjoueEtatDeCommande = () => {
   return (
     <LayoutLivreur>
       <View style={styles.container}>
-        <Text style={styles.header}>Suivi des livraisons</Text>
+        <Text style={styles.header}>{t('suiviliv')}</Text>
 
         {loading ? (
           <View style={styles.center}>

@@ -54,12 +54,12 @@ const UpdateProfileLivreur = ({ navigation }) => {
             setIsLoading(true);
             const token = await AsyncStorage.getItem('token');
             if (!token) {
-                Alert.alert(t('erreur'), t('non_authentifie'));
+                Alert.alert(t('erreur'), t('Non authentifie'));
                 return;
             }
 
             if (!formData.name || !formData.email || !formData.numTel || !formData.categorie || !formData.matricule) {
-                Alert.alert(t('champs_requis'), t('remplir_tous_champs'));
+                Alert.alert(t('Champs requis'), t('Remplissez tous les champs svp!'));
                 return;
             }
 
@@ -85,7 +85,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
 
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || t('erreur_mise_a_jour'));
+                throw new Error(data.message || t('Erreur de mise a jour'));
             }
 
             await AsyncStorage.setItem('user', JSON.stringify({
@@ -97,13 +97,13 @@ const UpdateProfileLivreur = ({ navigation }) => {
                 matricule: formData.matricule
             }));
 
-            Alert.alert(t('succes'), t('mise_a_jour_reussie'), [
+            Alert.alert(t('succes'), t('Mise à jour reussie'), [
                 { text: "OK", onPress: () => navigation.goBack() }
             ]);
 
         } catch (error) {
             console.error("Update error:", error);
-            Alert.alert(t('erreur'), error.message || t('erreur_mise_a_jour'));
+            Alert.alert(t('erreur'), error.message || t('Erreur de mise a jour'));
         } finally {
             setIsLoading(false);
         }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Image, ScrollView } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 
@@ -68,6 +69,7 @@ const GestiondesProduits = () => {
   };
 
   return (
+    
     <View style={styles.container}>
       <Text style={styles.title}>{t("listeproduits")}</Text>
       <ScrollView>
@@ -131,6 +133,7 @@ const GestiondesProduits = () => {
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
+    
   );
 };
 

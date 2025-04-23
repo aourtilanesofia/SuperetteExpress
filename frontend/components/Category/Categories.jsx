@@ -24,6 +24,9 @@ const Categories = () => {  // Ajout de navigation
   
     fetchCategories();
   }, []);
+  const handleImageError = (error) => {
+    console.log('Erreur de chargement image:', error);
+  };
 
 
   return (
@@ -35,7 +38,15 @@ const Categories = () => {  // Ajout de navigation
             style={styles.catContainer} 
             onPress={() => navigation.navigate("ProduitsParCategorie", { categorie: item.nom})}
           >
-            <Image source={{ uri: `${backendUrl}${item.image}` }} style={styles.img} />
+            <Image 
+            source={{ 
+              uri: item.image?.startsWith('http') 
+                ? item.image 
+                : `${backendUrl}${item.image}`
+            }} 
+            style={styles.img}
+            onError={handleImageError}
+          />
             <Text style={styles.txt}>{item.nom}</Text>
           </TouchableOpacity>
         ))}

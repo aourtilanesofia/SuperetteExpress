@@ -281,8 +281,7 @@ export const getActiveConsommateurCountController = async (req, res) => {
         // Recherche des consommateurs actifs
         const activeCount = await consommateurModel.countDocuments({ isActive: true });
 
-        // Affichage pour débogage
-        console.log("Nombre de consommateurs actifs :", activeCount);
+        
 
         res.status(200).json({
             success: true,
@@ -304,9 +303,6 @@ export const getNotActiveConsommateurCountController = async (req, res) => {
     try {
         // Recherche des consommateurs actifs
         const notactiveCount = await consommateurModel.countDocuments({ isActive: false });
-
-        // Affichage pour débogage
-        console.log("Nombre de consommateurs non actifs :", notactiveCount);
 
         res.status(200).json({
             success: true,

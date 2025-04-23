@@ -20,7 +20,7 @@ const MenuAdmin = () => {
   const { t } = useTranslation();
 
   const handleLanguagePress = () => {
-    navigation.navigate('LanguageSelection');
+    navigation.navigate('LanguageSelectionAdmin');
   };
 
  useEffect(() => {
@@ -49,7 +49,7 @@ const MenuAdmin = () => {
       "Voulez-vous vraiment vous déconnecter ?",
       [
         { text: "Annuler", style: "cancel" },
-        { text: "Oui", onPress: () => navigation.navigate("ConCommerçant") }
+        { text: "Oui", onPress: () => navigation.navigate("ConnAdmin") }
       ]
     );
   };
@@ -76,7 +76,7 @@ const MenuAdmin = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuContainer} onPress={handleLanguagePress}>
-        <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "LanguageSelection" && styles.active]} size={26} />
+        <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "LanguageSelectionAdmin" && styles.active]} size={26} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuContainer} onPress={handleLogout}>

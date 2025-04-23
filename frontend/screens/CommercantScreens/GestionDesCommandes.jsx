@@ -71,7 +71,7 @@ const GestionDesCommandes = () => {
     };
 
     return (
-        <>
+        <LayoutCommercant>
             <Text style={styles.txtdash}>{t("listedescommandes")}</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#329171" />
@@ -80,7 +80,7 @@ const GestionDesCommandes = () => {
             ) : (
                 <FlatList
                     style={styles.container}
-                    contentContainerStyle={{ paddingBottom: 40 }}
+                    contentContainerStyle={{ paddingBottom: 55 }}
                     data={commandes}
                     keyExtractor={(item) => item._id}
                     renderItem={({ item }) => (
@@ -89,7 +89,7 @@ const GestionDesCommandes = () => {
                             onPress={() => handlePressCommande(item)}
                         >
                             {newCommandes.includes(item._id) && <Text style={styles.badge}>Nouveau</Text>}
-                            <Text style={styles.commandeId}>{t("commande")} {item.numeroCommande}</Text>
+                            <Text style={styles.commandeId}>{t("commande")} #{item.numeroCommande}</Text>
                             <Text>{t("client")} : {item.userId ? item.userId.nom : "Inconnu"}</Text>
                             <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
                             <Text style={styles.date}>{new Date(item.date).toLocaleString()}</Text>
@@ -120,7 +120,7 @@ const GestionDesCommandes = () => {
                     )}
                 />
             )}
-        </>
+        </LayoutCommercant>
     );
 };
 

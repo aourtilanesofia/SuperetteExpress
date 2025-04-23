@@ -156,7 +156,7 @@ const CompteCommercant = ({ navigation }) => {
                         <View style={styles.infoItem}>
                             <Icon name="location-on" size={24} color="#2E7D32" style={styles.icon} />
                             <View style={styles.infoTextContainer}>
-                                <Text style={styles.infoLabel}>Adresse de la boutique</Text>
+                                <Text style={styles.infoLabel}>{t('adresseBoutique')}</Text>
                                 <Text style={styles.infoValue}>{user.adresseBoutique}</Text>
                             </View>
                         </View>
@@ -179,7 +179,7 @@ const CompteCommercant = ({ navigation }) => {
                             <ActivityIndicator color="#FFFFFF" />
                         ) : (
                             <>
-                                <Text style={styles.deleteButtonText}>Supprimer mon compte</Text>
+                                <Text style={styles.deleteButtonText}>{t('supprimercompte')}</Text>
                                 <Icon name="delete" size={20} color="#FFFFFF" />
                             </>
                         )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert,  ScrollView } from "react-native";
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useTranslation } from "react-i18next";
@@ -69,12 +70,12 @@ const ModifierProduit = ({ route, navigation }) => {
         quality: 1,
       });
   
-      console.log("Résultat de la sélection d'image:", result);
+      //console.log("Résultat de la sélection d'image:", result);
   
       // Vérifiez si l'image a été sélectionnée
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const imageUri = result.assets[0].uri; // L'URI est dans le premier objet du tableau `assets`
-        console.log("Image sélectionnée:", imageUri);
+        //console.log("Image sélectionnée:", imageUri);
         setImage(imageUri); // Mettez à jour l'état avec l'URI de l'image
         uploadImage(imageUri); // Si vous avez une fonction pour uploader l'image
       } else {
@@ -120,7 +121,7 @@ const ModifierProduit = ({ route, navigation }) => {
       }
   
       const data = await response.json(); // Tenter de parser la réponse en JSON
-      console.log('Image téléchargée avec succès:', data);
+      //console.log('Image téléchargée avec succès:', data);
   
     } catch (error) {
       console.error('Erreur lors du téléchargement de l\'image:', error);
@@ -229,6 +230,7 @@ const ModifierProduit = ({ route, navigation }) => {
     : null;
 
   return (
+    <LayoutCommercant>
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <Text style={styles.title}>{t("modifierproduit")}</Text>
@@ -269,7 +271,7 @@ const ModifierProduit = ({ route, navigation }) => {
       </View>
 
       <View style={styles.row}>
-          <Text style={styles.label}>{t("codeBarre")} :</Text>
+          <Text style={styles.label}>{t("codebarre")} :</Text>
           <TextInput
             style={styles.input}
             value={codeBarre}
@@ -308,13 +310,14 @@ const ModifierProduit = ({ route, navigation }) => {
       </TouchableOpacity>
     </View>
     </ScrollView>
+    </LayoutCommercant>
   );
 };
 
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 30, textAlign: "center", color: "#000" },
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: "#000" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
   label: { fontSize: 15, fontWeight: "bold", width: 100 },
   input: { flex: 1, borderWidth: 1, borderColor: "#9E9E9E", padding: 13, borderRadius: 10 },
@@ -323,7 +326,7 @@ const styles = StyleSheet.create({
   imageContainer: { width: 150, height: 150, borderRadius: 10, backgroundColor: "#ddd", justifyContent: "center", alignItems: "center", overflow: "hidden", flex: 1 },
   image: { width: "100%", height: "100%", resizeMode: "cover" },
   imagePlaceholder: { color: "#329171", fontWeight: "bold", textAlign: "center" },
-  btnModifier: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 30, },
+  btnModifier: { backgroundColor: "#2E7D32", padding: 12, borderRadius: 10, alignItems: "center" },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 
   pickerContainer: {

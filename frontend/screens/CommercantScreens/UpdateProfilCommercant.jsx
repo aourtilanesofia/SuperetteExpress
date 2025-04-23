@@ -53,7 +53,7 @@ const UpdateProfilCommercant = ({ navigation }) => {
             setIsLoading(true);
             const token = await AsyncStorage.getItem('token');
             if (!token) {
-                Alert.alert(t('erreur'), t('non_authentifie'));
+                Alert.alert(t('erreur'), t('Non authentifie'));
                 return;
             }
 
@@ -76,9 +76,9 @@ const UpdateProfilCommercant = ({ navigation }) => {
             });
 
             const data = await response.json();
-            console.log("Réponse du serveur:", data);
+            //console.log("Réponse du serveur:", data);
             if (!response.ok) {
-                throw new Error(data.message || t('erreur_mise_a_jour'));
+                throw new Error(data.message || t('Erreur de mise à jour'));
             }
 
             await AsyncStorage.setItem('user', JSON.stringify({
@@ -89,13 +89,13 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 adresseBoutique: formData.adresseBoutique,
             }));
 
-            Alert.alert(t('succes'), t('mise_a_jour_reussie'), [
+            Alert.alert(t('succes'), t('Mise à jour reussie'), [
                 { text: "OK", onPress: () => navigation.goBack() }
             ]);
 
         } catch (error) {
             console.error("Update error:", error);
-            Alert.alert(t('erreur'), error.message || t('erreur_mise_a_jour'));
+            Alert.alert(t('erreur'), error.message || t('Erreur de mise à jour'));
         } finally {
             setIsLoading(false);
         }

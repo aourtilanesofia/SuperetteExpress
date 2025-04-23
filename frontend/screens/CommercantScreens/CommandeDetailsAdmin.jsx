@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
-import LayoutAdmin from "../../components/LayoutAdmin/LayoutAdmin";
+import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 
@@ -41,9 +41,9 @@ const CommandeDetailsAdmin = ({ route }) => {
     };
 
     return (
-        <>
+        <LayoutCommercant>
             <View style={styles.container}>
-                <Text style={styles.title}>{t("commande")}: {commande.numeroCommande}</Text>
+                <Text style={styles.title}>{t("commande")} #{commande.numeroCommande}</Text>
                 <Text style={styles.client}>{t("client")} : {commande.userId ? commande.userId.nom : "Inconnu"}</Text>
                 <Text style={styles.sectionTitle}>{t("listeproduits")} :</Text>
             </View>
@@ -86,7 +86,7 @@ const CommandeDetailsAdmin = ({ route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </>
+        </LayoutCommercant>
     );
 };
 

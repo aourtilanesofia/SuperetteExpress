@@ -17,7 +17,7 @@ const MenuCommercant = () => {
     const { t } = useTranslation();
 
     const handleLanguagePress = () => {
-        navigation.navigate('LanguageSelection');
+        navigation.navigate('LanguageSelectionComm');
     };
 
     useEffect(() => {
@@ -72,7 +72,7 @@ const MenuCommercant = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuContainer} onPress={handleLanguagePress}>
-                <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "LanguageSelection" && styles.active]} size={26} />
+                <MaterialCommunityIcons name='syllabary-hiragana' style={[styles.icon, route.name === "LanguageSelectionComm" && styles.active]} size={26} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('CompteCommercant')}>

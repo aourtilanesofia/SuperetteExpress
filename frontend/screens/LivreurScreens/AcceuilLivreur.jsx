@@ -4,7 +4,7 @@ import Layout from "../../components/LayoutLivreur/LayoutLivreur";
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { useTranslation } from 'react-i18next';
 const { width } = Dimensions.get('window');
 
 const AcceuilLivreur = ({ navigation }) => {
@@ -17,6 +17,7 @@ const AcceuilLivreur = ({ navigation }) => {
   const [todayOrdersCount, setTodayOrdersCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   // Récupère toutes les statistiques
   const fetchAllStats = async () => {
@@ -81,7 +82,7 @@ const AcceuilLivreur = ({ navigation }) => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        <Text style={styles.headerTitle}>Tableau de Bord</Text>
+        <Text style={styles.headerTitle}>{t('Dashboard')}</Text>
         <TouchableOpacity 
           style={styles.menuButton} 
           onPress={() => navigation.navigate('AutresOptionsLivreur')}
@@ -109,8 +110,8 @@ const AcceuilLivreur = ({ navigation }) => {
       >
         {/* Section Bienvenue */}
         <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>Bonjour, Livreur!</Text>
-          <Text style={styles.subWelcomeText}>Voici votre activité aujourd'hui</Text>
+          <Text style={styles.welcomeText}>{t('bjrlivreur')}</Text>
+          <Text style={styles.subWelcomeText}>{t('actv')}</Text>
         </View>
 
         {/* Statistiques principales */}
@@ -118,25 +119,25 @@ const AcceuilLivreur = ({ navigation }) => {
           <View style={[styles.statCard, styles.cardToday]}>
             <View style={styles.cardHeader}>
               <MaterialCommunityIcons name="calendar-today" size={22} color="#fff" />
-              <Text style={styles.cardTitle}>Aujourd'hui</Text>
+              <Text style={styles.cardTitle}>{t('ajrdh')}</Text>
             </View>
             <Text style={styles.cardValue}>
               {loading ? '...' : todayOrdersCount}
             </Text>
-            <Text style={styles.cardLabel}>Commandes</Text>
+            <Text style={styles.cardLabel}>{t('Commande')}</Text>
           </View>
 
 
         </View>
 
         {/* Statistiques secondaires */}
-        <Text style={styles.sectionTitle}>Détails des Commandes</Text>
+        <Text style={styles.sectionTitle}>{t('detailcommande')}</Text>
         
         <View style={styles.statsGrid}>
           {/* Carte Commandes livrées */}
           <View style={[styles.gridCard, styles.cardDelivered]}>
             <MaterialCommunityIcons name="check-circle" size={28} color="#fff" />
-            <Text style={styles.gridCardTitle}>Livrées</Text>
+            <Text style={styles.gridCardTitle}>{t('Livrées')}</Text>
             <Text style={styles.gridCardValue}>
               {loading ? '...' : stats.livrees}
             </Text>
@@ -145,7 +146,7 @@ const AcceuilLivreur = ({ navigation }) => {
           {/* Carte Commandes en attente */}
           <View style={[styles.gridCard, styles.cardPending]}>
             <MaterialCommunityIcons name="clock" size={28} color="#fff" />
-            <Text style={styles.gridCardTitle}>En attente</Text>
+            <Text style={styles.gridCardTitle}>{t('attente')}</Text>
             <Text style={styles.gridCardValue}>
               {loading ? '...' : stats.enAttente}
             </Text>
@@ -154,7 +155,7 @@ const AcceuilLivreur = ({ navigation }) => {
           {/* Carte Commandes non livrées */}
           <View style={[styles.gridCard, styles.cardNotDelivered]}>
             <MaterialCommunityIcons name="close-circle" size={28} color="#fff" />
-            <Text style={styles.gridCardTitle}>Non livrées</Text>
+            <Text style={styles.gridCardTitle}>{t('Nonlivrées')}</Text>
             <Text style={styles.gridCardValue}>
               {loading ? '...' : stats.nonLivrees}
             </Text>
@@ -166,7 +167,7 @@ const AcceuilLivreur = ({ navigation }) => {
             onPress={() => navigation.navigate('ListeCommandeALivre')}
           >
             <MaterialCommunityIcons name="truck-delivery" size={28} color="#fff" />
-            <Text style={styles.gridCardTitle}>Voir commandes</Text>
+            <Text style={styles.gridCardTitle}>{t('voircommande')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

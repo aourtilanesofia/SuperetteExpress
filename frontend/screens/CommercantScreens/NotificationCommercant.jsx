@@ -14,9 +14,9 @@ const NotificationCommercant = () => {
         fetch("http://192.168.1.9:8080/api/v1/notifications")
             .then((res) => res.json())
             .then((data) => {
-                console.log("Données des notifications :", data); // Vérifie la structure des données
+                //console.log("Données des notifications :", data); // Vérifie la structure des données
                 const filteredNotifications = data.filter(n => n.role === "commercant");
-                console.log("Notifications filtrées :", filteredNotifications); // Vérifie les notifications filtrées
+                //console.log("Notifications filtrées :", filteredNotifications); // Vérifie les notifications filtrées
                 setNotifications(filteredNotifications);
                 setUnreadCount(filteredNotifications.filter(n => !n.isRead).length);
             });

@@ -80,7 +80,7 @@ const ListeCommandeALivre = () => {
 
     return (
         <LayoutLivreur>
-            <Text style={styles.txtdash}>Liste des commandes a livrer</Text>
+            <Text style={styles.txtdash}>{t('listecommandelivrer')}</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#329171" />
             ) : commandes.length === 0 ? (
@@ -98,10 +98,10 @@ const ListeCommandeALivre = () => {
                             onPress={() => handlePressCommande(item)}
                         >
                             {newCommandes.includes(item._id) && <Text style={styles.badge}>Nouveau</Text>}
-                            <Text style={styles.commandeId}>{t("commande")} {item.numeroCommande}</Text>
+                            <Text style={styles.commandeId}>{t("commande")} #{item.numeroCommande}</Text>
                             <Text>{t("client")} : {item.userId ? item.userId.nom : "Inconnu"}</Text>
                             <Text style={styles.total}>
-                                Num téléphone : {item.userId && item.userId.numTel ? item.userId.numTel : "Non disponible"}
+                                {t('num')} : {item.userId && item.userId.numTel ? item.userId.numTel : "Non disponible"}
                             </Text>
                             <Text style={styles.date}>{new Date(item.date).toLocaleString()}</Text>
                             <Text
