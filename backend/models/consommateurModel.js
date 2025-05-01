@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import JWT from "jsonwebtoken";
 
 const consommateurSchema = new mongoose.Schema(
-  {
+  { 
     nom: {
       type: String, 
       required: [true, "Le champ est obligatoire"],
@@ -15,11 +15,6 @@ const consommateurSchema = new mongoose.Schema(
     adresse: {
       type: String,
       required: [true, "Le champ est obligatoire"],
-    },
-    email: {
-      type: String,
-      required: [true, "Le champ est obligatoire"],
-      unique: [true, "L'adresse e-mail existe déjà"],
     },
     mdp: {
       type: String,

@@ -40,7 +40,7 @@ const MiseAjoueEtatDeCommande = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://192.168.1.9:8080/api/commandes/payeesouattente');
+      const response = await fetch('http://192.168.1.42:8080/api/commandes/payeesouattente');
       if (!response.ok) {
         throw new Error(`Erreur ${response.status}`);
       }
@@ -64,7 +64,7 @@ const MiseAjoueEtatDeCommande = () => {
   const updateCommande = async (id, data) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://192.168.1.9:8080/api/commandes/ModifierStat/${id}`, {
+      const response = await fetch(`http://192.168.1.42:8080/api/commandes/ModifierStat/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const MiseAjoueEtatDeCommande = () => {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
   
-      const response = await fetch(`http://192.168.1.9:8080/api/commandes/commande/${commandeId}/position`, {
+      const response = await fetch(`http://192.168.1.42:8080/api/commandes/commande/${commandeId}/position`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

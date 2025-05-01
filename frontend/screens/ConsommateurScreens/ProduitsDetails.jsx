@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from '@expo/vector-icons';
 
 
-const backendUrl = "http://192.168.1.9:8080";
+const backendUrl = "http://192.168.1.42:8080";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
@@ -56,10 +56,10 @@ const ProduitsDetails = () => {
       }
 
       await AsyncStorage.setItem("cart", JSON.stringify(panierExistant));
-      Alert.alert("✅", t("panier.ajout_succes"));
+      Alert.alert("✅", t("Produit ajouté au panier !"));
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier :", error);
-      Alert.alert("❌", t("panier.erreur_ajout"));
+      Alert.alert("❌", t("Erreur lors de l'ajout au panier"));
     }
   };
 

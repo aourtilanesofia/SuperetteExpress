@@ -12,7 +12,6 @@ const InsConsommateur = ({ navigation }) => {
         nom: '',
         numTel: '',
         adresse: '',
-        email: '',
         mdp: ''
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +21,9 @@ const InsConsommateur = ({ navigation }) => {
     };
 
     const handleSignup = async () => {
-        const { nom, numTel, adresse, email, mdp } = formData;
+        const { nom, numTel, adresse, mdp } = formData;
         
-        if (!nom || !numTel || !adresse || !email || !mdp) {
+        if (!nom || !numTel || !adresse || !mdp) {
             Alert.alert("Champs manquants", "Veuillez remplir tous les champs");
             return;
         }
@@ -34,16 +33,12 @@ const InsConsommateur = ({ navigation }) => {
             return;
         }
 
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
-            Alert.alert("Email invalide", "Veuillez entrer un email valide");
-            return;
-        }
-
+        
         setIsLoading(true);
 
         try {
 
-            const response = await fetch("http://192.168.1.9:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.1.42:8080/api/v1/consommateur/inscription", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -65,7 +60,6 @@ const InsConsommateur = ({ navigation }) => {
                 nom: '',
                 numTel: '',
                 adresse: '',
-                email: '',
                 mdp: ''
             });
 
@@ -119,7 +113,7 @@ const InsConsommateur = ({ navigation }) => {
                                 value={formData.numTel}
                                 onChangeText={(text) => handleChange('numTel', text)}
                                 maxLength={10}
-                            />
+                            /> 
                         </View>
 
                         {/* Adresse */}
@@ -131,20 +125,6 @@ const InsConsommateur = ({ navigation }) => {
                                 placeholderTextColor="#939494"
                                 value={formData.adresse}
                                 onChangeText={(text) => handleChange('adresse', text)}
-                            />
-                        </View>
-
-                        {/* Email */}
-                        <View style={styles.inputContainer}>
-                            <Ionicons name='mail-outline' size={20} color={'#329171'} style={styles.icon} />
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder='Email'
-                                placeholderTextColor="#939494"
-                                keyboardType='email-address'
-                                value={formData.email}
-                                onChangeText={(text) => handleChange('email', text)}
-                                autoCapitalize="none"
                             />
                         </View>
 

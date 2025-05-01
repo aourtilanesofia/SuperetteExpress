@@ -75,7 +75,7 @@ const Panier = () => {
                 statut: "En attente"
             };
 
-            const response = await fetch("http://192.168.1.9:8080/api/commandes/add", {
+            const response = await fetch("http://192.168.1.42:8080/api/commandes/add", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

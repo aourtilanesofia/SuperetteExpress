@@ -6,7 +6,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 
 
-const socket = io("http://192.168.1.9:8080");
+const socket = io("http://192.168.1.42:8080");
 
 
 const GestionDesCommandes = () => {
@@ -19,7 +19,7 @@ const GestionDesCommandes = () => {
     const fetchCommandes = async () => {
         try {
 
-            const response = await fetch("http://192.168.1.9:8080/api/commandes/");
+            const response = await fetch("http://192.168.1.42:8080/api/commandes/");
             const data = await response.json();
             if (response.ok) {
                 setCommandes(data.reverse());

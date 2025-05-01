@@ -8,13 +8,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const ConConsommateur = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
-    const [email, setEmail] = useState('');
+    const [numTel, setnumTel] = useState('');
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
         Keyboard.dismiss();
-        if (!email || !mdp) {
+        if (!numTel || !mdp) {
             Alert.alert("Champs requis", "Veuillez remplir tous les champs");
             return;
         }
@@ -22,17 +22,17 @@ const ConConsommateur = ({ navigation }) => {
         setIsLoading(true);
         
         try {
-            const response = await fetch("http://192.168.1.9:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.1.42:8080/api/v1/consommateur/connexion", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, mdp }),
+                body: JSON.stringify({ numTel, mdp }),
             });
 
             const data = await response.json();
 
             if (!response.ok || !data.consommateur || !data.token) {
-                Alert.alert("Erreur", data.message || "Email ou mot de passe incorrect");
+                Alert.alert("Erreur", data.message || "Numéro de téléphone ou mot de passe incorrect");
                 return;
             }
 
@@ -73,14 +73,14 @@ const ConConsommateur = ({ navigation }) => {
                     <View style={styles.formContainer}>
                         {/* Email Input */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
+                            <Ionicons name='phone-portrait-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
-                                placeholder='Adresse email'
+                                placeholder='Numéro Téléphone'
                                 placeholderTextColor="#939494"
-                                keyboardType='email-address'
-                                value={email}
-                                onChangeText={setEmail}
+                                keyboardType='phone-pad'
+                                value={numTel}
+                                onChangeText={setnumTel}
                                 autoCapitalize="none"
                                 autoCorrect={false}
                             />
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF', 
         borderRadius: 12,
         paddingHorizontal: 15,
         height: 56,

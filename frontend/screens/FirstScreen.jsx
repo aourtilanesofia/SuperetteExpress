@@ -13,7 +13,7 @@ const FirstScreen = ({ navigation }) => {
         <Text style={styles.txtadmin}>Commerçant</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.btnCons} onPress={() => navigation.navigate('WelcomePage')}>
+      <TouchableOpacity style={styles.btnCons} onPress={() => navigation.navigate('ListeShops')}>
         <Text style={styles.txtCons}>Consommateur</Text>
       </TouchableOpacity>
 

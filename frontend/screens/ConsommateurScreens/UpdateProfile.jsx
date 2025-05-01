@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 const UpdateProfile = ({ navigation }) => {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
         numTel: '',
         adr: '',
         mdp: '',
@@ -29,7 +28,6 @@ const UpdateProfile = ({ navigation }) => {
                     const user = JSON.parse(userData);
                     setFormData({
                         name: user.nom || '',
-                        email: user.email || '',
                         numTel: user.numTel ? user.numTel.toString() : '',
                         adr: user.adresse || '',
                         mdp: '',
@@ -57,21 +55,20 @@ const UpdateProfile = ({ navigation }) => {
                 return;
             }
 
-            if (!formData.name || !formData.email || !formData.numTel || !formData.adr) {
+            if (!formData.name || !formData.numTel || !formData.adr) {
                 Alert.alert(t('champs_requis'), t('remplir_tous_champs'));
                 return;
             }
 
             const updateData = {
                 nom: formData.name,
-                email: formData.email,
                 numTel: formData.numTel.toString(),
                 adresse: formData.adr,
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
 
-            const response = await fetch('http://192.168.1.9:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.1.42:8080/api/v1/consommateur/profile-update', {
 
                 method: 'PUT',
                 headers: {
@@ -89,7 +86,6 @@ const UpdateProfile = ({ navigation }) => {
             await AsyncStorage.setItem('user', JSON.stringify({
                 ...JSON.parse(await AsyncStorage.getItem('user')),
                 nom: formData.name,
-                email: formData.email,
                 numTel: formData.numTel,
                 adresse: formData.adr
             }));
@@ -136,20 +132,6 @@ const UpdateProfile = ({ navigation }) => {
                                     placeholderTextColor="#9E9E9E"
                                 />
                             </View>
-
-                            <View style={styles.inputContainer}>
-                                <Icon name="email" size={24} color="#2E7D32" style={styles.inputIcon} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={formData.email}
-                                    onChangeText={(text) => handleChange('email', text)}
-                                    placeholder="Email"
-                                    placeholderTextColor="#9E9E9E"
-                                    keyboardType='email-address'
-                                    autoCapitalize="none"
-                                />
-                            </View>
-
                             <View style={styles.inputContainer}>
                                 <Icon name="phone" size={24} color="#2E7D32" style={styles.inputIcon} />
                                 <TextInput
