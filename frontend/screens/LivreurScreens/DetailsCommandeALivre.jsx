@@ -62,7 +62,7 @@ const DetailsCommandeALivre = ({ route }) => {
         try {
             console.log("Tentative de mise à jour pour la commande:", commande._id);
             
-            const response = await fetch(`http://192.168.1.9:8080/api/commandes/livstat/${commande._id}`, {
+            const response = await fetch(`http://192.168.1.42:8080/api/commandes/livstat/${commande._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const DetailsCommandeALivre = ({ route }) => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://192.168.1.9:8080/api/commandes/${commande._id}`,
+                `http://192.168.1.42:8080/api/commandes/${commande._id}`,
                 {
                     method: "PUT",
                     headers: {

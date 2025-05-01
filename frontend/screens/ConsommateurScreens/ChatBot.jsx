@@ -16,6 +16,7 @@ const ChatBot = () => {
         "bonjour": "Bonjour ! Comment puis-je vous aider ?",
         "salut": "Salut ! Posez-moi vos questions sur nos produits/services.",
         "coucou": "Coucou ! Je suis là pour répondre à vos questions.",
+        "bonsoir":"Bonsoir ! Comment puis-je vous aider ?",
         
         "produits": "Nous offrons une large gamme de produits. Que cherchez-vous précisément ?",
         "produit": "Quel type de produit cherchez-vous ? Fruits, snacks, boissons, ou autre ?",
@@ -39,7 +40,7 @@ const ChatBot = () => {
         "heures d'ouverture": "Tous les jours de 8h à 20h, y compris les weekends.",
         "heure": "Nous sommes ouverts tous les jours de 8h à 20h.",
         
-        "contact": "Vous pouvez nous contacter au 01 23 45 67 89 ou par email : superettexpressbejaia@exemple.com",
+        "contact": "Vous pouvez nous contacter au 05 23 45 67 89 ou par email : superettexpressbejaia@exemple.com",
         "email": "Notre adresse email est : superettexpressbejaia@exemple.com",
         "téléphone": "Appelez-nous au 05 23 45 67 89",
         

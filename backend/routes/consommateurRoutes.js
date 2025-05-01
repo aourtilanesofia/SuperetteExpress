@@ -8,7 +8,7 @@ import  isAuth  from './../middlewares/authMiddelware.js';
 
 //créer un objet router
 const router = express.Router();
-
+ 
 //les routes
 
 //Inscription route

@@ -71,16 +71,7 @@ const Compte = ({ navigation }) => {
                     </View>
 
                     <View style={styles.profileInfo}>
-                        <View style={styles.infoItem}>
-                            <Icon name="email" size={24} color="#2E7D32" style={styles.icon} />
-                            <View style={styles.infoTextContainer}>
-                                <Text style={styles.infoLabel}>{t('email')}</Text>
-                                <Text style={styles.infoValue}>{user.email}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.separator} />
-
+                    
                         <View style={styles.infoItem}>
                             <Icon name="phone" size={24} color="#2E7D32" style={styles.icon} />
                             <View style={styles.infoTextContainer}>

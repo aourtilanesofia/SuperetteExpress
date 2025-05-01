@@ -5,19 +5,15 @@ import Notification from '../models/NotificationModel.js';
 // INSCRIPTION
 export const inscriptionController = async (req, res) => { 
     try {
-        const { nom, numTel, adresse, email, mdp } = req.body;
- 
-        if (!nom || !numTel || !adresse || !email || !mdp) {
+        const { nom, numTel, adresse, mdp } = req.body;
+  
+        if (!nom || !numTel || !adresse || !mdp) {
             return res.status(400).send({
                 success: false,
                 message: "Veuillez remplir tous les champs ! ",
             });
         }
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
-        }
 
         if (mdp.length <= 6) {
             return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
@@ -28,16 +24,16 @@ export const inscriptionController = async (req, res) => {
             return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
         }
 
-        const existingConsommateur = await consommateurModel.findOne({ email });
+        const existingConsommateur = await consommateurModel.findOne({ numTel });
 
         if (existingConsommateur) {
             return res.status(400).send({
                 success: false,
-                message: "Adresse e-mail déjà utilisée!",
+                message: "Numéro téléphone déjà utilisée!",
             });
         }
 
-        const consommateur = await consommateurModel.create({ nom, numTel, adresse, email, mdp });
+        const consommateur = await consommateurModel.create({ nom, numTel, adresse, mdp });
 
         // Créer la notification **avant** d'envoyer la réponse
         try {
@@ -73,16 +69,16 @@ export const inscriptionController = async (req, res) => {
 // CONNEXION
 export const connexionController = async (req, res) => {
     try {
-        const { email, mdp } = req.body;
+        const { numTel, mdp } = req.body;
 
-        if (!email || !mdp) {
+        if (!numTel || !mdp) {
             return res.status(400).send({
                 success: false,
                 message: "Veuillez entrer votre e-mail et votre mot de passe!",
             });
         }
 
-        const consommateur = await consommateurModel.findOne({ email });
+        const consommateur = await consommateurModel.findOne({ numTel });
 
         if (!consommateur) {
             return res.status(404).send({
@@ -147,7 +143,7 @@ export const getConsommateurProfileController = async (req, res) => {
 // MODIFIER LE PROFIL
 export const updateProfileController = async (req, res) => {
     try {
-        const { nom, numTel, email, adresse,mdp } = req.body;
+        const { nom, numTel, adresse,mdp } = req.body;
 
         const consommateur = await consommateurModel.findById(req.user.id);
         if (!consommateur) {
@@ -156,7 +152,6 @@ export const updateProfileController = async (req, res) => {
 
         consommateur.nom = nom || consommateur.nom;
         consommateur.numTel = numTel || consommateur.numTel;
-        consommateur.email = email || consommateur.email;
         consommateur.adresse = adresse || consommateur.adresse;
         consommateur.mdp = mdp || consommateur.mdp;
 

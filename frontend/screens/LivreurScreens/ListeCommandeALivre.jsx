@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const socket = io("http://192.168.1.9:8080");
+const socket = io("http://192.168.1.42:8080");
 
 const ListeCommandeALivre = () => {
     const { t } = useTranslation();
@@ -29,7 +29,7 @@ const ListeCommandeALivre = () => {
 
     const fetchCommandes = async () => {
         try {
-            const response = await fetch("http://192.168.1.9:8080/api/commandes/");
+            const response = await fetch("http://192.168.1.42:8080/api/commandes/");
             const data = await response.json();
             //console.log(data);
             if (response.ok) {

@@ -25,7 +25,7 @@ const AcceuilLivreur = ({ navigation }) => {
       setLoading(true);
       setError(null);
       
-      const API_BASE_URL = 'http://192.168.1.9:8080/api/commandes';
+      const API_BASE_URL = 'http://192.168.1.42:8080/api/commandes';
       
       // Requêtes parallèles
       const responses = await Promise.all([
