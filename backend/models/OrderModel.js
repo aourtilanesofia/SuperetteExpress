@@ -11,20 +11,27 @@ const commandeSchema = new mongoose.Schema({
     }
   ],
   total: { type: Number, required: true },
-  statut: { type: String, default: "En attente" }, 
+  statut: {
+    type: String,
+    enum: ['En attente', 'Assignée'], 
+    default: 'En attente'
+  },
+  
+  livreur: { type: mongoose.Schema.Types.ObjectId, ref: "Livreurs" }, 
+
   paiement: {
     type: String,
     enum: ['Payée', 'Non', 'En attente de paiement'],
-    default: 'Non'
+    default: 'En attente de paiement' 
   },
   destination: {
     adresse: { type: String },
-    infoSup: { type: String }
+    infoSup: { type: String } 
   },
   date: { type: Date, default: Date.now },
   livraison: {
     type: String,
-    enum: ["En attente", "En cours", "Livré", "Non Livré"],
+    enum: ["En attente", "En cours", "Livré", "Non Livré", 'Acceptée', 'Refusée'],
     default: "En attente"
   },
   positionLivreur: {
@@ -32,9 +39,8 @@ const commandeSchema = new mongoose.Schema({
     lng: { type: Number }
   }
 }, {
-  timestamps: true // Ajout correct ici
+  timestamps: true
 });
-
 // Schéma pour gérer l'incrémentation du numéro de commande
 const counterSchema = new mongoose.Schema({
   _id: { type: String, required: true },

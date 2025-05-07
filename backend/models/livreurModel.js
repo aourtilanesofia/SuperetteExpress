@@ -8,7 +8,7 @@ const livreurSchema = new mongoose.Schema(
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
-    numTel: {
+    numTel: { 
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
@@ -16,10 +16,14 @@ const livreurSchema = new mongoose.Schema(
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
+    marque: { 
+      type: String, 
+      required: [true, "Le champ est obligatoire"] 
+    },
     matricule: {
-        type: String,
-        required: [true, "Le champ est obligatoire"],
-      },
+      type: String,
+      required: [true, "Le champ est obligatoire"],
+    },
     email: {
       type: String,
       required: [true, "Le champ est obligatoire"],
@@ -30,10 +34,47 @@ const livreurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
-    isValidated: { type: Boolean, default: false },
+    isValidated: { 
+      type: Boolean, 
+      default: false 
+    },
+    profilePic: {  
+      type: String
+    },
+    // Nouveaux champs pour la géolocalisation
+    position: {
+      type: {
+        type: String,
+        enum: ['Point'], // GeoJSON type
+        default: 'Point',
+        required: true
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+        validate: {
+          validator: function(v) {
+            return v.length === 2 && 
+                   v[0] >= -180 && v[0] <= 180 && 
+                   v[1] >= -90 && v[1] <= 90;
+          },
+          message: props => `${props.value} n'est pas une position valide!`
+        }
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now
+      }
+    },
   },
-  { timestamps: true }
+  { 
+    timestamps: true 
+  }
 );
+
+// Index géospatial pour les requêtes de proximité
+livreurSchema.index({ position: '2dsphere' });
+
 
 // JWT token
 livreurSchema.methods.generateToken = function () {

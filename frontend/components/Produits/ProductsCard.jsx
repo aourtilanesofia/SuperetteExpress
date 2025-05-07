@@ -6,7 +6,7 @@ import { Modal } from 'react-native';
 import { useTranslation } from "react-i18next";
 
 
-const backendUrl = "http://192.168.1.42:8080";
+const backendUrl = "http://192.168.1.9:8080";
 
 
 const ProductsCard = ({ p }) => {
@@ -56,29 +56,6 @@ const ProductsCard = ({ p }) => {
       await mettreAJourPanier();
 
       const ingredients = await getIngredientsFromCart();
-
-if (ingredients.length > 0) {
-  try {
-
-    const response = await fetch(`http://192.168.1.42:8080/api/recettes/recherche`, {
-
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ingredients }),
-    });
-
-    const data = await response.json();
-
-    if (data && data.length > 0) {
-      const recette = data[0]; // prend la première recette correspondante
-      navigation.navigate('VideoRecette', { url: recette.video }); // tu dois créer cet écran
-    }
-  } catch (error) {
-    console.error("Erreur lors de la récupération de la recette :", error);
-  }
-}
-
-
       setModalVisible(false);
       Alert.alert(" ", "Produit ajouté au panier !");
     } catch (error) {

@@ -2,273 +2,609 @@
 import livreurModel from '../models/livreurModel.js';
 import Notification from '../models/NotificationModel.js';
 import { sendEmail } from '../utils/emailService.js';
+import mongoose from "mongoose";
+import { CommandeModel } from '../models/OrderModel.js';
 
 
 // INSCRIPTION
 export const inscriptionControllerL = async (req, res) => {
-    try {
-        const { nom, numTel, categorie, matricule, email, mdp } = req.body;
+  try {
+    const { nom, numTel, categorie, matricule, marque, email, mdp } = req.body;
 
-        if (!nom || !numTel || !categorie || !matricule || !email || !mdp) {
-            return res.status(400).send({ success: false, message: "Veuillez remplir tous les champs !" });
-        }
-
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
-        }
-
-        if (mdp.length <= 6) {
-            return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
-        }
-
-        const numTelRegex = /^(06|07|05)[0-9]{8}$/;
-        if (!numTelRegex.test(numTel)) {
-            return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
-        }
-
-        const existingLivreur = await livreurModel.findOne({ email });
-        if (existingLivreur) {
-            return res.status(400).send({ success: false, message: "Adresse e-mail déjà utilisée!" });
-        } 
-
-        const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, email, mdp });
-
-        // Créer la notification **avant** d'envoyer la réponse
-        try {
-            const notification = new Notification({
-                message: `${nom} vient de s'inscrire en tant que livreur.`,
-                isRead: false,
-                role: "administrateur",
-            });
-            await notification.save();
-            //console.log("Notification envoyée via Socket.io :", notification);
-            req.io.emit("newNotification", notification);
-        } catch (notifError) {
-            console.error("Erreur lors de la création de la notification :", notifError);
-        }
- 
-        // Envoyer la réponse une seule fois à la fin
-        res.status(201).send({
-            success: true,
-            message: "Vous êtes maintenant inscrit !, veuillez vous connecter",
-            livreur,
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({ success: false, message: "Erreur dans l'inscription", error });
+    if (!nom || !numTel || !categorie || !matricule || !marque || !email || !mdp) {
+      return res.status(400).send({ success: false, message: "Veuillez remplir tous les champs !" });
     }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
+    }
+
+    if (mdp.length <= 6) {
+      return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
+    }
+
+    const numTelRegex = /^(06|07|05)[0-9]{8}$/;
+    if (!numTelRegex.test(numTel)) {
+      return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
+    }
+
+    const existingLivreur = await livreurModel.findOne({ email });
+    if (existingLivreur) {
+      return res.status(400).send({ success: false, message: "Adresse e-mail déjà utilisée!" });
+    }
+
+    const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, marque, email, mdp });
+
+    // Créer la notification **avant** d'envoyer la réponse
+    try {
+      const notification = new Notification({
+        message: `${nom} vient de s'inscrire en tant que livreur.`,
+        isRead: false,
+        role: "administrateur",
+      });
+      await notification.save();
+      //console.log("Notification envoyée via Socket.io :", notification);
+      req.io.emit("newNotification", notification);
+    } catch (notifError) {
+      console.error("Erreur lors de la création de la notification :", notifError);
+    }
+
+    // Envoyer la réponse une seule fois à la fin
+    res.status(201).send({
+      success: true,
+      message: "Vous êtes maintenant inscrit !, veuillez vous connecter",
+      livreur,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ success: false, message: "Erreur dans l'inscription", error });
+  }
 };
- 
+
 
 // CONNEXION
 export const connexionControllerL = async (req, res) => {
-    try {
-        const { email, mdp } = req.body;
+  try {
+    const { email, mdp } = req.body;
 
-        if (!email || !mdp) {
-            return res.status(400).json({ success: false, message: "Veuillez entrer votre e-mail et votre mot de passe!" });
-        }
-
-        const livreur = await livreurModel.findOne({ email });
-
-        if (!livreur) {
-            return res.status(404).json({ success: false, message: "Utilisateur non trouvé!" });
-        }
-
-        if (mdp !== livreur.mdp) {
-            return res.status(400).json({ success: false, message: "Mot de passe invalide" });
-        }
-
-        if (!livreur.isValidated) {
-            return res.status(403).json({ success: false, message: "Votre compte doit être validé par l'admin." });
-        }
-
-        const token = livreur.generateToken();
-
-        return res.status(200).cookie("token", token).json({
-            success: true,
-            message: "Connecté avec succès",
-            token,
-            livreur,
-        });
-
-    } catch (error) {
-        console.error("Erreur connexion livreur :", error);
-        return res.status(500).json({ success: false, message: "Erreur dans l'API de connexion", error });
+    if (!email || !mdp) {
+      return res.status(400).json({ success: false, message: "Veuillez entrer votre e-mail et votre mot de passe!" });
     }
+
+    const livreur = await livreurModel.findOne({ email });
+
+    if (!livreur) {
+      return res.status(404).json({ success: false, message: "Utilisateur non trouvé!" });
+    }
+
+    if (mdp !== livreur.mdp) {
+      return res.status(400).json({ success: false, message: "Mot de passe invalide" });
+    }
+
+    if (!livreur.isValidated) {
+      return res.status(403).json({ success: false, message: "Votre compte doit être validé par l'admin." });
+    }
+
+    const token = livreur.generateToken();
+
+    return res.status(200).cookie("token", token).json({
+      success: true,
+      message: "Connecté avec succès",
+      token,
+      livreur,
+    });
+
+  } catch (error) {
+    console.error("Erreur connexion livreur :", error);
+    return res.status(500).json({ success: false, message: "Erreur dans l'API de connexion", error });
+  }
 };
 
 
 // PROFIL UTILISATEUR
 export const getLivreurProfileController = async (req, res) => {
-    try {
-        const livreur = await livreurModel.findById(req.user._id);
+  try {
+    const livreur = await livreurModel.findById(req.user._id);
 
-        res.status(200).send({
-            success: true,
-            message: "Profil utilisateur récupéré avec succès",
-            livreur,
-        });
+    res.status(200).send({
+      success: true,
+      message: "Profil utilisateur récupéré avec succès",
+      livreur,
+    });
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            success: false,
-            message: "Erreur dans l'API du profil",
-            error,
-        });
-    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Erreur dans l'API du profil",
+      error,
+    });
+  }
 };
 
 // MODIFIER LE PROFIL
 export const updateProfileControllerL = async (req, res) => {
-    try {
-        const { nom, numTel, email, categorie,matricule,mdp } = req.body;
+  try {
+    const { nom, numTel, email, categorie, matricule, marque, mdp } = req.body;
 
-        const livreur = await livreurModel.findById(req.user.id);
-        if (!livreur) {
-            return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
-        }
-
-        livreur.nom = nom || livreur.nom;
-        livreur.numTel = numTel || livreur.numTel;
-        livreur.email = email || livreur.email;
-        livreur.categorie = categorie || livreur.categorie;
-        livreur.matricule = matricule || livreur.matricule;
-        livreur.mdp = mdp || livreur.mdp;
-
-        await livreur.save();
-
-        res.status(200).json({ success: true, message: "Profil mis à jour", livreur });
-
-    } catch (error) {
-        console.error("Erreur mise à jour profil :", error);
-        res.status(500).json({ success: false, message: "Erreur serveur." });
+    const livreur = await livreurModel.findById(req.user.id);
+    if (!livreur) {
+      return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
     }
+
+    livreur.nom = nom || livreur.nom;
+    livreur.numTel = numTel || livreur.numTel;
+    livreur.email = email || livreur.email;
+    livreur.categorie = categorie || livreur.categorie;
+    livreur.matricule = matricule || livreur.matricule;
+    livreur.marque = marque || livreur.marque;
+    livreur.mdp = mdp || livreur.mdp;
+
+    await livreur.save();
+
+    res.status(200).json({ success: true, message: "Profil mis à jour", livreur });
+
+  } catch (error) {
+    console.error("Erreur mise à jour profil :", error);
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
 };
 
 
 
 // SUPPRIMER LE COMPTE
 export const deleteAccountControllerL = async (req, res) => {
-    try {
-      const livreur = await livreurModel.findById(req.user._id);
-  
-      if (!livreur) {
-        return res.status(404).send({
-          success: false,
-          message: "Utilisateur non trouvé!",
-        });
-      }
-  
-      // Utilisation de la méthode deleteAccount mise à jour
-      const result = await livreur.deleteAccount();
-  
-      res.status(200).send({
-        success: result.success,
-        message: result.message,
-      });
-    } catch (error) {
-      console.error("Erreur lors de la suppression du compte:", error.message);
-      res.status(500).send({
-        success: false,
-        message: error.message || "Erreur serveur",
-      });
-    }
-  };
+  try {
+    const livreur = await livreurModel.findById(req.user._id);
 
-  // Obtenir tous les livreurs
-export const getAllLivreurs = async (req,res) =>{
-    try {
-        const livreur = await livreurModel.find();
-        res.json(livreur);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (!livreur) {
+      return res.status(404).send({
+        success: false,
+        message: "Utilisateur non trouvé!",
+      });
     }
+
+    // Utilisation de la méthode deleteAccount mise à jour
+    const result = await livreur.deleteAccount();
+
+    res.status(200).send({
+      success: result.success,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression du compte:", error.message);
+    res.status(500).send({
+      success: false,
+      message: error.message || "Erreur serveur",
+    });
+  }
+};
+
+// Obtenir tous les livreurs
+export const getAllLivreurs = async (req, res) => {
+  try {
+    const livreur = await livreurModel.find();
+    res.json(livreur);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
 
-  // Valider livreur par l'Admin 
+// Valider livreur par l'Admin 
 
-  export const validerLivreur = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const livreur = await livreurModel.findByIdAndUpdate(id, { isValidated: true }, { new: true });
+export const validerLivreur = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const livreur = await livreurModel.findByIdAndUpdate(id, { isValidated: true }, { new: true });
 
-        if (!livreur) {
-            return res.status(404).json({ message: "Livreur non trouvé" });
-        }
-
-        // Envoyer un email au livreur
-        await sendEmail(
-            livreur.email,
-            "Validation de votre compte",
-            "Félicitations, votre compte a été validé par l'administrateur ! Vous pouvez maintenant vous connecter."
-        );
-
-        
-
-        res.status(200).json({ success: true, message: "Livreur validé avec succès", livreur });
-    } catch (error) {
-        res.status(500).json({ message: "Erreur lors de la validation du livreur", error });
+    if (!livreur) {
+      return res.status(404).json({ message: "Livreur non trouvé" });
     }
+
+    // Envoyer un email au livreur
+    await sendEmail(
+      livreur.email,
+      "Validation de votre compte",
+      "Félicitations, votre compte a été validé par l'administrateur ! Vous pouvez maintenant vous connecter."
+    );
+
+
+
+    res.status(200).json({ success: true, message: "Livreur validé avec succès", livreur });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la validation du livreur", error });
+  }
 };
 
 //Refuser (Supprimer livreur ) par l'Admin
 export const deleteLivreur = async (req, res) => {
-    try {
-        const { id } = req.params;
-        //console.log("ID reçu :", id);
+  try {
+    const { id } = req.params;
+    //console.log("ID reçu :", id);
 
-        if (!id) {
-            return res.status(400).json({ message: "ID manquant" });
-        }
-
-        const livreur = await livreurModel.findByIdAndDelete(id);
-        if (!livreur) {
-            return res.status(404).json({ message: "Utilisateur introuvable" });
-        }
-
-        res.json({ message: "Utilisateur supprimé avec succès" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (!id) {
+      return res.status(400).json({ message: "ID manquant" });
     }
+
+    const livreur = await livreurModel.findByIdAndDelete(id);
+    if (!livreur) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    res.json({ message: "Utilisateur supprimé avec succès" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 //Récupérer le nombre des livreurs
 export const getLivreurCountController = async (req, res) => {
-    try {
-        const count = await livreurModel.countDocuments();
-        res.status(200).json({
-            success: true,
-            count,
-        });
-    } catch (error) {
-        console.error("Erreur lors de la récupération du nombre de livreurs :", error);
-        res.status(500).json({
-            success: false,
-            message: "Erreur serveur",
-            error,
-        });
-    }
+  try {
+    const count = await livreurModel.countDocuments();
+    res.status(200).json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération du nombre de livreurs :", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+      error,
+    });
+  }
 };
 
 export const updateLocation = async (req, res) => {
-    const { commandeId, latitude, longitude } = req.body;
-  
-    await livreurModel.create({
+  const { commandeId, latitude, longitude } = req.body;
+
+  await livreurModel.create({
+    commandeId,
+    livreurId: req.user._id, // ID du livreur authentifié
+    coordinates: { latitude, longitude }
+  });
+
+  // Diffusion en temps réel via Socket.io
+  io.to(`commande_${commandeId}`).emit('location_update', {
+    latitude,
+    longitude
+  });
+
+  res.status(200).json({ success: true });
+};
+
+// Ajoutez cette fonction à votre fichier livreurController.js
+export const uploadProfilePicController = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Aucun fichier téléchargé'
+      });
+    }
+
+    // Utilisez le chemin relatif pour le stockage en base
+    const relativePath = `/uploads/${req.file.filename}`;
+
+    const updatedLivreur = await livreurModel.findByIdAndUpdate(
+      req.user._id,  // Utilisez req.user._id si vous utilisez isAuthL
+      { profilePic: relativePath },
+      { new: true }
+    );
+
+    if (!updatedLivreur) {
+      // Supprimez le fichier si l'utilisateur n'existe pas
+      fs.unlinkSync(req.file.path);
+      return res.status(404).json({
+        success: false,
+        message: 'Livreur non trouvé'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Photo de profil mise à jour',
+      profilePic: relativePath,
+      livreur: updatedLivreur
+    });
+
+  } catch (error) {
+    console.error('Erreur:', error);
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur serveur'
+    });
+  }
+};
+
+// Mettre à jour la position
+// Dans livreurController.js
+export const updatePosition = async (req, res) => {
+  try {
+    // Vérification que req.livreur existe
+    if (!req.livreur || !req.livreur._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentification requise ou session expirée"
+      });
+    }
+
+    const { longitude, latitude } = req.body;
+
+    if (!longitude || !latitude) {
+      return res.status(400).json({
+        success: false,
+        message: "Coordonnées GPS manquantes"
+      });
+    }
+
+    const livreur = await livreurModel.findByIdAndUpdate(
+      req.livreur._id,
+      {
+        position: {
+          type: "Point",
+          coordinates: [longitude, latitude]
+        },
+        lastPositionUpdate: new Date()
+      },
+      { new: true }
+    );
+
+    if (!livreur) {
+      return res.status(404).json({
+        success: false,
+        message: "Livreur non trouvé"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Position mise à jour",
+      data: {
+        position: livreur.position
+      }
+    });
+
+  } catch (error) {
+    console.error("Erreur mise à jour position:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur lors de la mise à jour de la position",
+      error: error.message
+    });
+  }
+};
+
+// Trouver les livreurs proches
+export const findNearbyLivreurs = async (req, res) => {
+  // Parse les coordonnées en nombres flottants
+  const lng = parseFloat(req.query.longitude);
+  const lat = parseFloat(req.query.latitude);
+  const commandeId = req.query.commandeId;
+  console.log(commandeId);
+
+  // Vérifie que les coordonnées sont valides
+  if (isNaN(lng) || isNaN(lat)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Coordonnées invalides'
+    });
+  }
+
+  const coords = [lng, lat];
+  const radius = parseInt(req.query.maxDistance) || 10000;
+
+  console.log('=== DEBUG LIVREURS ===');
+  console.log('Coordonnées:', coords);
+  console.log('Rayon:', radius);
+
+  try {
+    // Utilise le modèle mongoose plutôt que l'accès direct à la collection
+    const results = await mongoose.model('Livreurs').find({
+      position: {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: coords
+          },
+          $maxDistance: radius
+        }
+      },
+      isValidated: true
+    }).lean();
+
+    console.log('Livreurs trouvés:', results.length);
+
+    const formattedResults = results.map(livreur => ({
+      ...livreur,
+      distance: livreur.position?.coordinates
+        ? Math.round(calculateDistance(coords, livreur.position.coordinates))
+        : null
+    }));
+
+    if (formattedResults.length === 0) {
+      return res.status(404).json({ success: false, message: "Aucun livreur trouvé" });
+    }
+
+    const livreurAffecte = results[0];
+
+    const commande = await CommandeModel.findByIdAndUpdate(
+      
       commandeId,
-      livreurId: req.user._id, // ID du livreur authentifié
-      coordinates: { latitude, longitude }
+      {
+        livreur: livreurAffecte._id,
+        statut: "Assignée"
+      },
+      { new: true }
+    );
+    console.log("Commande mise à jour :", commande);
+    if (req.app.get("io")) {
+      const io = req.app.get("io");
+    
+      io.emit(`commande-assignee_${livreurAffecte._id}`, commande);
+    }
+
+
+    for (const livreurAffecte of results) {
+      const notification = new Notification({
+        message: "Nouvelle Commande à livrer!",
+        isRead: false,
+        role: "livreur",
+        livreurId: new mongoose.Types.ObjectId(livreurAffecte._id)
+      });
+
+      console.log(`Création de notification pour le livreur ${livreurAffecte._id}`);
+
+      await notification.save();
+
+      console.log(`Notification sauvegardée pour le livreur ${livreurAffecte._id}`);
+
+      // Envoi via WebSocket si disponible
+      if (req.app.get("io")) {
+        const io = req.app.get("io");
+        io.emit(`notification_livreur_${livreurAffecte._id}`, notification);
+      }
+    }
+
+
+    res.status(200).json({
+      success: true,
+      count: formattedResults.length,
+      data: formattedResults
     });
-  
-    // Diffusion en temps réel via Socket.io
-    io.to(`commande_${commandeId}`).emit('location_update', {
-      latitude,
-      longitude
+
+  } catch (error) {
+    console.error('ERREUR LIVREUR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
-  
-    res.status(200).json({ success: true });
-  };
+  }
+};
+
+function calculateDistance(coord1, coord2) {
+  const R = 6371e3;
+  const φ1 = coord1[1] * Math.PI / 180;
+  const φ2 = coord2[1] * Math.PI / 180;
+  const Δφ = (coord2[1] - coord1[1]) * Math.PI / 180;
+  const Δλ = (coord2[0] - coord1[0]) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) ** 2 +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+
+// Obtenir les commandes assignées à un livreur
+export const getCommandesAssignees = async (req, res) => {
+  try { 
+    const { livreurId } = req.params;
+    console.log(`Recherche commandes pour livreur: ${livreurId}`); // Log 1
+
+    if (!mongoose.Types.ObjectId.isValid(livreurId)) {
+      console.log('ID livreur invalide:', livreurId); // Log 2
+      return res.status(400).json({ message: 'ID livreur invalide' });
+    }
+
+    const commandes = await CommandeModel.find({ 
+      livreur: livreurId, 
+      statut: 'Assignée',
+      //livraison: 'En attente'
+    })
+    .populate('userId', 'nom numTel')
+    .populate('livreur', 'nom');
+
+    console.log('Commandes trouvées:', commandes); // Log 3
+
+    res.status(200).json(commandes);
+  } catch (error) {
+    console.error('Erreur complète:', error); // Log 4
+    res.status(500).json({ 
+      message: 'Erreur serveur',
+      error: error.message 
+    });
+  }
+};
+
+// Accepter une commande
+
+export const accepterCommande = async (req, res) => {
+  try {
+    const { numeroCommande } = req.params;
+    const { livreurId, livraison } = req.body;
+
+    console.log('Numéro de commande reçu (backend):', numeroCommande);
+
+    // Trouver la commande par numéro de commande
+    const commande = await CommandeModel.findOne({ numeroCommande });
+    if (!commande) {
+      return res.status(404).json({ message: 'Commande non trouvée' });
+    }
+
+    // Vérifier le livreur
+    const livreur = await livreurModel.findById(livreurId);
+    if (!livreur) {
+      return res.status(404).json({ message: 'Livreur non trouvé' });
+    }
+
+    // Mettre à jour la commande
+    commande.livraison = livraison;
+    commande.livreur = livreurId;
+    commande.dateAcceptation = new Date();
+    
+    await commande.save();
+
+    res.status(200).json({
+      message: 'Commande acceptée avec succès',
+      commande
+    });
+
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Erreur serveur',
+      error: error.message 
+    });
+  }
+};
+
+// Refuser une commande
+export const refuserCommande = async (req, res) => {
+  try {
+    const { numeroCommande } = req.params;
+    const { livreurId, raison } = req.body;
+
+    const commande = await CommandeModel.findOne({ numeroCommande });
+    if (!commande) {
+      return res.status(404).json({ message: 'Commande non trouvée' });
+    }
+
+    commande.livraison = "Refusée";
+    commande.raisonRefus = raison;
+    commande.livreur = null;
+    
+    await commande.save();
+
+    res.status(200).json({
+      message: 'Commande refusée avec succès',
+      commande
+    });
+
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Erreur serveur',
+      error: error.message 
+    });
+  }
+};
+
+
+
 

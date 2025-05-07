@@ -53,7 +53,7 @@ const CompteCommercant = ({ navigation }) => {
                             const token = await AsyncStorage.getItem('token');
                             const user = JSON.parse(await AsyncStorage.getItem('user'));
 
-                            const response = await fetch(`http://192.168.1.42:8080/api/v1/commercant/delete-account`, {
+                            const response = await fetch(`http://192.168.1.9:8080/api/v1/commercant/delete-account`, {
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,

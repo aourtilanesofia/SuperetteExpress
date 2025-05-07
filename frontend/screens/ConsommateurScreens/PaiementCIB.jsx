@@ -4,8 +4,9 @@ import { Picker } from '@react-native-picker/picker';
 
 
 const PaiementCIB = ({ navigation, route }) => {
-    
-  const {commande = route.params, total = 0, adresse, nomClient, telephoneClient,numeroCommande= null,infoSupplementaire } = route.params || {};
+  
+  const {commande = route.params, total = commande.total, adresse, nomClient, telephoneClient,numeroCommande= null,infoSupplementaire } = route.params || {};
+  const {livreur} = route.params;
   const [cardNumber, setCardNumber] = useState('');
   const [expirationMonth, setExpirationMonth] = useState('');
   const [expirationYear, setExpirationYear] = useState('');
@@ -16,7 +17,7 @@ const PaiementCIB = ({ navigation, route }) => {
 
   const handleValidation = async () => {
     try {
-      const response = await fetch(`http://192.168.1.42:8080/api/commandes/payer/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -67,7 +68,8 @@ const PaiementCIB = ({ navigation, route }) => {
         telephoneClient,
         paymentMethod: 'Carte CIB',
         numeroCommande,
-        infoSupplementaire
+        infoSupplementaire,
+        livreur
       });
       
     } catch (error) {
@@ -83,7 +85,7 @@ const PaiementCIB = ({ navigation, route }) => {
       <Text style={styles.title}>Paiement par carte CIB</Text>
       <View style={styles.section}>
         <Text style={styles.label}>Commande N°#{numeroCommande}</Text>
-        <Text style={styles.label}>Total: {total} DZD</Text>
+        <Text style={styles.label}>Total: {commande.total} DZD</Text>
       </View>
 
       <Text style={styles.inputLabel}>Numéro de la carte de crédit</Text>
@@ -147,7 +149,7 @@ const PaiementCIB = ({ navigation, route }) => {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleValidation}>
-        <Text style={styles.buttonText}>Valider</Text>
+        <Text style={styles.buttonText}>VALIDER</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -208,13 +210,13 @@ const styles = StyleSheet.create({
     marginTop: 30,
     backgroundColor: '#004C98',
     padding: 15,
-    borderRadius: 10,
+    //borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
   },
   pickerWrapper: {
     flex: 1,

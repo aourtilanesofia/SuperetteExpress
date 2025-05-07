@@ -13,19 +13,20 @@ import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
+import * as Location from 'expo-location';
 
 const DetailsCommandeALivre = ({ route }) => {
     const navigation = useNavigation();
-    const { commande } = route.params;
+    const { commande, numTel, nom } = route.params;
     const [statut, setStatut] = useState(commande.statut);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
 
-    const [adresse, setAdresse] = useState("");
-    const [nomClient, setNomClient] = useState("");
-    const [telephoneClient, setTelephoneClient] = useState("");
-    const [infoSupplementaire, setInfoSupplementaire] = useState("");
-    const [totalnet, setTotalNet] = useState("");
+    const [nomClient, setNomClient] = useState(commande.userId?.nom || t("inconnu"));
+    const [telephoneClient, setTelephoneClient] = useState(commande.userId?.numTel || t("non_specifie"));
+    const [adresse, setAdresse] = useState(commande.destination?.adresse || t("non_specifiee"));
+    const [infoSupplementaire, setInfoSupplementaire] = useState(commande.destination?.infoSup || "");
+    const [total, setTotal] = useState(commande.total || 0);
 
     useEffect(() => {
         const loadCommandeDetails = async () => {
@@ -39,7 +40,7 @@ const DetailsCommandeALivre = ({ route }) => {
                     setNomClient(parsed.nomClient || "");
                     setTelephoneClient(parsed.telephoneClient || "");
                     setInfoSupplementaire(parsed.infoSupplementaire || "");
-                    setTotalNet(parsed.total || "");
+                    setTotal(parsed.total || "");
                 }
             } catch (error) {
                 console.error("Erreur de chargement des détails:", error);
@@ -52,23 +53,36 @@ const DetailsCommandeALivre = ({ route }) => {
 
 
     const updateLivraisonStatus = async () => {
-        // Vérifier d'abord si la commande est déjà livrée
-        if (commande.livraison === "Livré") {
-            Alert.alert("Erreur", "Commande déjà livrée !");
+        if (commande.livraison === "Livré" || commande.livraison === "Non Livré") {
+            Alert.alert("Erreur", "Commande déjà traitée !");
             return;
         }
     
         setLoading(true);
         try {
-            console.log("Tentative de mise à jour pour la commande:", commande._id);
-            
-            const response = await fetch(`http://192.168.1.42:8080/api/commandes/livstat/${commande._id}`, {
+            // Récupérer la position actuelle du livreur
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error("Permission de localisation refusée");
+            }
+    
+            const location = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = location.coords;
+    
+            // Envoyer la position du livreur et mettre à jour le statut
+            const livreurId = await AsyncStorage.getItem('livreurId');
+            const response = await fetch(`http://192.168.1.9:8080/api/commandes/livstat/${commande._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ 
-                    livraison: "En cours" 
+                body: JSON.stringify({
+                    livraison: "En cours",
+                    livreurId: livreurId,
+                    livreurPosition: {
+                        latitude,
+                        longitude
+                    }
                 }),
             });
     
@@ -78,19 +92,40 @@ const DetailsCommandeALivre = ({ route }) => {
                 throw new Error(result.message || "Échec de la mise à jour");
             }
     
-            Alert.alert("Succès", result.message || "Livraison démarrée");
-            navigation.goBack();
+            // Envoyer la position initiale du livreur au serveur
+            await fetch('http://192.168.1.9:8080/api/livreur/position', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${await AsyncStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    longitude,
+                    latitude
+                }),
+            });
+    
+            navigation.navigate('MiseAjoueEtatDeCommande', {
+                commandeInitiale: {
+                    ...commande,
+                    livraison: "En cours"
+                },
+                numTel: numTel,
+                nom: nom,
+                adresse: adresse,
+                infoSupplementaire: infoSupplementaire,
+                total: total,
+                livreurPosition: { latitude, longitude }
+            });
         } catch (error) {
-            console.error("Erreur complète:", error);
-            Alert.alert(
-                "Erreur", 
-                error.message || "Une erreur est survenue lors de la mise à jour"
-            );
+            console.error("Erreur:", error);
+            Alert.alert("Erreur", error.message || "Erreur lors de la mise à jour");
         } finally {
             setLoading(false);
         }
     };
     
+
 
 
     const updateStatutCommande = async (nouveauStatut) => {
@@ -105,7 +140,7 @@ const DetailsCommandeALivre = ({ route }) => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://192.168.1.42:8080/api/commandes/${commande._id}`,
+                `http://192.168.1.9:8080/api/commandes/${commande._id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -191,7 +226,7 @@ const DetailsCommandeALivre = ({ route }) => {
                                 <View>
                                     <Text style={styles.infoLabel}>{t('nom')}</Text>
                                     <Text style={styles.infoText}>
-                                        {nomClient || (commande.userId?.nom ?? t("inconnu"))}
+                                        {nom || (commande.userId?.nom ?? t("inconnu"))}
                                     </Text>
                                 </View>
                             </View>
@@ -203,7 +238,7 @@ const DetailsCommandeALivre = ({ route }) => {
                                 <View>
                                     <Text style={styles.infoLabel}>{t('num')}</Text>
                                     <Text style={styles.infoText}>
-                                        {telephoneClient || t("non_specifie")}
+                                        {numTel || t("non_specifie")}
                                     </Text>
                                 </View>
                             </View>
@@ -243,7 +278,7 @@ const DetailsCommandeALivre = ({ route }) => {
             <View style={styles.footer}>
                 <View style={styles.totalContainer}>
                     <Text style={styles.totalLabel}>{t('totalapayer')}</Text>
-                    <Text style={styles.totalValue}>{totalnet} DA</Text>
+                    <Text style={styles.totalValue}>{(commande.total + 130)} DA</Text>
                 </View>
 
                 <TouchableOpacity
@@ -252,7 +287,7 @@ const DetailsCommandeALivre = ({ route }) => {
                         styles.confirmButton,
                         loading && styles.disabledButton
                     ]}
-                    onPress={updateLivraisonStatus}  // Appeler la fonction pour mettre à jour le statut
+                    onPress={updateLivraisonStatus}
                     disabled={loading}
                 >
                     <Icon name="directions-bike" size={20} color="#FFF" />

@@ -25,7 +25,7 @@ const ListeDesCommandes = () => {
                     return;
                 }
 
-                const response = await fetch(`http://192.168.1.42:8080/api/commandes/user/${userId}`);
+                const response = await fetch(`http://192.168.1.9:8080/api/commandes/user/${userId}`);
                 const data = await response.json();
 
                 if (response.ok) {
@@ -111,15 +111,7 @@ const ListeDesCommandes = () => {
                                             <Text style={styles.date}>{new Date(item.date).toLocaleString()}</Text>
                                         </View>
                                         <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
-                                        <View style={styles.v1}>
-                                            {/* Ne pas afficher le statut de commande pour les commandes "Payée" ou "En attente de paiement" */}
-                                            {item.paiement !== "Payée" && item.paiement !== "En attente de paiement" && (
-                                                <Text style={[styles.status, { color: statusColor }]}>
-                                                    {statusText}
-                                                </Text>
-                                            )}
-                                            {paiementStatut}
-                                        </View>
+                                        
                                     </TouchableOpacity>
                                 );
                             }}
@@ -131,7 +123,7 @@ const ListeDesCommandes = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ 
     container: { 
         flex: 1,
         padding: 20,
@@ -150,7 +142,7 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: "#fff",
-        padding: 15,
+        padding: 25,
         marginBottom: 10,
         borderRadius: 10,
         elevation: 6,

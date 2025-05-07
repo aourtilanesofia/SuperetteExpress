@@ -21,7 +21,7 @@ const ConLivreur = ({ navigation }) => {
 
         try {
 
-            const response = await fetch("http://192.168.1.42:8080/api/v1/livreur/connexionL", {
+            const response = await fetch("http://192.168.1.9:8080/api/v1/livreur/connexionL", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -37,7 +37,9 @@ const ConLivreur = ({ navigation }) => {
 
             await AsyncStorage.multiSet([
                 ['token', data.token],
-                ['user', JSON.stringify(data.livreur)]
+                ['user', JSON.stringify(data.livreur)],
+                ['livreurId', data.livreur._id],
+                ['livreurNom', data.livreur.nom]
             ]);
 
             navigation.navigate("AcceuilLivreur");

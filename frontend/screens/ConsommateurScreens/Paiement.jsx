@@ -10,19 +10,19 @@ import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
 
 const Paiement = ({ route }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation(); 
   const { commande } = route.params;
-  const prixLivraison = 180;
-  const fraistotal= 50;
+  const prixLivraison = 100;
+  const fraistotal = 30;
+  const numeroCommande= commande.numeroCommande;
   const totalNet = commande.total + prixLivraison + fraistotal;
   const [nomClient, setNomClient] = useState('');
   const [telephoneClient, setTelephoneClient] = useState(commande?.client?.telephone || '');
   const [adresse, setAdresse] = useState("");
   const [position, setPosition] = useState("À ma porte");
   const [infoSupplementaire, setInfoSupplementaire] = useState("");
-  const [optionsLivraison, setOptionsLivraison] = useState("Pas de frais supplémentaires");
-  const [destinataire, setDestinataire] = useState("+213 656 71 35 75");
   const { t } = useTranslation();
+ 
 
 
   const handleTextChange = (text) => {
@@ -38,7 +38,7 @@ const Paiement = ({ route }) => {
     const fetchUser = async () => {
       try {
 
-        const response = await fetch(`http://192.168.1.42:8080/api/v1/consommateur/${commande.userId}`);
+        const response = await fetch(`http://192.168.1.9:8080/api/v1/consommateur/${commande.userId}`);
 
 
         // Vérifier le statut de la réponse
@@ -147,7 +147,7 @@ const Paiement = ({ route }) => {
 
   const handleValider = async () => {
     try {
-      const response = await fetch(`http://192.168.1.42:8080/api/commandes/livraison/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/livraison/${commande.numeroCommande}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -166,21 +166,23 @@ const Paiement = ({ route }) => {
         return;
       }
 
-      //console.log("Commande mise à jour :", data.commande);
-
-      navigation.navigate("ModePaiement", {
-        total: totalNet,
-        adresse: adresse,
+      navigation.navigate("Liv1", {
+        commande: {
+          ...commande,
+          total: totalNet,
+        },
+        adresseLivraison: adresse,
         nomClient: nomClient,
         telephoneClient: telephoneClient,
         infoSupplementaire: infoSupplementaire,
-        numeroCommande: commande.numeroCommande,
+        numeroCommande:numeroCommande,
       });
 
     } catch (err) {
       console.error("Erreur réseau :", err.message);
     }
   };
+
 
 
 
@@ -205,7 +207,7 @@ const Paiement = ({ route }) => {
             <Ionicons name="chevron-forward" size={20} color="#9E9E9E" />
           </View>
         </TouchableOpacity>
-
+ 
         {/* Options de livraison */}
         <TouchableOpacity
           style={styles.optionCard}
@@ -243,26 +245,26 @@ const Paiement = ({ route }) => {
             <Ionicons name="chevron-forward" size={20} color="#9E9E9E" />
           </View>
         </TouchableOpacity>
-
+ 
         {/* Section Facturation */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('fact')}</Text>
           <View style={styles.facturationCard}>
             <View style={styles.facturationRow}>
               <Text style={styles.facturationLabel}>{t('soustotal')}</Text>
-              <Text style={styles.facturationValue}>{commande.total}.00 DA</Text>
+              <Text style={styles.facturationValue}>{commande.total} DA</Text>
             </View>
             <View style={styles.facturationRow}>
               <Text style={styles.facturationLabel}>{t('livraison')}</Text>
-              <Text style={styles.facturationValue}>180.00 DA</Text>
+              <Text style={styles.facturationValue}>100 DA</Text>
             </View>
             <View style={styles.facturationRow}>
               <Text style={styles.facturationLabel}>{t('Fraisdeservice')}</Text>
-              <Text style={styles.facturationValue}>50.00 DA</Text>
+              <Text style={styles.facturationValue}>30 DA</Text>
             </View>
             <View style={[styles.facturationRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>{t('totalnet')}</Text>
-              <Text style={styles.totalValue}>{totalNet}.00 DA</Text>
+              <Text style={styles.totalValue}>{totalNet} DA</Text>
             </View>
           </View>
         </View>

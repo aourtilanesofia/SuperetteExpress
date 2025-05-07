@@ -3,7 +3,7 @@ import livreurModel from './../models/livreurModel.js';
 
 const isAuthL = async (req, res, next) => {
     console.log("Middleware isAuthL exécuté");
-    console.log("Headers reçus :", req.headers);
+    console.log("Headers reçus :", req.headers); 
     console.log("Cookies reçus :", req.cookies);
 
     let token;
@@ -23,9 +23,9 @@ const isAuthL = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         console.log("Token décodé :", decoded);
 
-        req.user = await livreurModel.findById(decoded._id).select("-password");
+        req.livreur = await livreurModel.findById(decoded._id).select("-password");
 
-        if (!req.user) {
+        if (!req.livreur) {
             return res.status(401).json({ message: "Utilisateur non trouvé" });
         }
 

@@ -11,6 +11,8 @@ const Panier = () => {
     const navigation = useNavigation();
     const [cartCount, setCartCount] = useState(0);
     const { t } = useTranslation();
+     
+
 
     useEffect(() => {
         const chargerPanier = async () => {
@@ -55,54 +57,54 @@ const Panier = () => {
 
     const handleValidateOrder = async () => {
         try {
-            const userId = await AsyncStorage.getItem("userId");
-            //console.log("ID utilisateur récupéré :", userId); 
-
-            if (!userId) {
-                alert("Utilisateur non connecté !");
-                return;
+          const userId = await AsyncStorage.getItem("userId");
+          if (!userId) {
+            alert("Utilisateur non connecté !");
+            return;
+          }
+      
+          const response = await fetch("http://192.168.1.9:8080/api/commandes/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId,
+              produits: cartItems.map(item => ({
+                produitId: item._id,
+                nom: item.nom,
+                prix: item.prix,
+                quantite: item.qty
+              })),
+              total: totalPrice
+            })
+          });
+      
+          const data = await response.json();
+          console.log("Réponse complète du serveur:", data); // Log complet
+      
+          if (response.ok) {
+            // Modification ici: utilisez data.numeroCommande au lieu de data.commande.numeroCommande
+            if (!data.numeroCommande) {
+              throw new Error("Le serveur n'a pas renvoyé de numéro de commande");
             }
-
-            const newOrder = {
-                userId,
-                produits: cartItems.map(item => ({
-                    produitId: item._id,  // Ajoute l'ID du produit
-                    nom: item.nom,
-                    prix: item.prix,
-                    quantite: item.qty
-                })),
+      
+            await AsyncStorage.setItem("cart", JSON.stringify([]));
+            
+            navigation.navigate("Paiement", { 
+              commande: {
+                numeroCommande: data.numeroCommande, // Numéro de commande
+                produits: cartItems,
                 total: totalPrice,
-                statut: "En attente"
-            };
-
-            const response = await fetch("http://192.168.1.42:8080/api/commandes/add", {
-
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newOrder)
+                userId: userId
+              }
             });
-
-            const responseText = await response.text();
-            //console.log("Réponse brute du serveur :", responseText);
-
-            const data = JSON.parse(responseText);
-
-            if (response.ok) {
-                //console.log("Commande enregistrée :", data);
-
-                // Réinitialiser le panier
-                await AsyncStorage.setItem("cart", JSON.stringify([]));
-                await AsyncStorage.setItem("cartTotal", JSON.stringify(0));
-
-                setCartItems([]);
-                navigation.navigate("Valider", { produits: cartItems });
-            } else {
-                console.error("Erreur backend :", data.message);
-            }
+          } else {
+            alert(data.message || "Erreur serveur");
+          }
         } catch (error) {
-            console.error("Erreur lors de la validation de la commande :", error);
+          console.error("Erreur complète:", error);
+          alert(`Erreur: ${error.message}`);
         }
-    };
+      };
 
     const recupererTotalPanier = async (setCartCount) => {
         try {
