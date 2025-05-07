@@ -1,196 +1,406 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, ActivityIndicator } from "react-native"
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  RefreshControl
+} from "react-native";
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
-import { useTranslation } from "react-i18next";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
+const socket = io("http://192.168.1.9:8080");
 
-const socket = io("http://192.168.1.42:8080");
 
 const ListeCommandeALivre = () => {
-    const { t } = useTranslation();
-    const [commandes, setCommandes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [newCommandes, setNewCommandes] = useState([]);
-    const navigation = useNavigation();
+  const [commandesAssignees, setCommandesAssignees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [livreurId, setLivreurId] = useState(null);
+  const navigation = useNavigation();
+  const [refusedCommande, setRefusedCommande] = useState(null);
+  const [acceptedCommands, setAcceptedCommands] = useState([]);
+  const [orderDetails, setOrderDetails] = useState({}); // Stocke à la fois paymentMethod et total
 
-    const [total, setTotal] = useState('0');
-
-    useEffect(() => {
-        const getTotal = async () => {
-            const savedTotal = await AsyncStorage.getItem('total');
-            if (savedTotal) setTotal(savedTotal);
-        };
-
-        getTotal();
-    }, []);
-
-    const fetchCommandes = async () => {
-        try {
-            const response = await fetch("http://192.168.1.42:8080/api/commandes/");
-            const data = await response.json();
-            //console.log(data);
-            if (response.ok) {
-                const commandesFiltrees = data
-                    .filter(c => c.paiement === "Payée" || c.paiement === "En attente de paiement")
-                    .reverse();
-                setCommandes(commandesFiltrees);
-            } else {
-                console.error("Erreur lors de la récupération des commandes :", data.message);
-            }
-        } catch (error) {
-            console.error("Erreur de connexion au serveur :", error);
-        } finally {
-            setLoading(false);
+  // Charger les détails des commandes depuis AsyncStorage
+  const loadOrderDetails = async (commandes) => {
+    const details = {};
+    try {
+      for (const commande of commandes) {
+        const orderKey = `commande_${commande.numeroCommande}`;
+        const savedOrder = await AsyncStorage.getItem(orderKey);
+        if (savedOrder) {
+          const orderData = JSON.parse(savedOrder);
+          console.log("Contenu récupéré de AsyncStorage:", orderData);
+          details[commande.numeroCommande] = {
+            paymentMethod: orderData.paymentMethod || 'Non spécifiée',
+            total: (commande.total || 0) + 130
+          };
+        } else {
+          details[commande.numeroCommande] = {
+            paymentMethod: commande.methodePaiement || 'Non spécifiée',
+            total: commande.total || 0
+          };
         }
+      }
+      setOrderDetails(details);
+    } catch (error) {
+      console.error("Erreur lors du chargement des détails:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchLivreurId = async () => {
+      try {
+        let id = await AsyncStorage.getItem('livreurId');
+        if (!id) {
+          const userData = await AsyncStorage.getItem('user');
+          if (userData) {
+            const user = JSON.parse(userData);
+            id = user._id;
+            await AsyncStorage.setItem('livreurId', id);
+          }
+        }
+
+        if (id) {
+          setLivreurId(id);
+          fetchCommandes(id);
+        } else {
+          navigation.navigate('LoginLivreur');
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+      }
     };
 
-    useEffect(() => {
-        fetchCommandes();
-    }, []);
+    fetchLivreurId();
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchCommandes();
-        }, [])
+    return () => {
+      socket.off(`commande-assignee-${livreurId}`);
+    };
+  }, []);
+
+  const fetchCommandes = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://192.168.1.9:8080/api/v1/livreur/${id}/commandes-assignees`
+      );
+      const data = await response.json();
+      setCommandesAssignees(data || []);
+      await loadOrderDetails(data || []);
+    } catch (error) {
+      console.error('Erreur fetchCommandes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!livreurId) return;
+
+    socket.on(`commande-assignee-${livreurId}`, (newCommande) => {
+      setCommandesAssignees(prev => [newCommande, ...prev]);
+      loadOrderDetails([newCommande]);
+      Alert.alert("Nouvelle commande!", `Commande #${newCommande.numeroCommande}`);
+    });
+
+    return () => {
+      socket.off(`commande-assignee-${livreurId}`);
+    };
+  }, [livreurId]);
+
+  const accepterCommande = async (numeroCommande, numTel, nom) => {
+    try {
+      const API_URL = `http://192.168.1.9:8080/api/v1/livreur/${numeroCommande}/accept`;
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(API_URL, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          livreurId,
+          livraison: "Acceptée"
+        })
+      });
+
+      const responseText = await response.text();
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${responseText}`);
+      }
+
+      const data = JSON.parse(responseText);
+      setAcceptedCommands(prev => [...prev, numeroCommande]);
+      
+      navigation.navigate('DetailsCommandeALivre', { 
+        numeroCommande: numeroCommande,
+        numTel,
+        nom,
+        commande: data.commande
+      });
+    } catch (error) {
+      console.error('Erreur:', error);
+      Alert.alert('Erreur', error.message);
+    }
+  };
+
+  const refuserCommande = async (numeroCommande) => {
+    try {
+      const response = await fetch(
+        `http://192.168.1.9:8080/api/v1/livreur/${numeroCommande}/refuser`,
+        {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            livreurId,
+            raison: "Livreur non disponible",
+            livraison: "Refusée"
+          })
+        }
+      );
+
+      if (!response.ok) throw new Error("Échec du refus");
+
+      setCommandesAssignees(prev => 
+        prev.filter(c => c.numeroCommande !== numeroCommande)
+      );
+    } catch (error) {
+      Alert.alert("Erreur", error.message);
+    }
+  };
+
+  const removeCommandeFromList = (numeroCommande) => {
+    setCommandesAssignees(prev => 
+      prev.filter(c => c.numeroCommande !== numeroCommande)
     );
+    setAcceptedCommands(prev => 
+      prev.filter(num => num !== numeroCommande)
+    );
+  };
 
-    useEffect(() => {
-        socket.on("nouvelleCommande", (nouvelleCommande) => {
-            if (nouvelleCommande.paiement === "Payée" || nouvelleCommande.paiement === "En attente de paiement") {
-                setCommandes((prev) => [nouvelleCommande, ...prev]);
-                setNewCommandes((prev) => {
-                    if (!prev.includes(nouvelleCommande._id)) {
-                        return [...prev, nouvelleCommande._id];
-                    }
-                    return prev;
-                });
-            }
-        });
-
-        return () => socket.off("nouvelleCommande");
-    }, []);
-
-    const handlePressCommande = (commande) => {
-        setNewCommandes((prev) => prev.filter((id) => id !== commande._id));
-        navigation.navigate("DetailsCommandeALivre", { commande });
-    };
-
+  const renderItem = ({ item }) => {
+    const isAccepted = acceptedCommands.includes(item.numeroCommande);
+    const isDelivered = item.livraison === "Livré";
+    const showButtons = !isAccepted && !isDelivered;
+    const details = orderDetails[item.numeroCommande] || {};
+    
     return (
-        <LayoutLivreur>
-            <Text style={styles.txtdash}>{t('listecommandelivrer')}</Text>
-            {loading ? (
-                <ActivityIndicator size="large" color="#329171" />
-            ) : commandes.length === 0 ? (
-                <Text style={styles.noCommandes}>{t("Aucune commande")}</Text>
-            ) : (
-                <FlatList
-                    style={styles.container}
-                    contentContainerStyle={{ paddingBottom: 56 }}
-                    data={commandes}
-                    keyExtractor={(item) => item._id}
-                    renderItem={({ item }) => (
-                        console.log(item.userId),
-                        <TouchableOpacity
-                            style={[styles.card, newCommandes.includes(item._id) && styles.newCommande]}
-                            onPress={() => handlePressCommande(item)}
-                        >
-                            {newCommandes.includes(item._id) && <Text style={styles.badge}>Nouveau</Text>}
-                            <Text style={styles.commandeId}>{t("commande")} #{item.numeroCommande}</Text>
-                            <Text>{t("client")} : {item.userId ? item.userId.nom : "Inconnu"}</Text>
-                            <Text style={styles.total}>
-                                {t('num')} : {item.userId && item.userId.numTel ? item.userId.numTel : "Non disponible"}
-                            </Text>
-                            <Text style={styles.date}>{new Date(item.date).toLocaleString()}</Text>
-                            <Text
-                                style={[
-                                    styles.statut,
-                                    {
-                                        color:
-                                            item.paiement === "Payée" || item.paiement === "En attente de paiement"
-                                                ? "#2E7D32"
-                                                : item.statut === "Confirmée"
-                                                    ? "green"
-                                                    : item.statut === "Annulée"
-                                                        ? "red"
-                                                        : "#ff9800",
-                                    },
-                                ]}
-                            >
-                                {item.paiement}
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            )}
-        </LayoutLivreur>
+      <View style={styles.card}>
+        {(isAccepted || isDelivered) && (
+          <TouchableOpacity 
+            style={styles.deleteButton}
+            onPress={() => removeCommandeFromList(item.numeroCommande)}
+          >
+            <Icon name="close" size={24} color="#e74c3c" />
+          </TouchableOpacity>
+        )}
+        
+        <Text style={styles.commandeNumero}>Commande #{item.numeroCommande}</Text>
+        <Text style={styles.client}>Client: {item.userId?.nom || "Inconnu"}</Text>
+        <Text style={styles.telephone}>Tél: {item.userId?.numTel || "Non disponible"}</Text>
+        <Text style={styles.adresse}>Adresse: {item.destination?.adresse || "Non spécifiée"}</Text>
+  
+
+        <View style={styles.statusContainer}>
+          <Text style={[
+            styles.statusText,
+            item.livraison === 'Livré' && styles.statusLivree,
+            item.livraison === 'Refusée' && styles.statusRefusee,
+            item.livraison === 'Acceptée' && styles.statusAcceptee
+          ]}>
+            Statut: {item.livraison || 'En attente'} 
+          </Text>
+        </View>
+        
+        <Text style={styles.total}>Total: {(details.total)+130 || 0} DA</Text>
+
+        {showButtons && (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.acceptButton]}
+              onPress={() => accepterCommande(item.numeroCommande, item.userId?.numTel, item.userId?.nom)}
+            >
+              <Text style={styles.buttonText}>Accepter</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.rejectButton]}
+              onPress={() => refuserCommande(item.numeroCommande)}
+            >
+              <Text style={styles.buttonText}>Refuser</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     );
+  };
+
+  return (
+    <LayoutLivreur>
+      <Text style={styles.title}>Commandes Assignées</Text>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#2E7D32" />
+      ) : commandesAssignees.length === 0 ? (
+        <Text style={styles.emptyText}>Aucune commande assignée</Text>
+      ) : (
+        <FlatList
+          data={commandesAssignees}
+          renderItem={renderItem}
+          keyExtractor={item => item.numeroCommande.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                setRefreshing(true);
+                await fetchCommandes(livreurId);
+                setRefreshing(false);
+              }}
+              colors={["#2E7D32"]}
+            />
+          }
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+    </LayoutLivreur>
+  );
 };
 
-export default ListeCommandeALivre;
-
+// Les styles restent identiques à votre code original
 const styles = StyleSheet.create({
-    txtdash: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10,
-        //textAlign: "left",
-        marginLeft: 17,
-        marginTop: 25,
-        textAlign: 'center',
-    },
-    card: {
-        backgroundColor: "#fff",
-        padding: 14,
-        marginBottom: 10,
-        borderRadius: 10,
-        elevation: 6,
-        margin: 15,
-        position: "relative",
-    },
-    newCommande: {
-        borderColor: "green",
-        borderWidth: 2,
-    },
-    badge: {
-        position: "absolute",
-        top: -8,
-        right: -8,
-        backgroundColor: "red",
-        color: "white",
-        paddingVertical: 3,
-        paddingHorizontal: 7,
-        borderRadius: 10,
-        fontSize: 12,
-        fontWeight: "bold",
-        zIndex: 1,
-    },
-    commandeId: {
-        fontSize: 15,
-        fontWeight: "bold",
-        marginBottom: 5,
-    },
-    statut: {
-        fontSize: 14,
-        fontWeight: "bold",
-        color: "orange",
-        alignSelf: "flex-end",
-        marginTop: -20,
-    },
-    date: {
-        alignSelf: "flex-end",
-        color: "#666",
-        bottom: 79,
-    },
-    total: {
-        marginTop: 10,
-    },
-    noCommandes: {
-        textAlign: "center",
-        fontSize: 16,
-        color: "#666",
-        marginTop: 200,
-    },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    textAlign: 'center',
+    marginVertical: 15,
+  },
+  listContainer: {
+    paddingBottom: 70,
+  },
+  card: { 
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 15,
+    marginHorizontal: 15,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    position: 'relative',
+  },
+  commandeNumero: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  client: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 3,
+  },
+  telephone: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 3,
+  },
+  adresse: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 3,
+    fontStyle: 'italic',
+  },
+  paymentMethodContainer: {
+    marginVertical: 5,
+    paddingVertical: 5,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  paymentMethod: {
+    fontSize: 14,
+    color: '#555',
+    fontWeight: 'bold',
+  },
+  statusContainer: {
+    marginVertical: 5,
+    paddingVertical: 5,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  statusLivree: {
+    color: '#27ae60',
+  },
+  statusRefusee: {
+    color: '#e74c3c',
+  },
+  statusAcceptee: {
+    color: '#f39c12',
+  },
+  total: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginTop: 5,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  acceptButton: {
+    backgroundColor: '#2E7D32',
+    marginRight: 5,
+  },
+  rejectButton: {
+    backgroundColor: '#D32F2F',
+    marginLeft: 5,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 20,
+    fontSize: 16,
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
+
+export default ListeCommandeALivre;

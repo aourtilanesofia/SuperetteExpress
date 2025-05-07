@@ -1,77 +1,200 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator, Alert } from "react-native";
 import React, { useEffect, useState } from 'react';
 import Layout from "../../components/LayoutLivreur/LayoutLivreur";
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const { width } = Dimensions.get('window');
 
 const AcceuilLivreur = ({ navigation }) => {
-  // États pour les données
   const [stats, setStats] = useState({
     livrees: 0,
     enAttente: 0,
     nonLivrees: 0,
+    tauxLivraison: '0%'
   });
   const [todayOrdersCount, setTodayOrdersCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslation();
 
-  // Récupère toutes les statistiques
-  const fetchAllStats = async () => {
+  // Récupérer le token JWT
+  const getToken = async () => {
+    try {
+      const [token, user] = await AsyncStorage.multiGet(['token', 'user']);
+      if (!token || !user) {
+        navigation.replace('ConLivreur');
+        throw new Error('Redirection vers la connexion');
+      }
+      return token[1]; // Retourne la valeur du token
+    } catch (error) {
+      console.error("Erreur récupération token:", error);
+      navigation.replace('ConLivreur');
+      throw error;
+    }
+  };
+
+
+const updatePosition = async (coords) => {
+  try {
+    const token = await getToken();
+    if (!token) return;
+
+    const response = await fetch('http://192.168.1.9:8080/api/v1/livreur/position', { 
+      method: 'POST', // Gardez POST pour matcher le backend
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        longitude: coords.longitude,
+        latitude: coords.latitude
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Erreur serveur');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur position:", error);
+    // Gestion d'erreur plus robuste
+    if (error.message.includes('Failed to fetch')) {
+      Alert.alert('Erreur réseau', 'Impossible de se connecter au serveur');
+    }
+    throw error;
+  }
+};
+
+// Modifiez également la fonction setupLocation
+const setupLocation = async () => {
+  try {
+    // Vérifier si la géolocalisation est activée
+    const enabled = await Location.hasServicesEnabledAsync();
+    if (!enabled) {
+      Alert.alert(
+        'Géolocalisation désactivée',
+        'Veuillez activer la géolocalisation pour continuer',
+        [
+          {
+            text: 'Annuler',
+            style: 'cancel'
+          },
+          {
+            text: 'Paramètres',
+            onPress: () => Location.openSettings()
+          }
+        ]
+      );
+      return;
+    }
+
+    // Demander les permissions
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission requise',
+        'L\'application a besoin de votre position pour fonctionner',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Configurer les options
+    const locationOptions = {
+      accuracy: Location.Accuracy.High,
+      distanceInterval: 100,
+      timeInterval: 30000
+    };
+
+    // Envoyer la position initiale
+    const initialLocation = await Location.getCurrentPositionAsync({});
+    await updatePosition(initialLocation.coords);
+
+    // Démarrer le suivi continu
+    await Location.watchPositionAsync(
+      locationOptions,
+      async (location) => {
+        try {
+          await updatePosition(location.coords);
+        } catch (error) {
+          console.warn("Erreur suivi position:", error.message);
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error("Erreur setup location:", error);
+    Alert.alert(
+      'Erreur',
+      'Impossible d\'accéder à la géolocalisation: ' + error.message
+    );
+  }
+};
+  // Récupérer les statistiques
+  const fetchStats = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const API_BASE_URL = 'http://192.168.1.42:8080/api/commandes';
-      
-      // Requêtes parallèles
-      const responses = await Promise.all([
-        fetch(`${API_BASE_URL}/count/livre`),
-        fetch(`${API_BASE_URL}/count/en-attente`),
-        fetch(`${API_BASE_URL}/count/non-livre`),
-        fetch(`${API_BASE_URL}/count/today`)
-      ]);
+      const API_URL = 'http://192.168.1.9:8080/api/commandes';
+      const endpoints = [
+        '/count/livre',
+        '/count/en-attente',
+        '/count/non-livre',
+        '/count/today'
+      ];
 
-      // Vérification des erreurs HTTP
-      const hasError = responses.some(res => !res.ok);
-      if (hasError) throw new Error('Erreur de réseau');
-
-      // Extraction des données
-      const [livrees, enAttente, nonLivrees, today] = await Promise.all(
-        responses.map(res => res.json())
+      const responses = await Promise.all(
+        endpoints.map(endpoint => 
+          fetch(`${API_URL}${endpoint}`)
+            .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
+        )
       );
 
-      // Calcul du taux de livraison
-      const total = today.count || 1; // Évite division par zéro
-      const taux = Math.round((livrees.count / total) * 100);
+      const [livrees, enAttente, nonLivrees, today] = responses;
+      const taux = Math.round((livrees.count / (today.count || 1)) * 100);
 
-      // Mise à jour de l'état
       setStats({
-        livrees: livrees.data.count,
-        enAttente: enAttente.count,
-        nonLivrees: nonLivrees.data.count,
+        livrees: livrees.count || 0,
+        enAttente: enAttente.count || 0,
+        nonLivrees: nonLivrees.count || 0,
         tauxLivraison: `${taux}%`
       });
-      setTodayOrdersCount(today.count);
+      setTodayOrdersCount(today.count || 0);
 
     } catch (err) {
-      console.error('Erreur:', err);
-      setError(err.message);
+      console.error('Erreur stats:', err);
+      setError(t('stats_error'));
     } finally {
       setLoading(false);
     }
   };
 
-  // Chargement initial et rafraîchissement périodique
   useEffect(() => {
-    fetchAllStats();
-    const interval = setInterval(fetchAllStats, 30000); // Rafraîchit toutes les 30s
-    
-    return () => clearInterval(interval);
+    const initialize = async () => {
+      try {
+        await setupLocation();
+        await fetchStats();
+        
+        // Rafraîchissement périodique des stats
+        const interval = setInterval(fetchStats, 30000);
+        return () => clearInterval(interval);
+      } catch (error) {
+        console.error("Erreur initialisation:", error);
+      }
+    };
+
+    initialize();
   }, []);
+
+  
 
   return (
     <Layout>
@@ -126,8 +249,6 @@ const AcceuilLivreur = ({ navigation }) => {
             </Text>
             <Text style={styles.cardLabel}>{t('Commande')}</Text>
           </View>
-
-
         </View>
 
         {/* Statistiques secondaires */}
@@ -162,7 +283,7 @@ const AcceuilLivreur = ({ navigation }) => {
           </View>
 
           {/* Carte pour action rapide */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.gridCard, styles.cardAction]}
             onPress={() => navigation.navigate('ListeCommandeALivre')}
           >
@@ -175,6 +296,7 @@ const AcceuilLivreur = ({ navigation }) => {
   );
 };
 
+// Styles (inchangés par rapport à votre version originale)
 const styles = StyleSheet.create({
   hdr: {
     height: 80,
@@ -260,9 +382,6 @@ const styles = StyleSheet.create({
   cardToday: {
     backgroundColor: '#4285F4',
     width: '100%'
-  },
-  cardRate: {
-    backgroundColor: '#7B1FA2',
   },
   sectionTitle: {
     fontSize: 18,

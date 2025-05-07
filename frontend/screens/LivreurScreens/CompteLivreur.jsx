@@ -7,32 +7,155 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
-
+import * as ImagePicker from 'expo-image-picker';
 
 const CompteLivreur = ({ navigation }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { t } = useTranslation(); 
+    const [uploading, setUploading] = useState(false);
+    const { t } = useTranslation();
 
     useFocusEffect(
         React.useCallback(() => {
-          const fetchUser = async () => {
-            try {
-              setLoading(true);
-              const userData = await AsyncStorage.getItem('user');
-              if (userData) {
-                setUser(JSON.parse(userData));
-              }
-            } catch (error) {
-              Alert.alert('Erreur', "impossible de charger l'information");
-            } finally {
-              setLoading(false);
-            }
-          };
-      
-          fetchUser();
+            const fetchUser = async () => {
+                try {
+                    setLoading(true);
+                    const userData = await AsyncStorage.getItem('user');
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    }
+                } catch (error) {
+                    Alert.alert('Erreur', "Impossible de charger les informations");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchUser();
         }, [])
-      );
+    );
+
+    const pickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission refusée', 'Nous avons besoin de la permission pour accéder à vos photos.');
+            return;
+        }
+
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.7,
+            });
+
+            if (!result.canceled) {
+                await uploadImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            Alert.alert('Erreur', 'Une erreur est survenue lors de la sélection de l\'image');
+        }
+    };
+
+    const takePhoto = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission refusée', 'Nous avons besoin de la permission pour accéder à votre caméra.');
+            return;
+        }
+
+        try {
+            let result = await ImagePicker.launchCameraAsync({
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.7,
+            });
+
+            if (!result.canceled) {
+                await uploadImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            Alert.alert('Erreur', 'Une erreur est survenue lors de la prise de photo');
+        }
+    };
+
+
+    const uploadImage = async (uri) => {
+        setUploading(true);
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) throw new Error('Utilisateur non authentifié');
+
+            // Convertir l'URI en blob
+            const response = await fetch(uri);
+            const blob = await response.blob();
+
+            const formData = new FormData();
+            formData.append('profilePic', blob, 'profile.jpg');
+
+            const uploadResponse = await fetch('http://192.168.1.9:8080/api/v1/livreur/upload-profile-pic', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await uploadResponse.json();
+            if (!uploadResponse.ok) throw new Error(data.message || 'Erreur lors du téléchargement');
+
+            // FORCEZ le rafraîchissement en récupérant les données utilisateur complètes
+            const userResponse = await fetch('http://192.168.1.9:8080/api/v1/livreur/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const updatedUserData = await userResponse.json();
+
+            await AsyncStorage.setItem('user', JSON.stringify(updatedUserData));
+            setUser(updatedUserData);
+
+            Alert.alert('Succès', 'Photo mise à jour !');
+        } catch (error) {
+            console.error('Erreur complète:', error);
+            Alert.alert('Erreur', error.message || 'Échec de la mise à jour');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+
+
+    const getAbsoluteUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        // Ajoutez un '/' entre l'IP et le chemin si nécessaire
+        return `http://192.168.1.9:8080${path.startsWith('/') ? path : '/' + path}`;
+    };
+
+    const showImagePickerOptions = () => {
+        Alert.alert(
+            'Changer la photo de profil',
+            'Comment souhaitez-vous ajouter une photo?',
+            [
+                {
+                    text: 'Prendre une photo',
+                    onPress: takePhoto,
+                },
+                {
+                    text: 'Choisir depuis la galerie',
+                    onPress: pickImage,
+                },
+                {
+                    text: 'Annuler',
+                    style: 'cancel',
+                },
+            ]
+        );
+    };
 
     if (loading) {
         return (
@@ -63,12 +186,27 @@ const CompteLivreur = ({ navigation }) => {
             >
                 <View style={styles.container}>
                     <View style={styles.profileHeader}>
-                        <View style={styles.avatarContainer}>
-                            <Image 
-                                source={user.profilePic ? { uri: user.profilePic } : { uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} 
-                                style={styles.avatar}
-                            />
-                        </View>
+                        <TouchableOpacity onPress={showImagePickerOptions} disabled={uploading}>
+                            <View style={styles.avatarContainer}>
+                                {uploading ? (
+                                    <View style={styles.uploadOverlay}>
+                                        <ActivityIndicator size="large" color="#FFFFFF" />
+                                    </View>
+                                ) : null}
+                                <Image
+                                    source={{
+                                        uri: user.profilePic ? getAbsoluteUrl(user.profilePic) : 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+                                        cache: 'reload' // Force le rechargement
+                                    }}
+                                    style={styles.avatar}
+                                    onError={(e) => console.log('Erreur chargement image:', e.nativeEvent.error)}
+                                />
+
+                                <View style={styles.cameraIcon}>
+                                    <Icon name="photo-camera" size={24} color="#FFFFFF" />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
                         <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
@@ -104,6 +242,16 @@ const CompteLivreur = ({ navigation }) => {
                         <View style={styles.separator} />
 
                         <View style={styles.infoItem}>
+                            <MaterialCommunityIcons name="car-info" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('Marque de véhicule')}</Text>
+                                <Text style={styles.infoValue}>{user.marque || 'Non spécifiée'}</Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.separator} />
+
+                        <View style={styles.infoItem}>
                             <MaterialCommunityIcons name='numeric' size={20} color={'#2E7D32'} style={styles.icon} />
                             <View style={styles.infoTextContainer}>
                                 <Text style={styles.infoLabel}>{t('Matricule')}</Text>
@@ -112,7 +260,7 @@ const CompteLivreur = ({ navigation }) => {
                         </View>
                     </View>
 
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.editButton}
                         onPress={() => navigation.navigate('UpdateProfileLivreur')}
                     >
@@ -150,7 +298,7 @@ const styles = StyleSheet.create({
     },
     profileHeader: {
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 10,
     },
     avatarContainer: {
         width: 120,
@@ -159,15 +307,34 @@ const styles = StyleSheet.create({
         backgroundColor: '#E0E0E0',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 5,
         overflow: 'hidden',
-        marginTop: 25,
-        //borderWidth: 2,
-        //borderColor: '#2E7D32',
+        marginTop: 15,
+        position: 'relative',
     },
     avatar: {
         width: '100%',
         height: '100%',
+        resizeMode: 'cover',
+    },
+    cameraIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        width: '100%',
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    uploadOverlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1,
     },
     welcomeText: {
         fontSize: 20,
@@ -217,7 +384,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 30,
+        marginTop: 20,
         shadowColor: '#2E7D32',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

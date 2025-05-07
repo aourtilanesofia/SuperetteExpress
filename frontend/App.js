@@ -66,6 +66,10 @@ import LanguageSelectionLiv from './screens/LivreurScreens/LanguageSelectionLiv'
 import LanguageSelectionComm from './screens/CommercantScreens/LanguageSelectionComm';
 import LanguageSelectionAdmin from './screens/AdministrateurScreens/LanguageSelectionAdmin';
 import ListeShops from './screens/ConsommateurScreens/ListeShops';
+import Liv1 from './screens/ConsommateurScreens/Liv1';
+import Liv2 from './screens/ConsommateurScreens/Liv2';
+import DetailsCommandeLivreur from './screens/LivreurScreens/DetailsCommandeLivreur';
+import CommandeRefusee from './screens/LivreurScreens/CommandeRefusee';
 
 
 
@@ -137,6 +141,10 @@ export default function App() {
         <Stack.Screen name='LanguageSelectionComm' component={LanguageSelectionComm} options={{ headerTitle: '' }} />
         <Stack.Screen name='LanguageSelectionAdmin' component={LanguageSelectionAdmin} options={{ headerTitle: '' }} />
         <Stack.Screen name='ListeShops' component={ListeShops} options={{headerTitle: ''}} />
+        <Stack.Screen name='Liv1' component={Liv1} options={{headerTitle:''}}/>
+        <Stack.Screen name='Liv2' component={Liv2} options={{headerTitle:''}}/>
+        <Stack.Screen name='DetailsCommandeLivreur' component={DetailsCommandeLivreur} options={{headerTitle:''}}/>
+        <Stack.Screen name='CommandeRefusee' component={CommandeRefusee} options={{headerTitle:''}}/>
       </Stack.Navigator>
     </NavigationContainer>
 

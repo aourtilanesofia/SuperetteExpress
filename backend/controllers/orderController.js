@@ -76,7 +76,7 @@ export const addOrder = async (req, res) => {
       }
     }
 
-
+ 
 
     console.log("Stock mis à jour après validation de la commande");
 
@@ -140,15 +140,22 @@ export const getOrderByNumber = async (req, res) => {
 // Annuler une commande
 export const cancelOrder = async (req, res) => {
   try {
-    const order = await CommandeModel.findByIdAndDelete(req.params.orderId);
+    // Recherchez ET supprimez par numeroCommande au lieu de _id
+    const order = await CommandeModel.findOneAndDelete({ 
+      numeroCommande: req.params.numeroCommande 
+    });
 
     if (!order) {
       return res.status(404).json({ message: "Commande non trouvée" });
     }
 
-    res.status(200).json({ message: "Commande supprimée avec succès" });
+    res.status(200).json({ message: "Commande annulée avec succès" });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la suppression de la commande" });
+    console.error("Erreur backend:", error);
+    res.status(500).json({ 
+      message: "Erreur lors de l'annulation",
+      error: error.message 
+    });
   }
 };
 
@@ -249,16 +256,22 @@ export const mettreAJourPaiement = async (req, res) => {
       return res.status(404).json({ message: "Commande non trouvée" });
     }
 
-    let updatedStatus = 'En attente de paiement';
+    // Mise à jour du champ paiement en fonction de la méthode
+    let updatedStatus = 'Non';
 
-    if (paymentMethod !== 'Espèce' && paiement) {
-      updatedStatus = paiement;
+    if (paymentMethod === 'Espèce') {
+      updatedStatus = 'En attente de paiement';
+    } else if (paymentMethod === 'Carte') {
+      updatedStatus = 'Payée';
+    } else if (paiement) {
+      updatedStatus = paiement; // Permet d’accepter un statut manuellement défini
     }
 
     order.paiement = updatedStatus;
 
     await order.save();
 
+    // Notification au consommateur
     const user = await consommateurModel.findById(order.userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -280,27 +293,26 @@ export const mettreAJourPaiement = async (req, res) => {
 
     await notification.save();
 
+    // Émission de la notification au consommateur
     if (req.app.get("io")) {
       const io = req.app.get("io");
       io.emit(`notification_${order.userId}`, notification);
     }
 
-
-
-    // Notification pour le livreur
+    // Notification au livreur
     const notificationLivreur = new Notification({
       message: `Une nouvelle commande à livrer: la commande N° #${order.numeroCommande}.`,
       isRead: false,
       role: "livreur",
-      livreurId: new mongoose.Types.ObjectId(order.livreurId), // Assure-toi que `order.livreurId` existe
+      livreurId: new mongoose.Types.ObjectId(order.livreur), // Assure-toi que ce champ existe
     });
 
     await notificationLivreur.save();
 
-    // Émettre la notification au livreur
+    // Émission de la notification au livreur
     if (req.app.get("io")) {
       const io = req.app.get("io");
-      io.emit(`notification_${order.livreurId}`, notificationLivreur);
+      io.emit(`notification_${order.livreur}`, notificationLivreur);
     }
 
     res.status(200).json(order);
@@ -310,32 +322,35 @@ export const mettreAJourPaiement = async (req, res) => {
   }
 };
 
+
 export const updateOrder = async (req, res) => {
   try {
     const { numeroCommande } = req.params;
     const { adresse, infoSupplementaire } = req.body;
 
-    // Chercher la commande par numéro de commande
     const commande = await CommandeModel.findOne({ numeroCommande: Number(numeroCommande) });
+    console.log("Numéro reçu:", numeroCommande);
 
     if (!commande) {
       return res.status(404).json({ message: 'Commande non trouvée' });
     }
 
-    // Mettre à jour l'adresse et les informations supplémentaires
+    if (!commande.destination) {
+      commande.destination = {};
+    }
+
     commande.destination.adresse = adresse;
     commande.destination.infoSup = infoSupplementaire;
 
-    // Sauvegarder les modifications dans la base de données
     const updatedCommande = await commande.save();
 
-    // Retourner la commande mise à jour
     res.status(200).json({ message: 'Commande mise à jour', commande: updatedCommande });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur lors de la mise à jour de la commande' });
   }
 };
+
 
 // Récupérer toutes les commandes payées ou en attente de paiement
 
@@ -774,3 +789,55 @@ export const countAllStatuts = async (req, res) => {
     });
   }
 };
+
+
+//Assigner une commande à un livreur
+
+// POST /api/v1/commandes/:id/assigner
+export const assignerCommande = async (req, res) => {
+  try {
+    const { numeroCommande } = req.body; // Récupération depuis le body
+    const { livreurId } = req.body;
+
+    if (!numeroCommande || !livreurId) {
+      return res.status(400).json({ message: 'numeroCommande et livreurId sont requis' });
+    }
+
+    const commande = await CommandeModel.findOne({ numeroCommande });
+
+    console.log('Numéro de commande reçu:', numeroCommande);
+    if (!commande) {
+      return res.status(404).json({ message: 'Commande non trouvée' });
+    }
+
+    commande.livreur = livreurId;
+    commande.statut = 'Assignée';
+    await commande.save();
+
+    res.status(200).json(commande);
+  } catch (err) {
+    console.error('Erreur:', err);
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
+  }
+};
+
+
+export const getStatutLivraison = async (req, res) => {
+  try {
+    const commande = await CommandeModel.findOne({ 
+      numeroCommande: req.params.numeroCommande 
+    }).select('livraison');
+
+    if (!commande) {
+      return res.status(404).json({ message: 'Commande non trouvée' });
+    }
+
+    res.json({
+      livraison: commande.livraison
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

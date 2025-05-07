@@ -8,15 +8,16 @@ const PaiementEspece = ({ navigation, route }) => {
   // Extraction avec valeurs par défaut
   const { t } = useTranslation();
   const {
-    commande = route.params,
-    total = '0 DA',
+    commande = route.params, 
+    total = '0 DA', 
     adresse = 'Adresse non spécifiée',
     nomClient = 'Nom non renseigné',
     telephoneClient = 'Téléphone non renseigné',
     infoSupplementaire = ' ',
     numeroCommande= null,
+    paymentMethod= null,
   } = route.params || {};
-
+   const{livreur} = route.params;
   //console.log('Commande reçue:', commande);
   //console.log('Params reçus dans PaiementEspece:', route.params);
   const [orderNumber] = useState(() => {
@@ -32,7 +33,7 @@ const PaiementEspece = ({ navigation, route }) => {
   const handleConfirmation = async () => {
 
     try {
-      const response = await fetch(`http://192.168.1.42:8080/api/commandes/payer/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -53,6 +54,7 @@ const PaiementEspece = ({ navigation, route }) => {
         paymentMethod: 'En Espèce',
         infoSupplementaire,
         numeroCommande,
+        livreur:livreur,
       });
     } catch (error) {
       console.error('Erreur lors de la mise à jour du paiement:', error);
@@ -71,7 +73,7 @@ const PaiementEspece = ({ navigation, route }) => {
 
       {/* Carte de confirmation */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('montanttotal')} : {total} DA</Text>
+        <Text style={styles.cardTitle}>{t('montanttotal')} : {commande.total} DA</Text>
 
         <Text style={styles.sectionTitle}>{t('adr')} :</Text>
         <Text style={styles.addressText}>{adresse}</Text>
@@ -100,7 +102,8 @@ const PaiementEspece = ({ navigation, route }) => {
       paymentMethod: 'En Espèce',
       infoSupplementaire: infoSupplementaire,
       numeroCommande,
-    });
+      livreur:livreur,
+    }); 
   }}
 >
   <Text style={styles.confirmButtonText}>{t('valider')}</Text>

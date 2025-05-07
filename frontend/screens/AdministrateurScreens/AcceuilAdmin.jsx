@@ -15,7 +15,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récupérer le nombre des commerçants
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/commercant/count")
+    fetch("http://192.168.1.9:8080/api/v1/commercant/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -32,7 +32,7 @@ const AcceuilAdmin = ({ navigation }) => {
   //Récupérer le nombre des consommateurs actifs
 
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/consommateur/activeConsommateurs/count")
+    fetch("http://192.168.1.9:8080/api/v1/consommateur/activeConsommateurs/count")
       .then(response => response.json())
       .then(data => {
         //console.log("Réponse reçue :", data);
@@ -49,7 +49,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récuperer le nombre des consommateurs non actifs
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/consommateur/nonactiveConsommateurs/count")
+    fetch("http://192.168.1.9:8080/api/v1/consommateur/nonactiveConsommateurs/count")
       .then(response => response.json())
       .then(data => {
         //console.log("Réponse reçue :", data);
@@ -66,7 +66,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   //Récupérer le nombre des livreurs
   useEffect(() => {
-    fetch("http://192.168.1.42:8080/api/v1/livreur/count")
+    fetch("http://192.168.1.9:8080/api/v1/livreur/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {

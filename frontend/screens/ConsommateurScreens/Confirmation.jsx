@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 
 const Confirmation = ({ navigation, route }) => {
   // Récupération des données de la commande
-  const params = route.params || {};  
+  const params = route.params || {};
+
   const {
     total = params.total || '0 DA',
     adresse = params.adresse || 'Adresse non spécifiée',
@@ -16,7 +17,7 @@ const Confirmation = ({ navigation, route }) => {
     paymentMethod = params.paymentMethod || 'Méthode inconnue',
     numeroCommande = params.numeroCommande || 'Null',
   } = params;
-
+  const{livreur} = route.params;
   useEffect(() => {
     const saveOrderData = async () => {
       const orderKey = `commande_${numeroCommande}`;  // Création d'une clé unique pour chaque commande
@@ -26,15 +27,20 @@ const Confirmation = ({ navigation, route }) => {
         nomClient: nomClient,
         telephoneClient: telephoneClient,
         infoSupplementaire: infoSupplementaire,
+        paymentMethod: paymentMethod, 
+        livreur,
       };
   
-      // Sauvegarder les données de la commande dans AsyncStorage sous une clé unique
-      await AsyncStorage.setItem(orderKey, JSON.stringify(orderData));
+      try {
+        await AsyncStorage.setItem(orderKey, JSON.stringify(orderData));
+        console.log("Commande sauvegardée :", orderKey, orderData);
+      } catch (error) {
+        console.error("Erreur de sauvegarde AsyncStorage :", error);
+      }
     };
   
     saveOrderData();
-  }, [total, adresse, nomClient, telephoneClient, infoSupplementaire, numeroCommande]);
-  
+  }, [total, adresse, nomClient, telephoneClient, infoSupplementaire, numeroCommande, paymentMethod]);
  
   return (
     <View style={styles.container}>
@@ -70,7 +76,7 @@ const Confirmation = ({ navigation, route }) => {
 
         <Text style={styles.sectionTitle}>Livraison à</Text>
         <Text style={styles.address}>{adresse} - {infoSupplementaire}</Text>
-        <Text style={styles.clientInfo}>{nomClient} - {telephoneClient}</Text>
+        <Text style={styles.clientInfo}>Livreur : {livreur.nom} - {livreur.numTel}</Text>
       </View>
 
       {/* Boutons d'action */}
@@ -84,7 +90,18 @@ const Confirmation = ({ navigation, route }) => {
       <TouchableOpacity 
         style={styles.secondaryButton}
        
-        onPress={() => navigation.navigate('TrackCommande')}
+        onPress={() => navigation.navigate('TrackCommande', {
+          commandeId: numeroCommande,
+          commande:params,  // L'identifiant unique de la commande
+          livreur: livreur,
+          livreurId: livreur._id,           // Les infos du livreur
+          adresseLivraison: adresse,  // L'adresse de livraison
+          clientInfo: {
+              nom: nomClient,
+              telephone: telephoneClient
+          },
+          positionClient: null        // À remplir si vous avez déjà la position
+      })}
       >
         <Text style={styles.secondaryButtonText}>Suivre ma commande</Text>
       </TouchableOpacity>

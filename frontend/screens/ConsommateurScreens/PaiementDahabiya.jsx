@@ -15,6 +15,7 @@ const PaiementDahabiya = () => {
 
   const params = route.params || {}; 
   const commande = route.params;
+  const livreur = route.params;
   const total = params.total || '0.00';
   const adresse = params.adresse || 'Adresse non spécifiée';
   const nomClient = params.nomClient || 'Nom non renseigné';
@@ -25,13 +26,14 @@ const PaiementDahabiya = () => {
 
   const handlePayment = async () => {
     try {
-      const response = await fetch(`http://192.168.1.42:8080/api/commandes/payer/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ paiement: "Payée",
-          paymentMethod: 'Carte' })
+          paymentMethod: 'Carte',
+         livreur:livreur })
       });
   
       const data = await response.json();
@@ -77,7 +79,8 @@ const PaiementDahabiya = () => {
         telephoneClient,
         paymentMethod: 'Carte Dahabiya',
         numeroCommande,
-        infoSupplementaire
+        infoSupplementaire,
+        livreur,
       });
       
     } catch (error) {
@@ -85,7 +88,7 @@ const PaiementDahabiya = () => {
       
     }
     
-  };
+  }; 
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -100,7 +103,7 @@ const PaiementDahabiya = () => {
         </View>
         <View style={styles.tableRow}>
           <Text style={styles.tableCell}>#{numeroCommande}</Text>
-          <Text style={styles.tableCell}>{total} DZD</Text>
+          <Text style={styles.tableCell}>{commande.total} DZD</Text>
         </View>
       </View>
 
