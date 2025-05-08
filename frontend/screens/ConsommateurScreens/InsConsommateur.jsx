@@ -38,7 +38,7 @@ const InsConsommateur = ({ navigation }) => {
 
         try {
 
-            const response = await fetch("http://192.168.1.9:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.1.38:8080/api/v1/consommateur/inscription", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ProductsCard from './ProductsCard';
 
 
-const backendUrl = "http://192.168.1.9:8080"; // Remplace par ton URL de backend
+const backendUrl = "http://192.168.1.38:8080"; // Remplace par ton URL de backend
 
 
 const Produits = ({searchText }) => {

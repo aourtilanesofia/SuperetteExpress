@@ -38,7 +38,7 @@ const Paiement = ({ route }) => {
     const fetchUser = async () => {
       try {
 
-        const response = await fetch(`http://192.168.1.9:8080/api/v1/consommateur/${commande.userId}`);
+        const response = await fetch(`http://192.168.1.38:8080/api/v1/consommateur/${commande.userId}`);
 
 
         // Vérifier le statut de la réponse
@@ -147,7 +147,7 @@ const Paiement = ({ route }) => {
 
   const handleValider = async () => {
     try {
-      const response = await fetch(`http://192.168.1.9:8080/api/commandes/livraison/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.38:8080/api/commandes/livraison/${commande.numeroCommande}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

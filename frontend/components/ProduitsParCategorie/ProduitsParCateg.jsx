@@ -5,7 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 
 
-const backendUrl = "http://192.168.1.9:8080";
+const backendUrl = "http://192.168.1.38:8080";
 
 
 const ProduitsParCateg = ({searchText} ) => { 
@@ -14,7 +14,7 @@ const ProduitsParCateg = ({searchText} ) => {
   const { categorie } = route.params;
 
   useEffect(() => {
-    console.log("🔹 Catégorie envoyée à l'API :", categorie);
+    //console.log("🔹 Catégorie envoyée à l'API :", categorie);
     const fetchProduitsParCateg = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/produits/categorie/${categorie}`);

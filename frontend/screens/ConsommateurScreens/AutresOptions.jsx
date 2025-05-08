@@ -37,7 +37,7 @@ const AutresOptions = ({ navigation }) => {
                                 return;
                             }
 
-                            const response = await fetch('http://192.168.1.9:8080/api/v1/consommateur/delete-account', {
+                            const response = await fetch('http://192.168.1.38:8080/api/v1/consommateur/delete-account', {
 
                                 method: 'DELETE',
                                 headers: {

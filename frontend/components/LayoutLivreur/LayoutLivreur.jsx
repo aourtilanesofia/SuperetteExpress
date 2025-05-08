@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "absolute",
-    bottom: 10,
+    bottom: 0,
     width: "100%",
     height: 50,
     borderTopWidth: 0.5,

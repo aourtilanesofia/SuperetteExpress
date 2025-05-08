@@ -63,7 +63,7 @@ const Panier = () => {
             return;
           }
       
-          const response = await fetch("http://192.168.1.9:8080/api/commandes/add", {
+          const response = await fetch("http://192.168.1.38:8080/api/commandes/add", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -79,7 +79,7 @@ const Panier = () => {
           });
       
           const data = await response.json();
-          console.log("Réponse complète du serveur:", data); // Log complet
+          //console.log("Réponse complète du serveur:", data); // Log complet
       
           if (response.ok) {
             // Modification ici: utilisez data.numeroCommande au lieu de data.commande.numeroCommande

@@ -45,11 +45,11 @@ const recupererTotalPanier = async () => {
         return;
       }
 
-      const response = await fetch(`http://192.168.1.9:8080/api/v1/notifications/${userId}`);
+      const response = await fetch(`http://192.168.1.38:8080/api/v1/notifications/${userId}`);
 
       const data = await response.json();
 
-      console.log("Données reçues des notifications :", data); // Debug
+      //console.log("Données reçues des notifications :", data); // Debug
 
       if (!Array.isArray(data)) {
         console.warn("Format de réponse inattendu :", data);
