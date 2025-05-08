@@ -46,7 +46,7 @@ export const addOrder = async (req, res) => {
     });
 
     await newOrder.save();
-    console.log("Commande enregistrée avec succès !");
+    //console.log("Commande enregistrée avec succès !");
 
 
 
@@ -58,7 +58,7 @@ export const addOrder = async (req, res) => {
         continue; // Ignore cet élément et passe au suivant
       }
 
-      console.log(`Mise à jour du stock pour produit ID: ${item.produitId}`);
+      //console.log(`Mise à jour du stock pour produit ID: ${item.produitId}`);
 
       const produit = await produitModel.findById(item.produitId);
       if (!produit) {
@@ -69,16 +69,16 @@ export const addOrder = async (req, res) => {
       if (produit.stock >= item.quantite) {
         produit.stock -= item.quantite;
         await produit.save();
-        console.log(`Nouveau stock pour ${produit.nom} : ${produit.stock}`);
+        //console.log(`Nouveau stock pour ${produit.nom} : ${produit.stock}`);
       } else {
-        console.log(`Stock insuffisant pour ${produit.nom}`);
+        //console.log(`Stock insuffisant pour ${produit.nom}`);
         return res.status(400).json({ message: `Stock insuffisant pour ${produit.nom}` });
       }
     }
 
  
 
-    console.log("Stock mis à jour après validation de la commande");
+    //console.log("Stock mis à jour après validation de la commande");
 
     const notification = new Notification({
       message: `${user.nom} vient de passer une commande.`,
@@ -92,7 +92,7 @@ export const addOrder = async (req, res) => {
     if (req.app.get("io")) {
       const io = req.app.get("io");
       io.emit("newNotification", notification);
-      console.log("Notification envoyée via WebSocket");
+      //console.log("Notification envoyée via WebSocket");
     }
 
     res.status(201).json({ message: "Commande enregistrée avec succès !", numeroCommande });
@@ -329,7 +329,7 @@ export const updateOrder = async (req, res) => {
     const { adresse, infoSupplementaire } = req.body;
 
     const commande = await CommandeModel.findOne({ numeroCommande: Number(numeroCommande) });
-    console.log("Numéro reçu:", numeroCommande);
+    //console.log("Numéro reçu:", numeroCommande);
 
     if (!commande) {
       return res.status(404).json({ message: 'Commande non trouvée' });
@@ -356,17 +356,18 @@ export const updateOrder = async (req, res) => {
 
 export const getCommandesPayeesOuEnAttente = async (req, res) => {
   try {
-    console.log("Recherche des commandes avec critères:", {
+    console.log("Recherche des commandes avec critères:"
+      , {
       paiement: { $in: ['Payée', 'En attente de paiement'] }
     });
 
     // Option 1: Vérifiez d'abord sans filtre
     const toutesCommandes = await CommandeModel.find({}).limit(5);
-    console.log("5 premières commandes (sans filtre):", toutesCommandes);
+    //console.log("5 premières commandes (sans filtre):", toutesCommandes);
 
     // Option 2: Vérifiez les statuts existants
     const statutsExistants = await CommandeModel.distinct('statutPaiement');
-    console.log("Statuts de paiement existants:", statutsExistants);
+    //console.log("Statuts de paiement existants:", statutsExistants);
 
     // Requête finale
     const commandes = await CommandeModel.find({
@@ -375,8 +376,8 @@ export const getCommandesPayeesOuEnAttente = async (req, res) => {
       .populate("userId", "nom numTel")
       .lean();
 
-    console.log(`Nombre de commandes trouvées: ${commandes.length}`);
-    console.log("Exemple de commande:", commandes[0]);
+    //console.log(`Nombre de commandes trouvées: ${commandes.length}`);
+    //console.log("Exemple de commande:", commandes[0]);
 
     res.status(200).json({
       success: true,
@@ -465,15 +466,15 @@ export const ModifierCommande = async (req, res) => {
     }
 
     if (req.body.livraison) {
-      console.log('Ancien statut livraison:', commande.livraison);
+      //console.log('Ancien statut livraison:', commande.livraison);
       commande.livraison = req.body.livraison;
-      console.log('Nouveau statut livraison:', commande.livraison);
+      //console.log('Nouveau statut livraison:', commande.livraison);
     }
 
     if (req.body.paiement) {
-      console.log('Ancien statut paiement:', commande.paiement);
+      //console.log('Ancien statut paiement:', commande.paiement);
       commande.paiement = req.body.paiement;
-      console.log('Nouveau statut paiement:', commande.paiement);
+      //console.log('Nouveau statut paiement:', commande.paiement);
     }
 
     const savedCommande = await commande.save();
@@ -672,8 +673,7 @@ export const countCommandesLivrees = async (req, res) => {
   try {
     const count = await CommandeModel.countDocuments({
       livraison: "Livré",
-      // Optionnel : filtrer par période
-      // createdAt: { $gte: new Date('2023-01-01') }
+     
     });
 
     res.status(200).json({
@@ -717,7 +717,7 @@ export const countCommandesEnAttente = async (req, res) => {
   try {
     const count = await CommandeModel.countDocuments({
       livraison: "En attente",
-      // Optionnel : exclure les commandes annulées
+     
       statut: { $ne: "Annulé" }
     });
 
@@ -805,7 +805,7 @@ export const assignerCommande = async (req, res) => {
 
     const commande = await CommandeModel.findOne({ numeroCommande });
 
-    console.log('Numéro de commande reçu:', numeroCommande);
+    //console.log('Numéro de commande reçu:', numeroCommande);
     if (!commande) {
       return res.status(404).json({ message: 'Commande non trouvée' });
     }

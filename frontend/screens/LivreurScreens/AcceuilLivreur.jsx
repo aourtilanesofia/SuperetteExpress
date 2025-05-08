@@ -44,7 +44,7 @@ const updatePosition = async (coords) => {
     const token = await getToken();
     if (!token) return;
 
-    const response = await fetch('http://192.168.1.9:8080/api/v1/livreur/position', { 
+    const response = await fetch('http://192.168.1.38:8080/api/v1/livreur/position', { 
       method: 'POST', // Gardez POST pour matcher le backend
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const setupLocation = async () => {
       setLoading(true);
       setError(null);
       
-      const API_URL = 'http://192.168.1.9:8080/api/commandes';
+      const API_URL = 'http://192.168.1.38:8080/api/commandes';
       const endpoints = [
         '/count/livre',
         '/count/en-attente',
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   cardToday: {
-    backgroundColor: '#4285F4',
+    backgroundColor: 'rgb(87, 150, 252)',
     width: '100%'
   },
   sectionTitle: {
@@ -422,16 +422,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cardDelivered: {
-    backgroundColor: '#34A853',
-  },
+    backgroundColor: 'rgb(66, 186, 98)',},
   cardPending: {
-    backgroundColor: '#FBBC05',
+    backgroundColor: 'rgb(248, 199, 51)',
   },
   cardNotDelivered: {
-    backgroundColor: '#EA4335',
+    backgroundColor: 'rgb(252, 98, 84)',
   },
   cardAction: {
-    backgroundColor: '#7B1FA2',
+    backgroundColor: 'rgb(203, 109, 244)',
   },
   errorContainer: {
     backgroundColor: '#FFEBEE',

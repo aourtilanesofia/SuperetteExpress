@@ -66,7 +66,7 @@ import {
           setIsLoading(true);
   
           try {
-              const response = await fetch("http://192.168.1.9:8080/api/v1/livreur/inscriptionL", {
+              const response = await fetch("http://192.168.1.38:8080/api/v1/livreur/inscriptionL", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(formData),

@@ -17,7 +17,7 @@ const PaiementCIB = ({ navigation, route }) => {
 
   const handleValidation = async () => {
     try {
-      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.1.38:8080/api/commandes/payer/${commande.numeroCommande}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

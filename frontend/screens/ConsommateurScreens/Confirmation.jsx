@@ -33,7 +33,7 @@ const Confirmation = ({ navigation, route }) => {
   
       try {
         await AsyncStorage.setItem(orderKey, JSON.stringify(orderData));
-        console.log("Commande sauvegardée :", orderKey, orderData);
+        //console.log("Commande sauvegardée :", orderKey, orderData);
       } catch (error) {
         console.error("Erreur de sauvegarde AsyncStorage :", error);
       }

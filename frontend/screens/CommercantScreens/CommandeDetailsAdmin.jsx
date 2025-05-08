@@ -18,7 +18,7 @@ const CommandeDetailsAdmin = ({ route }) => {
 
         try {
 
-            const response = await fetch(`http://192.168.1.9:8080/api/commandes/${commande._id}`, {
+            const response = await fetch(`http://192.168.1.38:8080/api/commandes/${commande._id}`, {
 
                 method: "PUT",
                 headers: {
@@ -69,21 +69,9 @@ const CommandeDetailsAdmin = ({ route }) => {
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={[styles.confirmButton, (statut !== "En attente") && styles.disabledButton]} 
-                        onPress={() => updateStatutCommande("Confirmée")}
-                        disabled={statut !== "En attente"}
-                    >
-                        <Text style={styles.buttonText}>{t("confirmer")}</Text>
-                    </TouchableOpacity>
+                   
 
-                    <TouchableOpacity 
-                        style={[styles.cancelButton, (statut !== "En attente") && styles.disabledButton]} 
-                        onPress={() => updateStatutCommande("Annulée")}
-                        disabled={statut !== "En attente"}
-                    >
-                        <Text style={styles.buttonText}>{t("annuler")}</Text>
-                    </TouchableOpacity>
+                    
                 </View>
             </View>
         </LayoutCommercant>
