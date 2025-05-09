@@ -102,5 +102,32 @@ router.get('/derniere/:userId', async (req, res) => {
 });
 
 
+
+router.get('/', async (req, res) => {
+    try {
+        const commandes = await CommandeModel.find()
+            .populate({
+                path: 'userId',
+                model: 'Consommateurs',
+                select: 'nom numTel'
+            })
+            .populate({
+                path: 'livreur',
+                model: 'Livreurs',
+                select: 'nom numTel'
+            })
+            .sort({ createdAt: -1 });
+
+        console.log("Exemple de commande peuplée:", {
+            _id: commandes[0]?._id,
+            livreur: commandes[0]?.livreur // Vérifiez spécifiquement le livreur
+        });
+
+        res.json(commandes);
+    } catch (err) {
+        console.error("Erreur:", err);
+        res.status(500).json({ message: err.message });
+    }
+});
 export default router; 
      

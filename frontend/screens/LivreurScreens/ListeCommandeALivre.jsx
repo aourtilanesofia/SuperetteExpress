@@ -301,7 +301,7 @@ const ListeCommandeALivre = () => {
               {item.livraison || 'En attente'}
             </Text>
           </View>
-          <Text style={styles.total}>Total: {details.total || 0} DA</Text>
+          <Text style={styles.total}>Total: {(details.total)+130 || 0} DA</Text>
         </View>
           
         {/* Boutons d'action */}
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 10,
-    paddingBottom: 20,
+    paddingBottom: 60,
   },
   emptyContainer: {
     flex: 1,
