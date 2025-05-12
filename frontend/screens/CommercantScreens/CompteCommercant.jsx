@@ -12,27 +12,27 @@ const CompteCommercant = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
     const { t } = useTranslation();
- 
+
     useFocusEffect(
         React.useCallback(() => {
-          const fetchUser = async () => {
-            try {
-              setLoading(true);
-              const userData = await AsyncStorage.getItem('user');
-              if (userData) {
-                setUser(JSON.parse(userData));
-              }
-            } catch (error) {
-              Alert.alert(t('erreur'), t('impossible_charger_info'));
-            } finally {
-              setLoading(false);
-            }
-          };
-      
-          fetchUser();
+            const fetchUser = async () => {
+                try {
+                    setLoading(true);
+                    const userData = await AsyncStorage.getItem('user');
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    }
+                } catch (error) {
+                    Alert.alert(t('erreur'), t('impossible_charger_info'));
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchUser();
         }, [])
-      );
-      
+    );
+
 
     const handleDelete = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -53,7 +53,8 @@ const CompteCommercant = ({ navigation }) => {
                             const token = await AsyncStorage.getItem('token');
                             const user = JSON.parse(await AsyncStorage.getItem('user'));
 
-                            const response = await fetch(`http://192.168.1.38:8080/api/v1/commercant/delete-account`, {
+                            const response = await fetch(`http://192.168.38.149:8080/api/v1/commercant/delete-account`, {
+
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,
@@ -113,7 +114,7 @@ const CompteCommercant = ({ navigation }) => {
         );
     }
 
-    
+
 
     return (
         <LayoutCommercant>
@@ -124,24 +125,19 @@ const CompteCommercant = ({ navigation }) => {
                 <View style={styles.container}>
                     <View style={styles.profileHeader}>
                         <View style={styles.avatarContainer}>
-                            <Image
-                                source={user.profilePic ? { uri: user.profilePic } : { uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}
-                                style={styles.avatar}
-                            />
+                            {user.profilePic ? (
+                                <Image
+                                    source={{ uri: user.profilePic }}
+                                    style={styles.avatar}
+                                />
+                            ) : (
+                                <Text style={styles.avatarText}>{user.nom ? user.nom[0] : ''}</Text>
+                            )}
                         </View>
                         <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
                     <View style={styles.profileInfo}>
-                        <View style={styles.infoItem}>
-                            <Icon name="email" size={24} color="#2E7D32" style={styles.icon} />
-                            <View style={styles.infoTextContainer}>
-                                <Text style={styles.infoLabel}>{t('email')}</Text>
-                                <Text style={styles.infoValue}>{user.email}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.separator} />
 
                         <View style={styles.infoItem}>
                             <Icon name="phone" size={24} color="#2E7D32" style={styles.icon} />
@@ -219,16 +215,29 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     avatarContainer: {
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         borderRadius: 60,
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 15,
         overflow: 'hidden',
         marginTop: 25,
     },
+        avatarText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: '#66BB6A',  
+    width: 80,  
+    height: 80,  
+    borderRadius: 40,  
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    lineHeight: 90, 
+},
     avatar: {
         width: '100%',
         height: '100%',

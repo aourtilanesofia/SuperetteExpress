@@ -96,7 +96,8 @@ const CompteLivreur = ({ navigation }) => {
             const formData = new FormData();
             formData.append('profilePic', blob, 'profile.jpg');
 
-            const uploadResponse = await fetch('http://192.168.1.38:8080/api/v1/livreur/upload-profile-pic', {
+            const uploadResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/upload-profile-pic', {
+
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -108,7 +109,8 @@ const CompteLivreur = ({ navigation }) => {
             if (!uploadResponse.ok) throw new Error(data.message || 'Erreur lors du téléchargement');
 
             // FORCEZ le rafraîchissement en récupérant les données utilisateur complètes
-            const userResponse = await fetch('http://192.168.1.38:8080/api/v1/livreur/me', {
+            const userResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/me', {
+
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -133,7 +135,8 @@ const CompteLivreur = ({ navigation }) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         // Ajoutez un '/' entre l'IP et le chemin si nécessaire
-        return `http://192.168.1.38:8080${path.startsWith('/') ? path : '/' + path}`;
+        return `http://192.168.38.149:8080${path.startsWith('/') ? path : '/' + path}`;
+
     };
 
     const showImagePickerOptions = () => {
@@ -186,40 +189,20 @@ const CompteLivreur = ({ navigation }) => {
             >
                 <View style={styles.container}>
                     <View style={styles.profileHeader}>
-                        <TouchableOpacity onPress={showImagePickerOptions} disabled={uploading}>
-                            <View style={styles.avatarContainer}>
-                                {uploading ? (
-                                    <View style={styles.uploadOverlay}>
-                                        <ActivityIndicator size="large" color="#FFFFFF" />
-                                    </View>
-                                ) : null}
+                        <View style={styles.avatarContainer}>
+                            {user.profilePic ? (
                                 <Image
-                                    source={{
-                                        uri: user.profilePic ? getAbsoluteUrl(user.profilePic) : 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-                                        cache: 'reload' // Force le rechargement
-                                    }}
+                                    source={{ uri: user.profilePic }}
                                     style={styles.avatar}
-                                    onError={(e) => console.log('Erreur chargement image:', e.nativeEvent.error)}
                                 />
-
-                                <View style={styles.cameraIcon}>
-                                    <Icon name="photo-camera" size={24} color="#FFFFFF" />
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                            ) : (
+                                <Text style={styles.avatarText}>{user.nom ? user.nom[0] : ''}</Text>
+                            )}
+                        </View>
                         <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
                     <View style={styles.profileInfo}>
-                        <View style={styles.infoItem}>
-                            <Icon name="email" size={24} color="#2E7D32" style={styles.icon} />
-                            <View style={styles.infoTextContainer}>
-                                <Text style={styles.infoLabel}>{t('email')}</Text>
-                                <Text style={styles.infoValue}>{user.email}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.separator} />
 
                         <View style={styles.infoItem}>
                             <Icon name="phone" size={24} color="#2E7D32" style={styles.icon} />
@@ -255,7 +238,14 @@ const CompteLivreur = ({ navigation }) => {
                             <MaterialCommunityIcons name='numeric' size={20} color={'#2E7D32'} style={styles.icon} />
                             <View style={styles.infoTextContainer}>
                                 <Text style={styles.infoLabel}>{t('Matricule')}</Text>
-                                <Text style={styles.infoValue}>{user.matricule}</Text>
+                                <Text style={styles.infoValue}>
+                                    {user.matricule
+                                        ? user.matricule.replace(/^(\d{0,5})(\d{0,3})(\d{0,2}).*$/, (match, p1, p2, p3) =>
+                                            [p1, p2, p3].filter(Boolean).join(' ')
+                                        )
+                                        : ''}
+                                </Text>
+
                             </View>
                         </View>
                     </View>
@@ -301,16 +291,28 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     avatarContainer: {
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         borderRadius: 60,
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 5,
+        marginBottom: 15,
         overflow: 'hidden',
-        marginTop: 15,
-        position: 'relative',
+        marginTop: 25,
+    },
+    avatarText: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#fff',
+        backgroundColor: '#66BB6A',  
+        width: 80, 
+        height: 80,  
+        borderRadius: 40,  
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        lineHeight: 90, 
     },
     avatar: {
         width: '100%',

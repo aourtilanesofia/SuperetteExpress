@@ -8,7 +8,9 @@ import { useNavigation } from "@react-navigation/native";
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
-const socket = io("http://192.168.1.38:8080"); // Mets l'URL de ton backend
+
+const socket = io("http://192.168.38.149:8080"); // Mets l'URL de ton backend
+
 const MenuLivreur = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -18,7 +20,8 @@ const MenuLivreur = () => {
   
 
    useEffect(() => {
-    fetch("http://192.168.1.38:8080/api/v1/notifications")
+    fetch("http://192.168.38.149:8080/api/v1/notifications")
+
   
       .then((res) => res.json())
       .then((data) => {

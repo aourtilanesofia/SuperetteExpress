@@ -6,7 +6,9 @@ import { Modal } from 'react-native';
 import { useTranslation } from "react-i18next";
 
 
-const backendUrl = "http://192.168.1.38:8080";
+
+const backendUrl = "http://192.168.38.149:8080";
+
 
 
 const ProductsCard = ({ p }) => {

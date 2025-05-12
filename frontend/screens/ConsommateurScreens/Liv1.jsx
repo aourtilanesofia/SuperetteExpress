@@ -32,7 +32,8 @@ const Liv1 = ({ route }) => {
 
   const notifyLivreur = async (livreurId) => {
     try {
-      const response = await fetch(`http://192.168.1.38:8080/api/v1/livreur/assigner`, {
+      const response = await fetch(`http://192.168.38.149:8080/api/v1/livreur/assigner`, {
+
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -63,7 +64,8 @@ const Liv1 = ({ route }) => {
   useEffect(() => {
     const checkCommandeLivraison = async () => {
       try {
-        const response = await fetch(`http://192.168.1.38:8080/api/commandes/${numeroCommande}/livraison`);
+        const response = await fetch(`http://192.168.38.149:8080/api/commandes/${numeroCommande}/livraison`);
+
         const data = await response.json();
 
         if (data.livraison === 'Acceptée') {
@@ -86,7 +88,8 @@ const Liv1 = ({ route }) => {
 
   const assignerCommandeAuLivreur = async (numeroCommande, livreurId) => {
     try {
-      const response = await fetch(`http://192.168.1.38:8080/api/commandes/assigner`, {
+      const response = await fetch(`http://192.168.38.149:8080/api/commandes/assigner`, {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +132,8 @@ const Liv1 = ({ route }) => {
       };
 
       const livreurResponse = await fetch(
-        `http://192.168.1.38:8080/api/v1/livreur/nearby?longitude=${destination.longitude}&latitude=${destination.latitude}&maxDistance=10000`
+        `http://192.168.38.149:8080/api/v1/livreur/nearby?longitude=${destination.longitude}&latitude=${destination.latitude}&maxDistance=10000`
+
       );
 
       if (!livreurResponse.ok) {
@@ -171,7 +175,8 @@ const Liv1 = ({ route }) => {
   const annulerCommande = async () => {
     try {
       const response = await fetch(
-        `http://192.168.1.38:8080/api/commandes/cancel/${commande.numeroCommande}`,
+        `http://192.168.38.149:8080/api/commandes/cancel/${commande.numeroCommande}`,
+
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -193,7 +198,8 @@ const Liv1 = ({ route }) => {
 
   const handlePaiement = async () => {
     try {
-      const response = await fetch(`http://192.168.1.38:8080/api/commandes/${numeroCommande}/livraison`);
+      const response = await fetch(`http://192.168.38.149:8080/api/commandes/${numeroCommande}/livraison`);
+
       const data = await response.json();
 
       if (data.livraison === 'Acceptée') {

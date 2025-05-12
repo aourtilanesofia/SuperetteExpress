@@ -8,24 +8,38 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const ConCommercant = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
-    const [email, setEmail] = useState('');
+    const [numTel, setNumTel] = useState('');
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
- 
+
+
+    const validatePhoneNumber = (number) => {
+        const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+        return phoneRegex.test(number);
+    };
+
+
     const handleLogin = async () => {
         Keyboard.dismiss();
-        if (!email || !mdp) {
-            Alert.alert("Informations requises", "Veuillez saisir votre email et mot de passe professionnels");
+        if (!numTel || !mdp) {
+            Alert.alert("Informations requises", "Veuillez saisir votre numéro de téléphone et mot de passe professionnels");
+            return;
+        }
+
+        if (!validatePhoneNumber(numTel)) {
+            Alert.alert("Numéro invalide", "Veuillez saisir un numéro de téléphone valide.");
             return;
         }
 
         setIsLoading(true);
-        
+
         try {
-            const response = await fetch("http://192.168.1.38:8080/api/v1/commercant/connexion", {
+            const response = await fetch("http://192.168.38.149:8080/api/v1/commercant/connexion", {
+
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, mdp }),
+                body: JSON.stringify({ numTel, mdp }),
+
             });
 
             const data = await response.json();
@@ -61,7 +75,7 @@ const ConCommercant = ({ navigation }) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={styles.keyboardView}
                 >
@@ -71,18 +85,16 @@ const ConCommercant = ({ navigation }) => {
                     </View>
 
                     <View style={styles.formContainer}>
-                        {/* Email Input */}
+                        {/* Numéro de Téléphone  */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
+                            <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
-                                placeholder='Email professionnel'
+                                placeholder='Numéro de téléphone'
                                 placeholderTextColor="#939494"
-                                keyboardType='email-address'
-                                value={email}
-                                onChangeText={setEmail}
-                                autoCapitalize="none"
-                                autoCorrect={false}
+                                keyboardType='phone-pad'
+                                onChangeText={setNumTel}
+                                maxLength={10}
                             />
                         </View>
 
@@ -98,20 +110,20 @@ const ConCommercant = ({ navigation }) => {
                                 onChangeText={setMdp}
                                 autoCapitalize="none"
                             />
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setSecureEntry(prev => !prev)}
                                 style={styles.eyeIcon}
                             >
-                                <Octicons 
-                                    name={secureEntry ? 'eye-closed' : 'eye'} 
-                                    size={19} 
-                                    color={'#329171'} 
+                                <Octicons
+                                    name={secureEntry ? 'eye-closed' : 'eye'}
+                                    size={19}
+                                    color={'#329171'}
                                 />
                             </TouchableOpacity>
                         </View>
 
                         {/* Login Button */}
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.loginButton, isLoading && styles.disabledButton]}
                             onPress={handleLogin}
                             disabled={isLoading}
@@ -208,7 +220,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
-        marginTop:35,
+        marginTop: 35,
     },
     disabledButton: {
         opacity: 0.7,

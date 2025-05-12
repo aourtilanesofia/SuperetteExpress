@@ -24,11 +24,6 @@ const livreurSchema = new mongoose.Schema(
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
-    email: {
-      type: String,
-      required: [true, "Le champ est obligatoire"],
-      unique: [true, "L'adresse e-mail existe déjà"],
-    },
     mdp: {
       type: String,
       required: [true, "Le champ est obligatoire"],
@@ -42,12 +37,12 @@ const livreurSchema = new mongoose.Schema(
       type: String
     },
     // Nouveaux champs pour la géolocalisation
-    position: {
+    /*position: {
       type: {
         type: String,
         enum: ['Point'], // GeoJSON type
         default: 'Point',
-        required: true
+        required: true,
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
@@ -65,7 +60,7 @@ const livreurSchema = new mongoose.Schema(
         type: Date,
         default: Date.now
       }
-    },
+    },*/
   },
   { 
     timestamps: true 

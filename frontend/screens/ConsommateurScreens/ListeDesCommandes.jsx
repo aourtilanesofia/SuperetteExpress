@@ -26,9 +26,9 @@ const ListeDesCommandes = () => {
         setCommandes((prevCommandes) => prevCommandes.filter((commande) => commande._id !== idCommande));
     };
 
+    useEffect(() => {
     const fetchOrders = async () => {
         try {
-            setRefreshing(true);
             const userId = await AsyncStorage.getItem("userId");
             if (!userId) {
                 console.log("Aucun utilisateur connecté");
@@ -36,7 +36,7 @@ const ListeDesCommandes = () => {
                 return;
             }
 
-            const response = await fetch(`http://192.168.1.38:8080/api/commandes/user/${userId}`);
+            const response = await fetch(`http://192.168.38.149:8080/api/commandes/user/${userId}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -52,6 +52,11 @@ const ListeDesCommandes = () => {
             setRefreshing(false);
         }
     };
+
+    fetchOrders();  
+
+}, []); 
+
 
     useFocusEffect(
         useCallback(() => {

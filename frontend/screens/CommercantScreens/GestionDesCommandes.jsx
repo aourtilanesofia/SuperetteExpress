@@ -16,10 +16,10 @@ import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const socket = io("http://192.168.1.38:8080", {
-  transports: ["websocket"],
-  reconnectionAttempts: 5
-});
+
+const socket = io("http://192.168.38.149:8080");
+
+
 
 const GestionDesCommandes = () => {
     const { t } = useTranslation();
@@ -61,8 +61,9 @@ const GestionDesCommandes = () => {
 
     const fetchCommandes = async () => {
         try {
-            setLoading(true);
-            const response = await fetch("http://192.168.1.38:8080/api/commandes/");
+
+            const response = await fetch("http://192.168.38.149:8080/api/commandes/");
+
             const data = await response.json();
             
             if (response.ok) {

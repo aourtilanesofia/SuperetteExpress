@@ -9,7 +9,7 @@ import {
   deleteCommercant,
   toggleStatus,
   getCommercantByIdController,
-  getCommercantCountController
+  getCommercantCountController,
 } from '../controllers/commercantController.js';
 import isAuthCom from '../middlewares/authMiddelwareCom.js';
 
@@ -48,8 +48,5 @@ router.get("/count", getCommercantCountController);
 
 // Récupérer un commerçant par son ID
 router.get('/:id', getCommercantByIdController);
-
-
-
 
 export default router;
