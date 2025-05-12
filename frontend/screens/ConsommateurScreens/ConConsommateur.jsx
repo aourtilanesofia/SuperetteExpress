@@ -12,17 +12,27 @@ const ConConsommateur = ({ navigation }) => {
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+
+    const validatePhoneNumber = (number) => {
+        const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+        return phoneRegex.test(number);
+    };
+
     const handleLogin = async () => {
         Keyboard.dismiss();
         if (!numTel || !mdp) {
             Alert.alert("Champs requis", "Veuillez remplir tous les champs");
             return;
         }
+        if (!validatePhoneNumber(numTel)) {
+            Alert.alert("Numéro invalide", "Veuillez saisir un numéro de téléphone valide.");
+            return;
+        }
 
         setIsLoading(true);
-        
+
         try {
-            const response = await fetch("http://192.168.1.9:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.38.149:8080/api/v1/consommateur/connexion", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -61,7 +71,7 @@ const ConConsommateur = ({ navigation }) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={styles.keyboardView}
                 >
@@ -71,9 +81,9 @@ const ConConsommateur = ({ navigation }) => {
                     </View>
 
                     <View style={styles.formContainer}>
-                        {/* Email Input */}
+                        {/* Numéro de Téléphone */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='phone-portrait-outline' size={22} color={'#329171'} style={styles.icon} />
+                            <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
                                 placeholder='Numéro Téléphone'
@@ -98,22 +108,22 @@ const ConConsommateur = ({ navigation }) => {
                                 onChangeText={setMdp}
                                 autoCapitalize="none"
                             />
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setSecureEntry(prev => !prev)}
                                 style={styles.eyeIcon}
                             >
-                                <Octicons 
-                                    name={secureEntry ? 'eye-closed' : 'eye'} 
-                                    size={19} 
-                                    color={'#329171'} 
+                                <Octicons
+                                    name={secureEntry ? 'eye-closed' : 'eye'}
+                                    size={19}
+                                    color={'#329171'}
                                 />
                             </TouchableOpacity>
                         </View>
 
-                        
+
 
                         {/* Login Button */}
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.loginButton, isLoading && styles.disabledButton]}
                             onPress={handleLogin}
                             disabled={isLoading}
@@ -165,7 +175,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF', 
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         paddingHorizontal: 15,
         height: 56,
@@ -209,7 +219,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
-        marginTop:35,
+        marginTop: 35,
     },
     disabledButton: {
         opacity: 0.7,

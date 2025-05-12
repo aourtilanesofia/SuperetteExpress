@@ -1,7 +1,6 @@
 
 import livreurModel from '../models/livreurModel.js';
 import Notification from '../models/NotificationModel.js';
-import { sendEmail } from '../utils/emailService.js';
 import mongoose from "mongoose";
 import { CommandeModel } from '../models/OrderModel.js';
 
@@ -9,16 +8,12 @@ import { CommandeModel } from '../models/OrderModel.js';
 // INSCRIPTION
 export const inscriptionControllerL = async (req, res) => {
   try {
-    const { nom, numTel, categorie, matricule, marque, email, mdp } = req.body;
+    const { nom, numTel, categorie, matricule, marque, mdp } = req.body;
 
-    if (!nom || !numTel || !categorie || !matricule || !marque || !email || !mdp) {
+    if (!nom || !numTel || !categorie || !matricule || !marque || !mdp) {
       return res.status(400).send({ success: false, message: "Veuillez remplir tous les champs !" });
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
-    }
 
     if (mdp.length <= 6) {
       return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
@@ -29,12 +24,14 @@ export const inscriptionControllerL = async (req, res) => {
       return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
     }
 
-    const existingLivreur = await livreurModel.findOne({ email });
+    const existingLivreur = await livreurModel.findOne({ numTel });
     if (existingLivreur) {
-      return res.status(400).send({ success: false, message: "Adresse e-mail déjà utilisée!" });
+      return res.status(400).send({ success: false, message: "Numéro de téléphone déjà utilisé !" });
     }
 
-    const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, marque, email, mdp });
+
+
+    const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, marque, mdp });
 
     // Créer la notification **avant** d'envoyer la réponse
     try {
@@ -67,13 +64,13 @@ export const inscriptionControllerL = async (req, res) => {
 // CONNEXION
 export const connexionControllerL = async (req, res) => {
   try {
-    const { email, mdp } = req.body;
+    const { numTel, mdp } = req.body;
 
-    if (!email || !mdp) {
-      return res.status(400).json({ success: false, message: "Veuillez entrer votre e-mail et votre mot de passe!" });
+    if (!numTel || !mdp) {
+      return res.status(400).json({ success: false, message: "Veuillez entrer votre numero de telephone et votre mot de passe!" });
     }
 
-    const livreur = await livreurModel.findOne({ email });
+    const livreur = await livreurModel.findOne({ numTel });
 
     if (!livreur) {
       return res.status(404).json({ success: false, message: "Utilisateur non trouvé!" });
@@ -127,16 +124,15 @@ export const getLivreurProfileController = async (req, res) => {
 // MODIFIER LE PROFIL
 export const updateProfileControllerL = async (req, res) => {
   try {
-    const { nom, numTel, email, categorie, matricule, marque, mdp } = req.body;
+    const { nom, numTel, categorie, matricule, marque, mdp } = req.body;
 
-    const livreur = await livreurModel.findById(req.user.id);
+    const livreur = await livreurModel.findById(req.livreur._id);
     if (!livreur) {
       return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
     }
 
     livreur.nom = nom || livreur.nom;
     livreur.numTel = numTel || livreur.numTel;
-    livreur.email = email || livreur.email;
     livreur.categorie = categorie || livreur.categorie;
     livreur.matricule = matricule || livreur.matricule;
     livreur.marque = marque || livreur.marque;
@@ -202,13 +198,6 @@ export const validerLivreur = async (req, res) => {
     if (!livreur) {
       return res.status(404).json({ message: "Livreur non trouvé" });
     }
-
-    // Envoyer un email au livreur
-    await sendEmail(
-      livreur.email,
-      "Validation de votre compte",
-      "Félicitations, votre compte a été validé par l'administrateur ! Vous pouvez maintenant vous connecter."
-    );
 
 
 
@@ -434,7 +423,7 @@ export const findNearbyLivreurs = async (req, res) => {
     const livreurAffecte = results[0];
 
     const commande = await CommandeModel.findByIdAndUpdate(
-      
+
       commandeId,
       {
         livreur: livreurAffecte._id,
@@ -445,7 +434,7 @@ export const findNearbyLivreurs = async (req, res) => {
     console.log("Commande mise à jour :", commande);
     if (req.app.get("io")) {
       const io = req.app.get("io");
-    
+
       io.emit(`commande-assignee_${livreurAffecte._id}`, commande);
     }
 
@@ -505,7 +494,7 @@ function calculateDistance(coord1, coord2) {
 
 // Obtenir les commandes assignées à un livreur
 export const getCommandesAssignees = async (req, res) => {
-  try { 
+  try {
     const { livreurId } = req.params;
     console.log(`Recherche commandes pour livreur: ${livreurId}`); // Log 1
 
@@ -514,22 +503,22 @@ export const getCommandesAssignees = async (req, res) => {
       return res.status(400).json({ message: 'ID livreur invalide' });
     }
 
-    const commandes = await CommandeModel.find({ 
-      livreur: livreurId, 
+    const commandes = await CommandeModel.find({
+      livreur: livreurId,
       statut: 'Assignée',
       //livraison: 'En attente'
     })
-    .populate('userId', 'nom numTel')
-    .populate('livreur', 'nom');
+      .populate('userId', 'nom numTel')
+      .populate('livreur', 'nom');
 
     console.log('Commandes trouvées:', commandes); // Log 3
 
     res.status(200).json(commandes);
   } catch (error) {
     console.error('Erreur complète:', error); // Log 4
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Erreur serveur',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -559,7 +548,7 @@ export const accepterCommande = async (req, res) => {
     commande.livraison = livraison;
     commande.livreur = livreurId;
     commande.dateAcceptation = new Date();
-    
+
     await commande.save();
 
     res.status(200).json({
@@ -568,9 +557,9 @@ export const accepterCommande = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Erreur serveur',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -589,7 +578,7 @@ export const refuserCommande = async (req, res) => {
     commande.livraison = "Refusée";
     commande.raisonRefus = raison;
     commande.livreur = null;
-    
+
     await commande.save();
 
     res.status(200).json({
@@ -598,9 +587,9 @@ export const refuserCommande = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Erreur serveur',
-      error: error.message 
+      error: error.message
     });
   }
 };

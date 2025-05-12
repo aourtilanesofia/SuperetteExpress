@@ -15,7 +15,7 @@ const ListeDesCommercants = () => {
 
   const fetchCommercants = async () => {
     try {
-      const response = await fetch("http://192.168.1.9:8080/api/v1/commercant/tousCommercants");
+      const response = await fetch("http://192.168.38.149:8080/api/v1/commercant/tousCommercants");
       const data = await response.json();
       setCommercant(data);
     } catch (error) {
@@ -32,7 +32,7 @@ const ListeDesCommercants = () => {
         text: "Supprimer",
         onPress: async () => {
           try {
-            await fetch(`http://192.168.1.9:8080/api/v1/commercant/supCommercant/${id}`, { method: "DELETE" });
+            await fetch(`http://192.168.38.149:8080/api/v1/commercant/supCommercant/${id}`, { method: "DELETE" });
             setCommercant(commercant.filter((commercant) => commercant._id !== id));
           } catch (error) {
             console.error("Erreur suppression :", error);
@@ -44,7 +44,7 @@ const ListeDesCommercants = () => {
 
   const toggleStatus = async (id) => {
     try {
-      const response = await fetch(`http://192.168.1.9:8080/api/v1/commercant/status/${id}`, {
+      const response = await fetch(`http://192.168.38.149:8080/api/v1/commercant/status/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }, 
       });

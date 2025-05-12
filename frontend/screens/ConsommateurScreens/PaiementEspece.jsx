@@ -33,7 +33,7 @@ const PaiementEspece = ({ navigation, route }) => {
   const handleConfirmation = async () => {
 
     try {
-      const response = await fetch(`http://192.168.1.9:8080/api/commandes/payer/${commande.numeroCommande}`, {
+      const response = await fetch(`http://192.168.38.149:8080/api/commandes/payer/${commande.numeroCommande}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

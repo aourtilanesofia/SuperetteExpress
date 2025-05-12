@@ -22,23 +22,28 @@ const InsConsommateur = ({ navigation }) => {
 
     const handleSignup = async () => {
         const { nom, numTel, adresse, mdp } = formData;
-        
+
         if (!nom || !numTel || !adresse || !mdp) {
             Alert.alert("Champs manquants", "Veuillez remplir tous les champs");
             return;
         }
 
-        if (!/^[0-9]{10}$/.test(numTel)) {
-            Alert.alert("Numéro invalide", "Le numéro doit contenir 10 chiffres");
+        if (!/^(05|06|07)[0-9]{8}$/.test(numTel)) {
+            Alert.alert("Format incorrect", "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres");
             return;
         }
 
-        
+        if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
+            Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
+            return;  
+        }
+
+
         setIsLoading(true);
 
         try {
 
-            const response = await fetch("http://192.168.1.9:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.38.149:8080/api/v1/consommateur/inscription", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -113,7 +118,7 @@ const InsConsommateur = ({ navigation }) => {
                                 value={formData.numTel}
                                 onChangeText={(text) => handleChange('numTel', text)}
                                 maxLength={10}
-                            /> 
+                            />
                         </View>
 
                         {/* Adresse */}

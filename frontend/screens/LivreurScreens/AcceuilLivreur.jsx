@@ -44,7 +44,7 @@ const updatePosition = async (coords) => {
     const token = await getToken();
     if (!token) return;
 
-    const response = await fetch('http://192.168.1.9:8080/api/v1/livreur/position', { 
+    const response = await fetch('http://192.168.38.149:8080/api/v1/livreur/position', { 
       method: 'POST', // Gardez POST pour matcher le backend
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const setupLocation = async () => {
       setLoading(true);
       setError(null);
       
-      const API_URL = 'http://192.168.1.9:8080/api/commandes';
+      const API_URL = 'http://192.168.38.149:8080/api/commandes';
       const endpoints = [
         '/count/livre',
         '/count/en-attente',

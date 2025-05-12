@@ -17,7 +17,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchCategorieCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.9:8080/api/categories/count');
+        const response = await fetch('http://192.168.38.149:8080/api/categories/count');
         if (!response.ok) {
           throw new Error('Erreur de récupération des données');
         }
@@ -36,7 +36,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchProductsCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.9:8080/api/produits/count');
+        const response = await fetch('http://192.168.38.149:8080/api/produits/count');
         const text = await response.text();
         //console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
         const data = JSON.parse(text); // ← Si HTML, ça va planter ici
@@ -55,7 +55,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchTodayOrdersCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.9:8080/api/commandes/count/today');
+        const response = await fetch('http://192.168.38.149:8080/api/commandes/count/today');
         if (!response.ok) throw new Error('Erreur de récupération des commandes');
         const data = await response.json();
         setTodayOrdersCount(data.count);

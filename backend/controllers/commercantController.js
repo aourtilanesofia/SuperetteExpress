@@ -6,18 +6,13 @@ import mongoose from 'mongoose';
 // INSCRIPTION
 export const inscriptionCommercantController = async (req, res) => {
     try {
-        const { nom, numTel, adresseBoutique, email, mdp } = req.body;
+        const { nom, numTel, adresseBoutique, mdp } = req.body;
 
-        if (!nom || !numTel || !adresseBoutique || !email || !mdp) {
+        if (!nom || !numTel || !adresseBoutique || !mdp) {
             return res.status(400).send({
                 success: false,
                 message: "Veuillez remplir tous les champs !",
             });
-        }
-
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).send({ success: false, message: "L'email doit être au format 'exemple@gmail.com'" });
         }
 
         if (mdp.length <= 6) {
@@ -29,16 +24,10 @@ export const inscriptionCommercantController = async (req, res) => {
             return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
         }
 
-        const existingCommercant = await commercantModel.findOne({ email });
 
-        if (existingCommercant) {
-            return res.status(400).send({
-                success: false,
-                message: "Adresse e-mail déjà utilisée!",
-            });
-        }
 
-        const commercant = await commercantModel.create({ nom, numTel, adresseBoutique, email, mdp });
+        const commercant = await commercantModel.create({ nom, numTel, adresseBoutique, mdp });
+ 
 
         // Créer la notification **avant** d'envoyer la réponse
         try {
@@ -72,16 +61,16 @@ export const inscriptionCommercantController = async (req, res) => {
 // CONNEXION
 export const connexionCommercantController = async (req, res) => {
     try {
-        const { email, mdp } = req.body;
+        const { numTel, mdp } = req.body;
 
-        if (!email || !mdp) {
+        if (!numTel || !mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Veuillez entrer votre e-mail et votre mot de passe!",
+                message: "Veuillez entrer votre numéro de téléphone et votre mot de passe!",
             });
         }
 
-        const commercant = await commercantModel.findOne({ email });
+        const commercant = await commercantModel.findOne({ numTel });
 
         if (!commercant) {
             return res.status(404).send({
@@ -89,6 +78,7 @@ export const connexionCommercantController = async (req, res) => {
                 message: "Commerçant non trouvé!",
             });
         }
+
 
         if (mdp !== commercant.mdp) {
             return res.status(400).send({
@@ -114,6 +104,8 @@ export const connexionCommercantController = async (req, res) => {
         });
     }
 };
+
+
 
 // PROFIL COMMERÇANT
 export const getCommercantProfileController = async (req, res) => {
@@ -142,7 +134,7 @@ export const updateCommercantProfileController = async (req, res) => {
         const { nom, email, numTel, adresseBoutique, mdp } = req.body;
 
         const commercant = await commercantModel.findById(new mongoose.Types.ObjectId(req.user._id));
- 
+
         if (!commercant) {
             return res.status(404).json({ success: false, message: "Commerçant non trouvé" });
         }
@@ -280,4 +272,6 @@ export const getCommercantCountController = async (req, res) => {
     }
 };
 
+
+  
 

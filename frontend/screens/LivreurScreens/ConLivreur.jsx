@@ -7,13 +7,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ConLivreur = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
-    const [email, setEmail] = useState('');
+    const [numTel, setNumTel] = useState('');
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const validatePhoneNumber = (number) => {
+        const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+        return phoneRegex.test(number);
+    };
+
     const handleLogin = async () => {
-        if (!email || !mdp) {
+        if (!numTel || !mdp) {
             Alert.alert("Champs requis", "Veuillez remplir tous les champs");
+            return;
+        }
+
+        if (!validatePhoneNumber(numTel)) {
+            Alert.alert("Numéro invalide", "Veuillez saisir un numéro de téléphone valide.");
             return;
         }
 
@@ -21,17 +31,17 @@ const ConLivreur = ({ navigation }) => {
 
         try {
 
-            const response = await fetch("http://192.168.1.9:8080/api/v1/livreur/connexionL", {
+            const response = await fetch("http://192.168.38.149:8080/api/v1/livreur/connexionL", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, mdp }),
+                body: JSON.stringify({ numTel, mdp }),
             });
 
             const data = await response.json();
 
             if (!response.ok || !data.livreur || !data.token) {
-                Alert.alert("Erreur", data.message || "Email ou mot de passe incorrect");
+                Alert.alert("Erreur", data.message || "Numéro de téléphone ou mot de passe incorrect");
                 return;
             }
 
@@ -70,18 +80,16 @@ const ConLivreur = ({ navigation }) => {
                 </View>
 
                 <View style={styles.formContainer}>
-                    {/* Email Input */}
+                    {/* Numéro de Téléphone  */}
                     <View style={styles.inputContainer}>
-                        <Ionicons name='mail-outline' size={22} color={'#329171'} style={styles.icon} />
+                        <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                         <TextInput
                             style={styles.textInput}
-                            placeholder='Adresse email'
+                            placeholder='Numéro de téléphone'
                             placeholderTextColor="#939494"
-                            keyboardType='email-address'
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            autoCorrect={false}
+                            keyboardType='phone-pad'
+                            onChangeText={setNumTel}
+                            maxLength={10}
                         />
                     </View>
 
@@ -97,22 +105,22 @@ const ConLivreur = ({ navigation }) => {
                             onChangeText={setMdp}
                             autoCapitalize="none"
                         />
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={() => setSecureEntry(prev => !prev)}
                             style={styles.eyeIcon}
                         >
-                            <Octicons 
-                                name={secureEntry ? 'eye-closed' : 'eye'} 
-                                size={19} 
-                                color={'#329171'} 
+                            <Octicons
+                                name={secureEntry ? 'eye-closed' : 'eye'}
+                                size={19}
+                                color={'#329171'}
                             />
                         </TouchableOpacity>
                     </View>
 
-                   
+
 
                     {/* Login Button */}
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={[styles.loginButton, isLoading && styles.disabledButton]}
                         onPress={handleLogin}
                         disabled={isLoading}
@@ -210,7 +218,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
-        marginTop:35,
+        marginTop: 35,
     },
     disabledButton: {
         opacity: 0.7,

@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next';
 const UpdateProfilCommercant = ({ navigation }) => {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
-        numTel: '', 
+        numTel: '',
         adresseBoutique: '',
         mdp: '',
         newPassword: ''
@@ -29,7 +28,6 @@ const UpdateProfilCommercant = ({ navigation }) => {
                     const user = JSON.parse(userData);
                     setFormData({
                         name: user.nom || '',
-                        email: user.email || '',
                         numTel: user.numTel ? user.numTel.toString() : '',
                         adresseBoutique: user.adresseBoutique || '',
                         mdp: '',
@@ -50,6 +48,16 @@ const UpdateProfilCommercant = ({ navigation }) => {
 
     const handleUpdateProfile = async () => {
         try {
+            if (!/^(05|06|07)[0-9]{8}$/.test(formData.numTel)) {
+                Alert.alert("Format incorrect", "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres");
+                return;  
+            }
+
+            if (!/^[A-Za-zÀ-ÿ\s]+$/.test(formData.name)) {
+                Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
+                return; 
+            }
+
             setIsLoading(true);
             const token = await AsyncStorage.getItem('token');
             if (!token) {
@@ -57,16 +65,15 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 return;
             }
 
-        
+
             const updateData = {
                 nom: formData.name,
-                email: formData.email,
                 numTel: formData.numTel.toString(),
                 adresseBoutique: formData.adresseBoutique,
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
-            const response = await fetch('http://192.168.1.9:8080/api/v1/commercant/modifier', {
+            const response = await fetch('http://192.168.38.149:8080/api/v1/commercant/modifier', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,14 +117,15 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.container}>
                         <View style={styles.profileHeader}>
-                            <View style={styles.avatarContainer}>
-                                
-                                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }} style={styles.avatar} />
-                                
-                                <TouchableOpacity style={styles.editIcon}>
-                                    <Icon name="edit" size={24} color="#FFFFFF" />
-                                </TouchableOpacity>
-                            </View>
+                            {profilePic ? (
+                                <Image source={{ uri: profilePic }} style={styles.avatar} />
+                            ) : (
+                                <View style={styles.avatarFallback}>
+                                    <Text style={styles.avatarText}>
+                                        {formData.name ? formData.name[0].toUpperCase() : ''}
+                                    </Text>
+                                </View>
+                            )}
                         </View>
 
                         <View style={styles.formContainer}>
@@ -133,19 +141,6 @@ const UpdateProfilCommercant = ({ navigation }) => {
                             </View>
 
                             <View style={styles.inputContainer}>
-                                <Icon name="email" size={24} color="#2E7D32" style={styles.inputIcon} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={formData.email}
-                                    onChangeText={(text) => handleChange('email', text)}
-                                    placeholder="Email"
-                                    placeholderTextColor="#9E9E9E"
-                                    keyboardType='email-address'
-                                    autoCapitalize="none"
-                                />
-                            </View>
- 
-                            <View style={styles.inputContainer}>
                                 <Icon name="phone" size={24} color="#2E7D32" style={styles.inputIcon} />
                                 <TextInput
                                     style={styles.textInput}
@@ -155,6 +150,7 @@ const UpdateProfilCommercant = ({ navigation }) => {
                                     placeholder={t('telephone')}
                                     placeholderTextColor="#9E9E9E"
                                     keyboardType='phone-pad'
+                                    maxLength={10}
                                 />
                             </View>
 
@@ -179,7 +175,7 @@ const UpdateProfilCommercant = ({ navigation }) => {
                                     placeholderTextColor="#9E9E9E"
                                     secureTextEntry={!isPasswordVisible}
                                 />
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                                     style={styles.eyeIcon}
                                 >
@@ -191,7 +187,7 @@ const UpdateProfilCommercant = ({ navigation }) => {
                                 </TouchableOpacity>
                             </View>
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.saveButton}
                                 onPress={handleUpdateProfile}
                                 disabled={isLoading}
@@ -224,18 +220,32 @@ const styles = StyleSheet.create({
     },
     profileHeader: {
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 30,
+        marginTop: 40,
     },
     avatarContainer: {
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         borderRadius: 60,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 15,
-        position: 'relative',
-        marginTop:35,
+        overflow: 'hidden',
+        marginTop: 25,
+    },
+    avatarText: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#fff',
+        backgroundColor: '#66BB6A',  
+        width: 80,  
+        height: 80,  
+        borderRadius: 40,  
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        lineHeight: 90,  
     },
     avatar: {
         width: '100%',

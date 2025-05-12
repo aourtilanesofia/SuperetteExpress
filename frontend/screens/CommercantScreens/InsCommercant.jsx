@@ -12,7 +12,6 @@ const InsCommercant = ({ navigation }) => {
         nom: '',
         numTel: '',
         adresseBoutique: '',
-        email: '',
         mdp: ''
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -21,28 +20,27 @@ const InsCommercant = ({ navigation }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSignup = async () => {
-        const { nom, numTel, adresseBoutique, email, mdp } = formData;
+  const handleSignup = async () => {
+        const { nom, numTel, adresseBoutique, mdp } = formData;
         
-        if (!nom || !numTel || !adresseBoutique || !email || !mdp) {
+        if (!nom || !numTel || !adresseBoutique || !mdp) {
             Alert.alert("Informations incomplètes", "Veuillez renseigner tous les champs obligatoires");
             return;
         }
 
-        if (!/^[0-9]{10}$/.test(numTel)) {
-            Alert.alert("Format incorrect", "Votre numéro de téléphone professionnel doit contenir 10 chiffres");
+        if (!/^(05|06|07)[0-9]{8}$/.test(numTel)) {
+            Alert.alert("Format incorrect", "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres");
             return;
         }
-
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
-            Alert.alert("Email non valide", "Veuillez saisir une adresse email professionnelle valide");
-            return;
+         if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
+            Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
+            return; 
         }
 
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.9:8080/api/v1/commercant/inscription", {
+            const response = await fetch("http://192.168.38.149:8080/api/v1/commercant/inscription", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -63,7 +61,6 @@ const InsCommercant = ({ navigation }) => {
                 nom: '',
                 numTel: '',
                 adresseBoutique: '',
-                email: '',
                 mdp: ''
             });
 
@@ -129,20 +126,6 @@ const InsCommercant = ({ navigation }) => {
                                 placeholderTextColor="#939494"
                                 value={formData.adresseBoutique}
                                 onChangeText={(text) => handleChange('adresseBoutique', text)}
-                            />
-                        </View>
-
-                        {/* Email */}
-                        <View style={styles.inputContainer}>
-                            <Ionicons name='mail-outline' size={20} color={'#329171'} style={styles.icon} />
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder='Email professionnel'
-                                placeholderTextColor="#939494"
-                                keyboardType='email-address'
-                                value={formData.email}
-                                onChangeText={(text) => handleChange('email', text)}
-                                autoCapitalize="none"
                             />
                         </View>
 

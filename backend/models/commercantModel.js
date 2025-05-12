@@ -15,13 +15,8 @@ const commercantSchema = new mongoose.Schema(
     adresseBoutique: {
       type: String,
       required: [true, "Le champ est obligatoire"],
-    },
+    },   
     
-    email: {
-      type: String,
-      required: [true, "Le champ est obligatoire"],
-      unique: [true, "L'adresse e-mail existe déjà"],
-    },
     mdp: {
       type: String,
       required: [true, "Le champ est obligatoire"],
