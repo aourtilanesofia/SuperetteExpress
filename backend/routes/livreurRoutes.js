@@ -196,7 +196,20 @@ router.get('/position/:livreurId', async (req, res) => {
   });
 
 
+// Dans votre backend (ex: livreurRoutes.js)
+router.get('/:id', async (req, res) => {
+    try {
+        const livreur = await livreurModel.findById(req.params.id)
+            .select('nom numTel'); 
 
+        if (!livreur) {
+            return res.status(404).json({ message: "Livreur non trouvé" });
+        }
+        res.json(livreur);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 
 export default router;

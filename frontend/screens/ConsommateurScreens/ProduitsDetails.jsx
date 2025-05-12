@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const backendUrl = "http://192.168.38.149:8080";
 
+
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 const ProduitsDetails = () => {

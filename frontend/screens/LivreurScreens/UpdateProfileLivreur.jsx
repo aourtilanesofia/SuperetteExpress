@@ -30,6 +30,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         return `http://192.168.38.149:8080${path}`;
+
     };
 
     useEffect(() => {
@@ -189,7 +190,9 @@ const UpdateProfileLivreur = ({ navigation }) => {
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
-            const response = await fetch('http://192.168.38.149:8080/api/v1/livreur/profile-updateL', {
+
+    const response = await fetch('http://192.168.38.149:8080/api/v1/livreur/profile-updateL', {
+
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

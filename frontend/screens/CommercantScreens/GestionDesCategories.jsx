@@ -22,6 +22,7 @@ const GestionDesCategories = () => {
 
 
             const response = await fetch('http://192.168.38.149:8080/api/categories');
+
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -40,7 +41,9 @@ const GestionDesCategories = () => {
                     onPress: async () => {
                         try {
 
+
                             await fetch(`http://192.168.38.149:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+
 
                             fetchCategories();
                         } catch (error) {
@@ -67,6 +70,7 @@ const GestionDesCategories = () => {
                         <Image 
 
                             source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.38.149:8080${item.image}` }} 
+
 
                             style={styles.image} 
                             resizeMode="contain"
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
     buttonText: { color: '#fff', fontWeight: '600' },
     addButton: {
         position: 'absolute',
-        bottom: 55,
+        bottom: 65,
         right: 20,
         backgroundColor: '#007BFF',
         width: 60,

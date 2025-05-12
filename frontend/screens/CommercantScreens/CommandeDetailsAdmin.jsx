@@ -12,7 +12,7 @@ const CommandeDetailsAdmin = ({ route }) => {
 
     const updateStatutCommande = async (nouveauStatut) => {
         if (statut === "Confirmée" || statut === "Annulée") {
-            Alert.alert("Action non autorisée", "Le statut ne peut plus être modifié.");
+            Alert.alert(t("actionNonAutorisee"), t("statutNonModifiable"));
             return;
         }
 
@@ -29,164 +29,203 @@ const CommandeDetailsAdmin = ({ route }) => {
 
             if (response.ok) {
                 setStatut(nouveauStatut);
-                Alert.alert(" ", `Commande ${nouveauStatut} !`);
+                Alert.alert(" ", `${t("commande")} ${nouveauStatut} !`);
                 navigation.goBack();
             } else {
-                Alert.alert("Erreur", "Échec de la mise à jour du statut");
+                Alert.alert(t("erreur"), t("echecMiseAJour"));
             }
         } catch (error) {
             console.error("Erreur de connexion :", error);
-            Alert.alert("Erreur", "Impossible de se connecter au serveur");
+            Alert.alert(t("erreur"), t("connexionServeurImpossible"));
         }
     };
+
+    const renderStatutButtons = () => {
+        if (statut === "Confirmée" || statut === "Annulée") return null;
+
+       
+    };
+
+    const renderProductItem = ({ item }) => (
+        <View style={styles.productCard}>
+            <Text style={styles.productName}>{item.nom}</Text>
+            <View style={styles.detailsContainer}>
+                <Text style={styles.quantity}>{t("qte")}: {item.quantite}</Text>
+                <Text style={styles.price}>{item.prix} DA</Text>
+            </View>
+        </View>
+    );
 
     return (
         <LayoutCommercant>
             <View style={styles.container}>
-                <Text style={styles.title}>{t("commande")} #{commande.numeroCommande}</Text>
-                <Text style={styles.client}>{t("client")} : {commande.userId ? commande.userId.nom : "Inconnu"}</Text>
-                <Text style={styles.sectionTitle}>{t("listeproduits")} :</Text>
+                <View style={styles.header}>
+                    <Text style={styles.title}>{t("commande")} #{commande.numeroCommande}</Text>
+                    <View style={[styles.statusBadge, statut === "Confirmée" ? styles.successBadge : statut === "Annulée" ? styles.errorBadge : styles.warningBadge]}>
+                        <Text style={styles.statusText}>{statut}</Text>
+                    </View>
+                </View>
+                
+                <Text style={styles.client}>{t("client")}: {commande.userId ? commande.userId.nom : "Inconnu"}</Text>
+                <Text style={styles.sectionTitle}>{t("listeproduits")}</Text>
             </View>
 
             <FlatList
                 data={commande.produits}
                 keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                    <View style={styles.productCard}>
-                        <Text style={styles.productName}>{item.nom}</Text>
-                        <View style={styles.detailsContainer}>
-                            <Text style={styles.quantity}>{t("qte")}: {item.quantite}</Text>
-                            <Text style={styles.price}>{item.prix} DA</Text>
-                        </View>
-                    </View>
-                )}
+                renderItem={renderProductItem}
+                contentContainerStyle={styles.listContent}
             />
 
             <View style={styles.footer}>
                 <View style={styles.grandTotal}>
-                    <Text style={styles.totalLabel}>{t("total")} :</Text>
+                    <Text style={styles.totalLabel}>{t("total")}:</Text>
                     <Text style={styles.totalValue}>{commande.total} DA</Text>
                 </View>
 
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={[styles.confirmButton, (statut !== "En attente") && styles.disabledButton]} 
-                        onPress={() => updateStatutCommande("Confirmée")}
-                        disabled={statut !== "En attente"}
-                    >
-                        <Text style={styles.buttonText}>{t("confirmer")}</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={[styles.cancelButton, (statut !== "En attente") && styles.disabledButton]} 
-                        onPress={() => updateStatutCommande("Annulée")}
-                        disabled={statut !== "En attente"}
-                    >
-                        <Text style={styles.buttonText}>{t("annuler")}</Text>
-                    </TouchableOpacity>
-                </View>
+                {renderStatutButtons()}
             </View>
         </LayoutCommercant>
     );
 };
 
-export default CommandeDetailsAdmin;
-
 const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 16,
+        paddingTop: 20,
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 12,
+    },
     title: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: "bold",
-        marginBottom: 10,
-        textAlign: "center",
-        marginTop:40,
+        color: "#2c3e50",
     },
     client: {
         fontSize: 16,
-        marginBottom: 5,
-        textAlign: "center",
+        color: "#7f8c8d",
+        marginBottom: 20,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'left',
-        marginLeft: 17,
+        fontWeight: '600',
+        color: '#2c3e50',
         marginBottom: 15,
-        marginTop: 15,
+    },
+    listContent: {
+        paddingHorizontal: 16,
     },
     productCard: {
-        padding: 8,
-        borderRadius: 8,
-        marginBottom: 3,
-        margin: 16,
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        padding: 16,
+        marginBottom: 12,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
     productName: {
-        fontSize: 15,
-        fontWeight: "bold",
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#2c3e50",
+        marginBottom: 8,
     },
     detailsContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 5,
-        margin: 10,
     },
     quantity: {
         fontSize: 14,
+        color: "#7f8c8d",
     },
     price: {
         fontSize: 14,
         fontWeight: "bold",
+        color: "#2E7D32",
     },
-    totalLabel: {
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    totalValue: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: "#000",
+    footer: {
+        paddingHorizontal: 16,
+        paddingBottom: 70,
     },
     grandTotal: {
-        borderWidth: 1,
-        borderColor: "lightgray",
-        backgroundColor: "#ffffff",
-        padding: 6,
-        margin: 5,
-        marginHorizontal: 20,
-        borderRadius: 5,
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        padding: 16,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        marginBottom: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    totalLabel: {
+        fontSize: 18,
+        fontWeight: "600",
+        color: "#2c3e50",
+    },
+    totalValue: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#2E7D32",
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
-        marginTop: 90,
+        justifyContent: "space-between",
+        marginTop: 10,
+    },
+    actionButton: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 10,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 5,
     },
     confirmButton: {
-        backgroundColor: "#2E7D32",
-        padding: 10,
-        borderRadius: 10,
-        width: "40%",
-        alignItems: "center",
-        bottom: 70,
+        backgroundColor: "#27ae60",
     },
     cancelButton: {
-        backgroundColor: "red",
-        padding: 10,
-        borderRadius: 10,
-        width: "40%",
-        alignItems: "center",
-        bottom: 70,
+        backgroundColor: "#e74c3c",
     },
     buttonText: {
         color: "#fff",
         fontSize: 16,
         fontWeight: "600",
     },
-    disabledButton: {
-        backgroundColor: "#ccc",
+    statusBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+    },
+    successBadge: {
+        backgroundColor: "#d5f5e3",
+    },
+    errorBadge: {
+        backgroundColor: "#fadbd8",
+    },
+    warningBadge: {
+        backgroundColor: "#fef9e7",
+    },
+    statusText: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#2c3e50",
     },
 });
+
+export default CommandeDetailsAdmin;

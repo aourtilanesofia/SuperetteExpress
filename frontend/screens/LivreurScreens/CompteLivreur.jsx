@@ -97,6 +97,7 @@ const CompteLivreur = ({ navigation }) => {
             formData.append('profilePic', blob, 'profile.jpg');
 
             const uploadResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/upload-profile-pic', {
+
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -109,6 +110,7 @@ const CompteLivreur = ({ navigation }) => {
 
             // FORCEZ le rafraîchissement en récupérant les données utilisateur complètes
             const userResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/me', {
+
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -134,6 +136,7 @@ const CompteLivreur = ({ navigation }) => {
         if (path.startsWith('http')) return path;
         // Ajoutez un '/' entre l'IP et le chemin si nécessaire
         return `http://192.168.38.149:8080${path.startsWith('/') ? path : '/' + path}`;
+
     };
 
     const showImagePickerOptions = () => {

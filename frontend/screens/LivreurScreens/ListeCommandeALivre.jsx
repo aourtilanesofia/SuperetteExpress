@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
   Alert,
   RefreshControl
 } from "react-native";
+import React, { useState, useEffect } from "react";
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const socket = io("http://192.168.38.149:8080");
+
 
 
 const ListeCommandeALivre = () => {
@@ -26,9 +27,8 @@ const ListeCommandeALivre = () => {
   const navigation = useNavigation();
   const [refusedCommande, setRefusedCommande] = useState(null);
   const [acceptedCommands, setAcceptedCommands] = useState([]);
-  const [orderDetails, setOrderDetails] = useState({}); // Stocke à la fois paymentMethod et total
+  const [orderDetails, setOrderDetails] = useState({});
 
-  // Charger les détails des commandes depuis AsyncStorage
   const loadOrderDetails = async (commandes) => {
     const details = {};
     try {
@@ -37,7 +37,6 @@ const ListeCommandeALivre = () => {
         const savedOrder = await AsyncStorage.getItem(orderKey);
         if (savedOrder) {
           const orderData = JSON.parse(savedOrder);
-          console.log("Contenu récupéré de AsyncStorage:", orderData);
           details[commande.numeroCommande] = {
             paymentMethod: orderData.paymentMethod || 'Non spécifiée',
             total: (commande.total || 0) + 130
@@ -70,6 +69,12 @@ const ListeCommandeALivre = () => {
 
         if (id) {
           setLivreurId(id);
+          const savedCommandes = await AsyncStorage.getItem('commandesAssignees');
+          if (savedCommandes) {
+            const parsedCommandes = JSON.parse(savedCommandes);
+            setCommandesAssignees(parsedCommandes);
+            await loadOrderDetails(parsedCommandes);
+          }
           fetchCommandes(id);
         } else {
           navigation.navigate('LoginLivreur');
@@ -82,7 +87,7 @@ const ListeCommandeALivre = () => {
     fetchLivreurId();
 
     return () => {
-      socket.off(`commande-assignee-${livreurId}`);
+      if (livreurId) socket.off(`commande-assignee-${livreurId}`);
     };
   }, []);
 
@@ -93,8 +98,25 @@ const ListeCommandeALivre = () => {
         `http://192.168.38.149:8080/api/v1/livreur/${id}/commandes-assignees`
       );
       const data = await response.json();
-      setCommandesAssignees(data || []);
-      await loadOrderDetails(data || []);
+
+      const savedCommandes = await AsyncStorage.getItem('commandesAssignees');
+      const savedCommandesMap = savedCommandes 
+        ? JSON.parse(savedCommandes).reduce((acc, cmd) => {
+            acc[cmd.numeroCommande] = cmd;
+            return acc;
+          }, {})
+        : {};
+
+      const commandesAvecBadge = data.map(c => ({
+        ...c,
+        isNew: !savedCommandesMap[c.numeroCommande] || savedCommandesMap[c.numeroCommande].isNew
+      }));
+
+      const sortedCommands = commandesAvecBadge.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setCommandesAssignees(sortedCommands);
+      await AsyncStorage.setItem('commandesAssignees', JSON.stringify(sortedCommands));
+      await loadOrderDetails(data);
     } catch (error) {
       console.error('Erreur fetchCommandes:', error);
     } finally {
@@ -106,7 +128,12 @@ const ListeCommandeALivre = () => {
     if (!livreurId) return;
 
     socket.on(`commande-assignee-${livreurId}`, (newCommande) => {
-      setCommandesAssignees(prev => [newCommande, ...prev]);
+      const commandeAvecBadge = { ...newCommande, isNew: true };
+      setCommandesAssignees(prev => {
+        const newCommandes = [commandeAvecBadge, ...prev];
+        AsyncStorage.setItem('commandesAssignees', JSON.stringify(newCommandes));
+        return newCommandes;
+      });
       loadOrderDetails([newCommande]);
       Alert.alert("Nouvelle commande!", `Commande #${newCommande.numeroCommande}`);
     });
@@ -119,6 +146,7 @@ const ListeCommandeALivre = () => {
   const accepterCommande = async (numeroCommande, numTel, nom) => {
     try {
       const API_URL = `http://192.168.38.149:8080/api/v1/livreur/${numeroCommande}/accept`;
+
       const token = await AsyncStorage.getItem('token');
 
       const response = await fetch(API_URL, {
@@ -134,34 +162,42 @@ const ListeCommandeALivre = () => {
       });
 
       const responseText = await response.text();
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${responseText}`);
-      }
+      if (!response.ok) throw new Error(`Erreur ${response.status}: ${responseText}`);
 
       const data = JSON.parse(responseText);
       setAcceptedCommands(prev => [...prev, numeroCommande]);
       
       navigation.navigate('DetailsCommandeALivre', { 
-        numeroCommande: numeroCommande,
+        numeroCommande,
         numTel,
         nom,
         commande: data.commande
       });
     } catch (error) {
       console.error('Erreur:', error);
+      const revertedCommandes = commandesAssignees.map(commande => 
+        commande.numeroCommande === numeroCommande 
+          ? { ...commande, isNew: true } 
+          : commande
+      );
+      setCommandesAssignees(revertedCommandes);
+      await AsyncStorage.setItem('commandesAssignees', JSON.stringify(revertedCommandes));
       Alert.alert('Erreur', error.message);
     }
   };
 
   const refuserCommande = async (numeroCommande) => {
     try {
+      const updatedCommandes = commandesAssignees.filter(c => c.numeroCommande !== numeroCommande);
+      setCommandesAssignees(updatedCommandes);
+      await AsyncStorage.setItem('commandesAssignees', JSON.stringify(updatedCommandes));
+
       const response = await fetch(
         `http://192.168.38.149:8080/api/v1/livreur/${numeroCommande}/refuser`,
+
         {
           method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             livreurId,
             raison: "Livreur non disponible",
@@ -171,71 +207,109 @@ const ListeCommandeALivre = () => {
       );
 
       if (!response.ok) throw new Error("Échec du refus");
-
-      setCommandesAssignees(prev => 
-        prev.filter(c => c.numeroCommande !== numeroCommande)
-      );
     } catch (error) {
+      if (livreurId) fetchCommandes(livreurId);
       Alert.alert("Erreur", error.message);
     }
   };
 
-  const removeCommandeFromList = (numeroCommande) => {
-    setCommandesAssignees(prev => 
-      prev.filter(c => c.numeroCommande !== numeroCommande)
-    );
-    setAcceptedCommands(prev => 
-      prev.filter(num => num !== numeroCommande)
-    );
+  const supprimerCommandeListe = (numeroCommande) => {
+    const updatedCommandes = commandesAssignees.filter(c => c.numeroCommande !== numeroCommande);
+    setCommandesAssignees(updatedCommandes);
+    AsyncStorage.setItem('commandesAssignees', JSON.stringify(updatedCommandes));
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    if (livreurId) fetchCommandes(livreurId).then(() => setRefreshing(false));
   };
 
   const renderItem = ({ item }) => {
-    const isAccepted = acceptedCommands.includes(item.numeroCommande);
-    const isDelivered = item.livraison === "Livré";
-    const showButtons = !isAccepted && !isDelivered;
+    const isLivree = item.livraison === "Livré";
+    const showButtons = item.livraison === "Assignée" || item.livraison === "En attente";
     const details = orderDetails[item.numeroCommande] || {};
-    
+
     return (
       <View style={styles.card}>
-        {(isAccepted || isDelivered) && (
-          <TouchableOpacity 
-            style={styles.deleteButton}
-            onPress={() => removeCommandeFromList(item.numeroCommande)}
-          >
-            <Icon name="close" size={24} color="#e74c3c" />
-          </TouchableOpacity>
+        {/* Badge Nouveau */}
+        {!isLivree && item.isNew && (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>NOUVEAU</Text>
+          </View>
         )}
         
-        <Text style={styles.commandeNumero}>Commande #{item.numeroCommande}</Text>
-        <Text style={styles.client}>Client: {item.userId?.nom || "Inconnu"}</Text>
-        <Text style={styles.telephone}>Tél: {item.userId?.numTel || "Non disponible"}</Text>
-        <Text style={styles.adresse}>Adresse: {item.destination?.adresse || "Non spécifiée"}</Text>
-  
+        {/* Bouton de suppression */}
+        {isLivree && (
+          <TouchableOpacity 
+            style={styles.deleteButton}
+            onPress={() => supprimerCommandeListe(item.numeroCommande)}
+          >
+            <Icon name="close" size={20} color="#D62828" />
+          </TouchableOpacity>
+        )}
 
-        <View style={styles.statusContainer}>
-          <Text style={[
-            styles.statusText,
-            item.livraison === 'Livré' && styles.statusLivree,
-            item.livraison === 'Refusée' && styles.statusRefusee,
-            item.livraison === 'Acceptée' && styles.statusAcceptee
-          ]}>
-            Statut: {item.livraison || 'En attente'} 
-          </Text>
+        {/* En-tête de la carte */}
+        <View style={styles.cardHeader}>
+          <View style={styles.commandeInfo}>
+            <Text style={styles.commandeNumero}>Commande #{item.numeroCommande}</Text>
+            <View style={styles.infoRow}>
+              <Icon name="access-time" size={16} color="#555" />
+              <Text style={styles.dateText}>
+                {new Date(item.date).toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </Text>
+            </View>
+          </View>
         </View>
-        
-        <Text style={styles.total}>Total: {(details.total)+130 || 0} DA</Text>
 
+        {/* Détails client */}
+        <View style={styles.clientInfo}>
+          <View style={styles.infoRow}>
+            <Icon name="person" size={16} color="#555" />
+            <Text style={styles.client}> {item.userId?.nom || "Inconnu"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Icon name="phone" size={16} color="#555" />
+            <Text style={styles.telephone}> {item.userId?.numTel || "Non disponible"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Icon name="place" size={16} color="#555" />
+            <Text style={styles.adresse}> {item.destination?.adresse || "Non spécifiée"}</Text>
+          </View>
+        </View>
+
+        {/* Statut et Total */}
+        <View style={styles.statusContainer}>
+          <View style={[
+            styles.statusBadge,
+            isLivree ? styles.statusLivree : 
+            item.livraison === "Refusée" ? styles.statusRefusee :
+            item.livraison === "Acceptée" ? styles.statusAcceptee :
+            styles.statusAssignee
+          ]}>
+            <Text style={styles.statusText}>
+              {item.livraison || 'En attente'}
+            </Text>
+          </View>
+          <Text style={styles.total}>Total: {(details.total)+130 || 0} DA</Text>
+        </View>
+          
+        {/* Boutons d'action */}
         {showButtons && (
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.acceptButton]}
+            <TouchableOpacity 
+              style={[styles.button, styles.acceptButton]} 
               onPress={() => accepterCommande(item.numeroCommande, item.userId?.numTel, item.userId?.nom)}
             >
               <Text style={styles.buttonText}>Accepter</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.rejectButton]}
+            <TouchableOpacity 
+              style={[styles.button, styles.rejectButton]} 
               onPress={() => refuserCommande(item.numeroCommande)}
             >
               <Text style={styles.buttonText}>Refuser</Text>
@@ -247,60 +321,104 @@ const ListeCommandeALivre = () => {
   };
 
   return (
-    <LayoutLivreur>
-      <Text style={styles.title}>Commandes Assignées</Text>
+    <LayoutLivreur loading={loading}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Commandes Assignées</Text>
+        <TouchableOpacity onPress={() => onRefresh()} style={styles.refreshButton}>
+          <Icon name="refresh" size={24} color="#2E7D32" />
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#2E7D32" />
-      ) : commandesAssignees.length === 0 ? (
-        <Text style={styles.emptyText}>Aucune commande assignée</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2E7D32" />
+        </View>
       ) : (
         <FlatList
           data={commandesAssignees}
+          contentContainerStyle={styles.listContainer}
+          keyExtractor={(item) => item._id.toString()}
           renderItem={renderItem}
-          keyExtractor={item => item.numeroCommande.toString()}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={async () => {
-                setRefreshing(true);
-                await fetchCommandes(livreurId);
-                setRefreshing(false);
-              }}
-              colors={["#2E7D32"]}
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh} 
+              colors={['#2E7D32']}
+              tintColor="#2E7D32"
             />
           }
-          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Icon name="assignment" size={50} color="#cccccc" />
+              <Text style={styles.emptyText}>Aucune commande assignée</Text>
+            </View>
+          }
         />
       )}
     </LayoutLivreur>
   );
 };
 
-// Les styles restent identiques à votre code original
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#2E7D32',
-    textAlign: 'center',
-    marginVertical: 15,
+  },
+  refreshButton: {
+    padding: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listContainer: {
-    paddingBottom: 70,
+    padding: 10,
+    paddingBottom: 60,
   },
-  card: { 
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 50,
+  },
+  emptyText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  card: {
     backgroundColor: '#FFF',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    marginHorizontal: 15,
-    marginBottom: 10,
-    elevation: 3,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 6,
+    elevation: 3,
     position: 'relative',
+  },
+  cardHeader: {
+    marginBottom: 12,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  commandeInfo: {
+    marginBottom: 8,
   },
   commandeNumero: {
     fontSize: 18,
@@ -308,56 +426,78 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 5,
   },
+  dateText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 5,
+  },
+  clientInfo: {
+    marginVertical: 5,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   client: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#555',
-    marginBottom: 3,
   },
   telephone: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 3,
   },
   adresse: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 3,
     fontStyle: 'italic',
   },
-  paymentMethodContainer: {
-    marginVertical: 5,
-    paddingVertical: 5,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
-  paymentMethod: {
-    fontSize: 14,
-    color: '#555',
-    fontWeight: 'bold',
-  },
   statusContainer: {
-    marginVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
     paddingVertical: 5,
+    borderRadius: 12,
   },
   statusText: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   statusLivree: {
+    backgroundColor: '#e8f5e9',
+  },
+  statusTextLivree: {
     color: '#27ae60',
   },
   statusRefusee: {
+    backgroundColor: '#ffebee',
+  },
+  statusTextRefusee: {
     color: '#e74c3c',
   },
   statusAcceptee: {
+    backgroundColor: '#fff3e0',
+  },
+  statusTextAcceptee: {
     color: '#f39c12',
+  },
+  statusAssignee: {
+    backgroundColor: '#e3f2fd',
+  },
+  statusTextAssignee: {
+    color: '#3498db',
   },
   total: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#2E7D32',
-    marginTop: 5,
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -367,39 +507,61 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     paddingVertical: 12,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
   },
   acceptButton: {
-    backgroundColor: '#2E7D32',
-    marginRight: 5,
+    backgroundColor: '#4CAF50',
+    marginRight: 8,
   },
   rejectButton: {
-    backgroundColor: '#D32F2F',
-    marginLeft: 5,
+    backgroundColor: '#F44336',
+    marginLeft: 8,
   },
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
+    marginLeft: 5,
   },
-  emptyText: {
-    textAlign: 'center',
-    color: '#666',
-    marginTop: 20,
-    fontSize: 16,
+  newBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#E63946',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  newBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   deleteButton: {
     position: 'absolute',
-    right: 10,
     top: 10,
-    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+    right: 10,
+    zIndex: 2,
+    backgroundColor: 'rgb(244, 171, 178)',
     borderRadius: 15,
     width: 30,
     height: 30,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });
 

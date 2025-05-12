@@ -14,6 +14,7 @@ const ModifierCategories = ({ route, navigation }) => {
 
             await fetch(`http://192.168.38.149:8080/api/categories/update/${category._id}`, {
 
+
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nom, image })

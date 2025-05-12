@@ -9,7 +9,9 @@ import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
 
+
 const socket = io("http://192.168.38.149:8080"); // Mets l'URL de ton backend
+
 
 
 
@@ -24,7 +26,9 @@ const MenuAdmin = () => {
   };
 
  useEffect(() => {
+
   fetch("http://192.168.38.149:8080/api/v1/notifications")
+
 
     .then((res) => res.json())
     .then((data) => {
@@ -91,7 +95,7 @@ export default MenuAdmin;
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    width: '100%',
+    width: '100%', 
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,

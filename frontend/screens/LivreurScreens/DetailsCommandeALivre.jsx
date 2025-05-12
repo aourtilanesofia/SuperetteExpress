@@ -72,6 +72,7 @@ const DetailsCommandeALivre = ({ route }) => {
             // Envoyer la position du livreur et mettre à jour le statut
             const livreurId = await AsyncStorage.getItem('livreurId');
             const response = await fetch(`http://192.168.38.149:8080/api/commandes/livstat/${commande._id}`, {
+
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -94,6 +95,7 @@ const DetailsCommandeALivre = ({ route }) => {
     
             // Envoyer la position initiale du livreur au serveur
             await fetch('http://192.168.38.149:8080/api/livreur/position', {
+
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -141,6 +143,7 @@ const DetailsCommandeALivre = ({ route }) => {
         try {
             const response = await fetch(
                 `http://192.168.38.149:8080/api/commandes/${commande._id}`,
+
                 {
                     method: "PUT",
                     headers: {

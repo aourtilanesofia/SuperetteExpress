@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  FlatList, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  Alert,
+  RefreshControl
+} from "react-native";
 import Layout from "../../components/Layout/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ListeDesCommandes = () => {
     const [commandes, setCommandes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation();
     const { t } = useTranslation();
 
@@ -16,33 +27,46 @@ const ListeDesCommandes = () => {
     };
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const userId = await AsyncStorage.getItem("userId");
-                if (!userId) {
-                    console.log("Aucun utilisateur connecté");
-                    setLoading(false);
-                    return;
-                }
-
-                const response = await fetch(`http://192.168.38.149:8080/api/commandes/user/${userId}`);
-                const data = await response.json();
-
-                if (response.ok) {
-                    const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    setCommandes(sortedData);
-                } else {
-                    console.log("Erreur lors de la récupération des commandes :", data.message);
-                }
-            } catch (error) {
-                console.log("Erreur de connexion au serveur :", error);
-            } finally {
+    const fetchOrders = async () => {
+        try {
+            const userId = await AsyncStorage.getItem("userId");
+            if (!userId) {
+                console.log("Aucun utilisateur connecté");
                 setLoading(false);
+                return;
             }
-        };
 
+            const response = await fetch(`http://192.168.38.149:8080/api/commandes/user/${userId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                setCommandes(sortedData);
+            } else {
+                console.log("Erreur lors de la récupération des commandes :", data.message);
+            }
+        } catch (error) {
+            console.log("Erreur de connexion au serveur :", error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    fetchOrders();  
+
+}, []); 
+
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchOrders();
+        }, [])
+    );
+
+    const onRefresh = () => {
         fetchOrders();
-    }, []);
+    };
 
     const handlePaiement = (statut, commande) => {
         if (statut !== "Confirmée") {
@@ -52,146 +76,196 @@ const ListeDesCommandes = () => {
         }
     };
 
+    const renderCommandeItem = ({ item }) => {
+        let statusColor = "#ff9800";
+        let statusText = item.statut;
+
+        if (item.paiement === "Payée" || item.paiement === "En attente de paiement") {
+            statusText = item.paiement;
+            statusColor = item.paiement === "Payée" ? "green" : "#ff9800";
+        } else if (item.statut === "Confirmée") {
+            statusColor = "green";
+        } else if (item.statut === "Annulée") {
+            statusColor = "red";
+        }
+
+        const isDisabled = item.statut === "Annulée";
+
+        return (
+            <View style={styles.card}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("CommandeDetails", {
+                        commande: item,
+                        onDelete: supprimerCommande
+                    })}
+                    style={styles.touchableArea}
+                >
+                    <View style={styles.cardHeader}>
+                        <Text style={styles.commandeId}>{t("commande")} #{item.numeroCommande}</Text>
+                        <View style={styles.infoRow}>
+                            <Icon name="access-time" size={16} color="#2E7D32" />
+                            <Text style={styles.dateText}>
+                                {new Date(item.date).toLocaleString()}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.statusContainer}>
+                        <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
+                    </View>
+
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     return (
         <Layout>
-            <View style={styles.container}>
-                {loading ? (
-                    <ActivityIndicator size="large" color="#ff9800" />
-                ) : commandes.length === 0 ? (
-                    <Text style={styles.emptyMessage}>{t("Aucune commande")}</Text>
-                ) : (
-                    <>
-                        <Text style={styles.subTitle}>{t("nbrcommande")} : {commandes.length}</Text>
-                        <FlatList
-                            data={commandes}
-                            keyExtractor={(item) => item._id}
-                            contentContainerStyle={{ paddingBottom: 50 }}
-                            renderItem={({ item }) => {
-                                // Déterminer la couleur et le texte à afficher pour le statut
-                                let statusColor = "#ff9800"; // Par défaut, en attente
-                                let statusText = item.statut;
-
-                                if (item.paiement === "Payée" || item.paiement === "En attente de paiement") {
-                                    // Afficher uniquement le statut de paiement, pas de statut de commande
-                                    statusText = item.paiement;
-                                    statusColor = item.paiement === "Payée" ? "green" : "#ff9800"; // Vert pour Payée, Orange pour En attente
-                                } else if (item.statut === "Confirmée") {
-                                    statusColor = "green"; // Confirmée reste en vert
-                                } else if (item.statut === "Annulée") {
-                                    statusColor = "red"; // Annulée en rouge
-                                }
-
-                                const isDisabled = item.statut === "Annulée";
-
-                                // Affichage du bouton de paiement uniquement si la commande n'est pas payée ou annulée
-                                const paiementStatut = (item.paiement === "Payée" || item.paiement === "En attente de paiement") ? (
-                                    <Text style={[styles.status, { color: "blue" }]}>
-                                        {statusText}
-                                    </Text>
-                                ) : (
-                                    <TouchableOpacity
-                                        style={[styles.paiementButton, isDisabled && styles.disabledButton]}
-                                        onPress={() => handlePaiement(item.statut, item)}
-                                        disabled={isDisabled}
-                                    >
-                                        <Text style={styles.paiementButtonText}>{t("Paiement")}</Text>
-                                    </TouchableOpacity>
-                                );
-
-                                return (
-                                    <TouchableOpacity
-                                        style={styles.card}
-                                        onPress={() => navigation.navigate("CommandeDetails", {
-                                            commande: item,
-                                            onDelete: supprimerCommande
-                                        })}
-                                    >
-                                        <View style={styles.row}>
-                                            <Text style={styles.commandeId}>{t("commande")} #{item.numeroCommande}</Text>
-                                            <Text style={styles.date}>{new Date(item.date).toLocaleString()}</Text>
-                                        </View>
-                                        <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
-                                        
-                                    </TouchableOpacity>
-                                );
-                            }}
-                        />
-                    </>
-                )}
+            <View style={styles.header}>
+                <Text style={styles.title}>{t("Mes Commandes")}</Text>
+                <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
+                    <Icon name="refresh" size={24} color="#329171" />
+                </TouchableOpacity>
             </View>
+
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#329171" />
+                </View>
+            ) : commandes.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                    <Icon name="assignment" size={50} color="#cccccc" />
+                    <Text style={styles.emptyText}>{t("Aucune commande")}</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={commandes}
+                    keyExtractor={(item) => item._id}
+                    renderItem={renderCommandeItem}
+                    contentContainerStyle={styles.listContainer}
+                    refreshControl={
+                        <RefreshControl 
+                            refreshing={refreshing} 
+                            onRefresh={onRefresh} 
+                            colors={['#329171']}
+                            tintColor="#329171"
+                        />
+                    }
+                />
+            )}
         </Layout>
     );
 };
 
-const styles = StyleSheet.create({ 
-    container: { 
+const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        backgroundColor: '#f8f9fa',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#2E7D32',
+    },
+    refreshButton: {
+        padding: 5,
+    },
+    loadingContainer: {
         flex: 1,
-        padding: 20,
-        backgroundColor: "#f5f5f5",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    subTitle: {
-        fontSize: 15,
-        marginBottom: 15,
-        fontWeight: "bold",
+    listContainer: {
+        padding: 10,
+        paddingBottom: 70,
     },
-    emptyMessage: {
-        textAlign: "center",
-        fontSize: 17,
-        color: "#666",
-        marginTop: 290,
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 50,
     },
-    card: {
-        backgroundColor: "#fff",
-        padding: 25,
-        marginBottom: 10,
-        borderRadius: 10,
-        elevation: 6,
-    },
-    row: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 5,
-    },
-    commandeId: {
-        fontSize: 15,
-        fontWeight: "bold",
-        color: "#333",
-    },
-    date: {
-        fontSize: 14,
-        color: "#666",
-    },
-    total: {
-        fontSize: 14,
-        marginTop: 8,
-    },
-    status: {
-        fontSize: 14,
-        fontWeight: "bold",
-        marginTop: 5,
-        textAlign: "right",
-    },
-    paiementButton: {
-        backgroundColor: "#2E7D32",
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        width: '32%',
-        bottom: 10,
-    },
-    paiementButtonText: {
-        color: "#fff",
-        fontSize: 14,
+    emptyText: {
+        marginTop: 15,
+        fontSize: 16,
+        color: '#666',
         textAlign: 'center',
     },
-    disabledButton: {
-        backgroundColor: "#ccc",
+    card: {
+        backgroundColor: '#FFF',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
     },
-    v1: { 
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+    touchableArea: {
+        flex: 1,
+    },
+    cardHeader: {
+        marginBottom: 12,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    commandeId: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 5,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    dateText: {
+        fontSize: 14,
+        color: '#666',
+        marginLeft: 5,
+    },
+    statusContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 10,
+        paddingTop: 10,
+        //borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+    },
+    statusText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    total: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#2E7D32',
+        marginLeft:230,
+    },
+    paiementButton: {
+        backgroundColor: '#2E7D32',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 10,
+        alignItems: 'center',
+    },
+    paiementButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    disabledButton: {
+        backgroundColor: '#cccccc',
     },
 });
 

@@ -58,6 +58,7 @@ const TrackCommande = ({ route, navigation }) => {
         const userId = await AsyncStorage.getItem('userId');
         
         const response = await fetch(`http://192.168.38.149:8080/api/commandes/active/${userId}`, {
+
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -91,6 +92,7 @@ const TrackCommande = ({ route, navigation }) => {
 
       const token = await AsyncStorage.getItem('token');
       const response = await fetch(`http://192.168.38.149:8080/api/v1/livreur/position/${livreurId}`, {
+
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

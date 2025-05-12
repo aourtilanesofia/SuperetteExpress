@@ -29,7 +29,7 @@ export const getProductById = async (req, res) => {
 export const addProduct = async (req, res) => {
   const { nom, prix, categorie, stock, description, codeBarre } = req.body;
 
-  const imageUrl = req.file ? `http://192.168.1.9:8080/uploads/${req.file.filename}` : null;
+  const imageUrl = req.file ? `http://192.168.1.38:8080/uploads/${req.file.filename}` : null;
 
   try {
     // Création d'un nouveau produit avec tous les champs requis
@@ -64,7 +64,7 @@ export const updateProduct = async (req, res) => {
 
     // Si une nouvelle image est envoyée
     const imageUrl = req.file
-      ? `http://192.168.1.9:8080/uploads/${req.file.filename}`
+      ? `http://192.168.1.38:8080/uploads/${req.file.filename}`
       : req.body.imagePath || req.body.image; // accepte imagePath s’il existe
 
     const updateFields = {};

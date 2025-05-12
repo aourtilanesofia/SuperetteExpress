@@ -39,6 +39,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
 
                             const response = await fetch('http://192.168.38.149:8080/api/v1/livreur/delete-accountL', {
 
+
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,

@@ -34,6 +34,7 @@ const PaiementEspece = ({ navigation, route }) => {
 
     try {
       const response = await fetch(`http://192.168.38.149:8080/api/commandes/payer/${commande.numeroCommande}`, {
+
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

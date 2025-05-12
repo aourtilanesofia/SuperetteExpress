@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 
+
 const backendUrl = "http://192.168.38.149:8080";
+
 
 
 const Categories = () => {  // Ajout de navigation
@@ -15,7 +17,7 @@ const Categories = () => {  // Ajout de navigation
       try {
         const response = await fetch(`${backendUrl}/api/categories`);
         const data = await response.json();
-        console.log("Données récupérées :", data);  // <--- ici
+        //console.log("Données récupérées :", data);  // <--- ici
         setCategories(data);
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);

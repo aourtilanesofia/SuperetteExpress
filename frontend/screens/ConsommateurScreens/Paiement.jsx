@@ -41,6 +41,7 @@ const Paiement = ({ route }) => {
         const response = await fetch(`http://192.168.38.149:8080/api/v1/consommateur/${commande.userId}`);
 
 
+
         // Vérifier le statut de la réponse
         if (!response.ok) {
           throw new Error(`Erreur du serveur : ${response.status} - ${response.statusText}`);
@@ -148,6 +149,7 @@ const Paiement = ({ route }) => {
   const handleValider = async () => {
     try {
       const response = await fetch(`http://192.168.38.149:8080/api/commandes/livraison/${commande.numeroCommande}`, {
+
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

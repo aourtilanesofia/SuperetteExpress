@@ -371,13 +371,10 @@ export const updatePosition = async (req, res) => {
 
 // Trouver les livreurs proches
 export const findNearbyLivreurs = async (req, res) => {
-  // Parse les coordonnées en nombres flottants
   const lng = parseFloat(req.query.longitude);
   const lat = parseFloat(req.query.latitude);
   const commandeId = req.query.commandeId;
-  console.log(commandeId);
 
-  // Vérifie que les coordonnées sont valides
   if (isNaN(lng) || isNaN(lat)) {
     return res.status(400).json({
       success: false,
@@ -388,12 +385,7 @@ export const findNearbyLivreurs = async (req, res) => {
   const coords = [lng, lat];
   const radius = parseInt(req.query.maxDistance) || 10000;
 
-  console.log('=== DEBUG LIVREURS ===');
-  console.log('Coordonnées:', coords);
-  console.log('Rayon:', radius);
-
   try {
-    // Utilise le modèle mongoose plutôt que l'accès direct à la collection
     const results = await mongoose.model('Livreurs').find({
       position: {
         $nearSphere: {
@@ -407,23 +399,22 @@ export const findNearbyLivreurs = async (req, res) => {
       isValidated: true
     }).lean();
 
-    console.log('Livreurs trouvés:', results.length);
-
-    const formattedResults = results.map(livreur => ({
-      ...livreur,
-      distance: livreur.position?.coordinates
-        ? Math.round(calculateDistance(coords, livreur.position.coordinates))
-        : null
-    }));
-
-    if (formattedResults.length === 0) {
-      return res.status(404).json({ success: false, message: "Aucun livreur trouvé" });
+    if (results.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Aucun livreur trouvé" 
+      });
     }
 
+    // Sélectionne uniquement le livreur le plus proche (premier résultat)
     const livreurAffecte = results[0];
 
+    // Met à jour la commande
     const commande = await CommandeModel.findByIdAndUpdate(
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
       commandeId,
       {
         livreur: livreurAffecte._id,
@@ -431,35 +422,39 @@ export const findNearbyLivreurs = async (req, res) => {
       },
       { new: true }
     );
-    console.log("Commande mise à jour :", commande);
+
+    // Crée une seule notification pour le livreur affecté
+    const notification = new Notification({
+      message: "Nouvelle Commande à livrer!",
+      isRead: false,
+      role: "livreur",
+      livreurId: livreurAffecte._id
+    });
+
+    await notification.save();
+
+    // Envoi des notifications via WebSocket
     if (req.app.get("io")) {
       const io = req.app.get("io");
+<<<<<<< HEAD
 
+=======
+      
+      // Un seul emit pour la commande assignée
+>>>>>>> main
       io.emit(`commande-assignee_${livreurAffecte._id}`, commande);
+      
+      // Un seul emit pour la notification
+      io.emit(`notification_livreur_${livreurAffecte._id}`, notification);
     }
 
-
-    for (const livreurAffecte of results) {
-      const notification = new Notification({
-        message: "Nouvelle Commande à livrer!",
-        isRead: false,
-        role: "livreur",
-        livreurId: new mongoose.Types.ObjectId(livreurAffecte._id)
-      });
-
-      console.log(`Création de notification pour le livreur ${livreurAffecte._id}`);
-
-      await notification.save();
-
-      console.log(`Notification sauvegardée pour le livreur ${livreurAffecte._id}`);
-
-      // Envoi via WebSocket si disponible
-      if (req.app.get("io")) {
-        const io = req.app.get("io");
-        io.emit(`notification_livreur_${livreurAffecte._id}`, notification);
-      }
-    }
-
+    // Formatage des résultats pour la réponse
+    const formattedResults = results.map(livreur => ({
+      ...livreur,
+      distance: livreur.position?.coordinates
+        ? Math.round(calculateDistance(coords, livreur.position.coordinates))
+        : null
+    }));
 
     res.status(200).json({
       success: true,
@@ -475,6 +470,7 @@ export const findNearbyLivreurs = async (req, res) => {
     });
   }
 };
+
 
 function calculateDistance(coord1, coord2) {
   const R = 6371e3;
@@ -496,10 +492,10 @@ function calculateDistance(coord1, coord2) {
 export const getCommandesAssignees = async (req, res) => {
   try {
     const { livreurId } = req.params;
-    console.log(`Recherche commandes pour livreur: ${livreurId}`); // Log 1
+    //console.log(`Recherche commandes pour livreur: ${livreurId}`); // Log 1
 
     if (!mongoose.Types.ObjectId.isValid(livreurId)) {
-      console.log('ID livreur invalide:', livreurId); // Log 2
+      //console.log('ID livreur invalide:', livreurId); 
       return res.status(400).json({ message: 'ID livreur invalide' });
     }
 
@@ -511,7 +507,7 @@ export const getCommandesAssignees = async (req, res) => {
       .populate('userId', 'nom numTel')
       .populate('livreur', 'nom');
 
-    console.log('Commandes trouvées:', commandes); // Log 3
+    //console.log('Commandes trouvées:', commandes); 
 
     res.status(200).json(commandes);
   } catch (error) {
@@ -530,7 +526,7 @@ export const accepterCommande = async (req, res) => {
     const { numeroCommande } = req.params;
     const { livreurId, livraison } = req.body;
 
-    console.log('Numéro de commande reçu (backend):', numeroCommande);
+    //console.log('Numéro de commande reçu (backend):', numeroCommande);
 
     // Trouver la commande par numéro de commande
     const commande = await CommandeModel.findOne({ numeroCommande });

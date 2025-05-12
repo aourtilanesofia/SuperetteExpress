@@ -13,7 +13,7 @@ const Valider = () => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        console.log("Produits reçus dans Valider :", JSON.stringify(produits, null, 2));
+        //console.log("Produits reçus dans Valider :", JSON.stringify(produits, null, 2));
     }, [produits]);
 
     const produitsFormates = (produits || []).map(p => ({
@@ -40,6 +40,7 @@ const Valider = () => {
 
 
                 const response = await fetch(`http://192.168.38.149:8080/api/commandes/add`, {
+
 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

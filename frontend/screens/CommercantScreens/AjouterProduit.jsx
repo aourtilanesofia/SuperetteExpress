@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 const backendUrl = "http://192.168.38.149:8080";
 
+
 const AjouterProduit = ({ navigation }) => {
   const [nom, setNom] = useState("");
   const [prix, setPrix] = useState("");

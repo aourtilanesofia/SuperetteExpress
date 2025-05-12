@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    flex: 1,  // Permet au contenu d'occuper tout l'espace disponible
+    flex: 1,
   },
   footer: {
     position: "absolute",
