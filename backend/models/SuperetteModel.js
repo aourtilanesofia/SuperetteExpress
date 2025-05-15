@@ -5,7 +5,7 @@ const superetteSchema = new mongoose.Schema({
   address: String,
   location: {
     type: {
-      type: String,
+      type: String, 
       enum: ['Point'],
       required: true
     },

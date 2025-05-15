@@ -80,10 +80,6 @@ export const connexionControllerL = async (req, res) => {
       return res.status(400).json({ success: false, message: "Mot de passe invalide" });
     }
 
-    if (!livreur.isValidated) {
-      return res.status(403).json({ success: false, message: "Votre compte doit être validé par l'admin." });
-    }
-
     const token = livreur.generateToken();
 
     return res.status(200).cookie("token", token).json({
@@ -411,10 +407,7 @@ export const findNearbyLivreurs = async (req, res) => {
 
     // Met à jour la commande
     const commande = await CommandeModel.findByIdAndUpdate(
-<<<<<<< HEAD
 
-=======
->>>>>>> main
       commandeId,
       {
         livreur: livreurAffecte._id,
@@ -436,12 +429,6 @@ export const findNearbyLivreurs = async (req, res) => {
     // Envoi des notifications via WebSocket
     if (req.app.get("io")) {
       const io = req.app.get("io");
-<<<<<<< HEAD
-
-=======
-      
-      // Un seul emit pour la commande assignée
->>>>>>> main
       io.emit(`commande-assignee_${livreurAffecte._id}`, commande);
       
       // Un seul emit pour la notification

@@ -6,7 +6,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
   const [qty, setQty] = useState(item.qty !== undefined ? item.qty : 1);
 
 
-  const backendUrl = "http://192.168.38.149:8080";
+  const backendUrl = "http://192.168.1.36:8080";
 
 
   useEffect(() => {

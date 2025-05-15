@@ -83,7 +83,7 @@ export const connexionCommercantController = async (req, res) => {
         if (mdp !== commercant.mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Mot de passe invalide!",
+                message: " Mot de passe invalide!",
             });
         }
 

@@ -53,7 +53,7 @@ const CompteCommercant = ({ navigation }) => {
                             const token = await AsyncStorage.getItem('token');
                             const user = JSON.parse(await AsyncStorage.getItem('user'));
 
-                            const response = await fetch(`http://192.168.38.149:8080/api/v1/commercant/delete-account`, {
+                            const response = await fetch(`http://192.168.1.36:8080/api/v1/commercant/delete-account`, {
 
                                 method: 'DELETE',
                                 headers: {
@@ -113,6 +113,44 @@ const CompteCommercant = ({ navigation }) => {
             </LayoutCommercant>
         );
     }
+    const getAvatarColor = (name) => {
+        if (!name) return 'rgb(102, 187, 106)';
+
+        const colors = [
+            'rgb(228, 134, 127)',     // rouge
+            'rgb(233, 30, 99)',     // rose
+            'rgb(156, 39, 176)',    // violet
+            'rgb(103, 58, 183)',    // violet foncé
+            'rgb(63, 81, 181)',     // bleu
+            'rgb(33, 150, 243)',    // bleu clair
+            'rgb(3, 169, 244)',     // cyan
+            'rgb(0, 188, 212)',     // turquoise
+            'rgb(0, 150, 136)',     // vert foncé
+            'rgb(76, 175, 80)',     // vert
+            'rgb(139, 195, 74)',    // vert clair
+            'rgb(205, 220, 57)',    // citron
+            'rgb(225, 214, 111)',    // jaune
+            'rgb(240, 201, 62)',    // jaune foncé
+            'rgb(255, 152, 0)',     // orange
+            'rgb(121, 85, 72)'      // marron
+        ];
+
+        const charCode = name.charCodeAt(0) + (name.length > 1 ? name.charCodeAt(1) : 0);
+        return colors[charCode % colors.length];
+    };
+    // Fonction pour générer les initiales
+    const getInitials = (name) => {
+        if (!name) return '';
+
+        const names = name.split(' ');
+        let initials = names[0][0].toUpperCase();
+
+        if (names.length > 1) {
+            initials += names[names.length - 1][0].toUpperCase();
+        }
+
+        return initials;
+    };
 
 
 
@@ -124,16 +162,19 @@ const CompteCommercant = ({ navigation }) => {
             >
                 <View style={styles.container}>
                     <View style={styles.profileHeader}>
-                        <View style={styles.avatarContainer}>
-                            {user.profilePic ? (
-                                <Image
-                                    source={{ uri: user.profilePic }}
-                                    style={styles.avatar}
-                                />
-                            ) : (
-                                <Text style={styles.avatarText}>{user.nom ? user.nom[0] : ''}</Text>
-                            )}
-                        </View>
+                        {user.photoProfil ? (
+                            <Image source={{ uri: getAbsoluteUrl(user.photoProfil) }} style={styles.avatar} />
+                        ) : (
+                            <View style={[
+                                styles.avatarFallback,
+                                { backgroundColor: getAvatarColor(user.nom) }
+                            ]}>
+                                <Text style={styles.avatarText}>
+                                    {getInitials(user.nom)}
+                                </Text>
+
+                            </View>
+                        )}
                         <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
@@ -194,6 +235,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        marginTop:30,
     },
     loadingContainer: {
         flex: 1,
@@ -210,9 +252,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#FF3B30',
     },
-    profileHeader: {
+   profileHeader: {
         alignItems: 'center',
         marginBottom: 30,
+        marginTop: 20,
+    },
+    avatarFallback: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
     },
     avatarContainer: {
         width: 100,
@@ -225,27 +281,27 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginTop: 25,
     },
-        avatarText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#fff',
-    backgroundColor: '#66BB6A',  
-    width: 80,  
-    height: 80,  
-    borderRadius: 40,  
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-    lineHeight: 90, 
-},
+    avatarText: {
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: '#fff',
+        textAlign: 'center',
+        textShadowColor: 'rgba(0,0,0,0.2)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2, // Centrer la lettre verticalement
+    },
     avatar: {
-        width: '100%',
-        height: '100%',
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 3,
+        borderColor: '#fff',
     },
     welcomeText: {
         fontSize: 18,
         fontWeight: '600',
         color: '#000',
+        marginTop:20,
     },
     profileInfo: {
         backgroundColor: '#FFFFFF',

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -13,6 +14,16 @@ const CompteLivreur = ({ navigation }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [profilePic, setProfilePic] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        numTel: '',
+        categorie: '',
+        marque: '',
+        matricule: '',
+        mdp: '',
+        newPassword: ''
+    });
     const { t } = useTranslation();
 
     useFocusEffect(
@@ -96,7 +107,7 @@ const CompteLivreur = ({ navigation }) => {
             const formData = new FormData();
             formData.append('profilePic', blob, 'profile.jpg');
 
-            const uploadResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/upload-profile-pic', {
+            const uploadResponse = await fetch('http://192.168.1.36:8080/api/v1/livreur/upload-profile-pic', {
 
                 method: 'POST',
                 headers: {
@@ -109,7 +120,7 @@ const CompteLivreur = ({ navigation }) => {
             if (!uploadResponse.ok) throw new Error(data.message || 'Erreur lors du téléchargement');
 
             // FORCEZ le rafraîchissement en récupérant les données utilisateur complètes
-            const userResponse = await fetch('http://192.168.38.149:8080/api/v1/livreur/me', {
+            const userResponse = await fetch('http://192.168.1.36:8080/api/v1/livreur/me', {
 
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -135,7 +146,7 @@ const CompteLivreur = ({ navigation }) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         // Ajoutez un '/' entre l'IP et le chemin si nécessaire
-        return `http://192.168.38.149:8080${path.startsWith('/') ? path : '/' + path}`;
+        return `http://192.168.1.36:8080${path.startsWith('/') ? path : '/' + path}`;
 
     };
 
@@ -181,6 +192,48 @@ const CompteLivreur = ({ navigation }) => {
         );
     }
 
+    const getAvatarColor = (name) => {
+        if (!name) return 'rgb(102, 187, 106)';
+
+        const colors = [
+            'rgb(228, 134, 127)',    // rouge
+            'rgb(233, 30, 99)',     // rose
+            'rgb(156, 39, 176)',    // violet
+            'rgb(103, 58, 183)',    // violet foncé
+            'rgb(63, 81, 181)',     // bleu
+            'rgb(33, 150, 243)',    // bleu clair
+            'rgb(3, 169, 244)',     // cyan
+            'rgb(0, 188, 212)',     // turquoise
+            'rgb(0, 150, 136)',     // vert foncé
+            'rgb(76, 175, 80)',     // vert
+            'rgb(139, 195, 74)',    // vert clair
+            'rgb(205, 220, 57)',    // citron
+            'rgb(225, 214, 111)',    // jaune
+            'rgb(240, 201, 62)',    // jaune foncé
+            'rgb(255, 152, 0)',     // orange
+            'rgb(121, 85, 72)'      // marron
+        ];
+
+        const charCode = name.charCodeAt(0) + (name.length > 1 ? name.charCodeAt(1) : 0);
+        return colors[charCode % colors.length];
+    };
+    // Fonction pour générer les initiales
+   const getInitials = (name) => {
+    if (!name || typeof name !== 'string') return '';
+
+    const names = name.trim().split(' ').filter(n => n.length > 0);
+    if (names.length === 0) return '';
+
+    let initials = names[0][0].toUpperCase();
+
+    if (names.length > 1) {
+        initials += names[names.length - 1][0].toUpperCase();
+    }
+
+    return initials;
+};
+
+
     return (
         <LayoutLivreur>
             <LinearGradient
@@ -189,16 +242,19 @@ const CompteLivreur = ({ navigation }) => {
             >
                 <View style={styles.container}>
                     <View style={styles.profileHeader}>
-                        <View style={styles.avatarContainer}>
-                            {user.profilePic ? (
-                                <Image
-                                    source={{ uri: user.profilePic }}
-                                    style={styles.avatar}
-                                />
-                            ) : (
-                                <Text style={styles.avatarText}>{user.nom ? user.nom[0] : ''}</Text>
-                            )}
-                        </View>
+                        {user.photoProfil ? (
+                            <Image source={{ uri: getAbsoluteUrl(user.photoProfil) }} style={styles.avatar} />
+                        ) : (
+                            <View style={[
+                                styles.avatarFallback,
+                                { backgroundColor: getAvatarColor(user.nom) }
+                            ]}>
+                                <Text style={styles.avatarText}>
+                                    {getInitials(user.nom)}
+                                </Text>
+
+                            </View>
+                        )}
                         <Text style={styles.welcomeText}>{t('Bienvenue')} {user.nom} 👋</Text>
                     </View>
 
@@ -240,12 +296,9 @@ const CompteLivreur = ({ navigation }) => {
                                 <Text style={styles.infoLabel}>{t('Matricule')}</Text>
                                 <Text style={styles.infoValue}>
                                     {user.matricule
-                                        ? user.matricule.replace(/^(\d{0,5})(\d{0,3})(\d{0,2}).*$/, (match, p1, p2, p3) =>
-                                            [p1, p2, p3].filter(Boolean).join(' ')
-                                        )
+                                        ? user.matricule.replace(/^(\d{5})(\d{3})(\d{2})$/, '$1 $2 $3')
                                         : ''}
                                 </Text>
-
                             </View>
                         </View>
                     </View>
@@ -270,6 +323,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        marginTop: 20,
     },
     loadingContainer: {
         flex: 1,
@@ -285,10 +339,24 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 16,
         color: '#FF3B30',
-    },
+    }, 
     profileHeader: {
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 30,
+        marginTop: 20,
+    },
+    avatarFallback: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
     },
     avatarContainer: {
         width: 100,
@@ -302,22 +370,20 @@ const styles = StyleSheet.create({
         marginTop: 25,
     },
     avatarText: {
-        fontSize: 40,
+        fontSize: 36,
         fontWeight: 'bold',
         color: '#fff',
-        backgroundColor: '#66BB6A',  
-        width: 80, 
-        height: 80,  
-        borderRadius: 40,  
-        justifyContent: 'center',
-        alignItems: 'center',
         textAlign: 'center',
-        lineHeight: 90, 
+        textShadowColor: 'rgba(0,0,0,0.2)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2, // Centrer la lettre verticalement
     },
     avatar: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 3,
+        borderColor: '#fff',
     },
     cameraIcon: {
         position: 'absolute',
@@ -342,7 +408,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '600',
         color: '#000',
-        marginTop: 10,
+        marginTop: 20,
     },
     profileInfo: {
         backgroundColor: '#FFFFFF',

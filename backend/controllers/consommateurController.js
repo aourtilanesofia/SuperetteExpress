@@ -201,7 +201,7 @@ export const getAllConsommateurs = async (req,res) =>{
         const consommateur = await consommateurModel.find();
         res.json(consommateur);
     } catch (error) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: error.message });
     }
 }
 

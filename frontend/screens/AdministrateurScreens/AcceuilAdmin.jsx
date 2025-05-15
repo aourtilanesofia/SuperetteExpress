@@ -5,18 +5,17 @@ import { AntDesign, MaterialIcons, FontAwesome, Entypo } from 'react-native-vect
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react";
 
-
 const AcceuilAdmin = ({ navigation }) => {
   const { t } = useTranslation();
   const [nombreCommercants, setNombreCommercants] = useState(0);
   const [nombreConsommateursActifs, setNombreConsommateursActifs] = useState(0);
   const [nombreConsommateursNotActifs, setNombreConsommateursNotActifs] = useState(0);
   const [nombreLivreurs, setNombreLivreurs] = useState(0);
+  const [nombreSuperettes, setNombreSuperettes] = useState(0);
 
-  //Récupérer le nombre des commerçants
+  // Récupérer le nombre des commerçants
   useEffect(() => {
-    fetch("http://192.168.38.149:8080/api/v1/commercant/count")
-
+    fetch("http://192.168.1.33:8080/api/v1/commercant/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -30,14 +29,11 @@ const AcceuilAdmin = ({ navigation }) => {
       });
   }, []);
 
-  //Récupérer le nombre des consommateurs actifs
-
+  // Récupérer le nombre des consommateurs actifs
   useEffect(() => {
-    fetch("http://192.168.38.149:8080/api/v1/consommateur/activeConsommateurs/count")
-
+    fetch("http://192.168.1.33:8080/api/v1/consommateur/activeConsommateurs/count")
       .then(response => response.json())
       .then(data => {
-        //console.log("Réponse reçue :", data);
         if (data.success) {
           setNombreConsommateursActifs(data.count);  
         } else {
@@ -49,13 +45,11 @@ const AcceuilAdmin = ({ navigation }) => {
       });
   }, []);
 
-  //Récuperer le nombre des consommateurs non actifs
+  // Récupérer le nombre des consommateurs non actifs
   useEffect(() => {
-    fetch("http://192.168.38.149:8080/api/v1/consommateur/nonactiveConsommateurs/count")
-
+    fetch("http://192.168.1.33:8080/api/v1/consommateur/nonactiveConsommateurs/count")
       .then(response => response.json())
       .then(data => {
-        //console.log("Réponse reçue :", data);
         if (data.success) {
           setNombreConsommateursNotActifs(data.count);  
         } else {
@@ -67,10 +61,9 @@ const AcceuilAdmin = ({ navigation }) => {
       });
   }, []);
 
-  //Récupérer le nombre des livreurs
+  // Récupérer le nombre des livreurs
   useEffect(() => {
-    fetch("http://192.168.38.149:8080/api/v1/livreur/count")
-
+    fetch("http://192.168.1.33:8080/api/v1/livreur/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -84,10 +77,13 @@ const AcceuilAdmin = ({ navigation }) => {
       });
   }, []);
 
-
-  
-
   const menuItems = [
+    {
+      title: t('Liste des supérettes'),
+      icon: <Entypo name="shopping-basket" style={styles.icone} />,
+      nav: 'GestionDesSuperettes',
+      color: '#FF9800'
+    },
     {
       title: t('listComm'),
       icon: <Entypo name="shop" style={styles.icone} />,
@@ -116,8 +112,8 @@ const AcceuilAdmin = ({ navigation }) => {
           <Text style={styles.welcomeText}>{t('Bienvenue_admin')}</Text>
           <Text style={styles.subHeader}>{t('Gestion_plateforme')}</Text>
         </View>
+        
         <View style={styles.viewContainer}>
-
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreCommercants}</Text>
@@ -127,8 +123,8 @@ const AcceuilAdmin = ({ navigation }) => {
               <Text style={styles.statNumber}>{nombreConsommateursActifs}</Text>
               <Text style={styles.statLabel}>{t('Clients_actifs')}</Text>
             </View>
-
           </View>
+          
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreConsommateursNotActifs}</Text>
@@ -138,7 +134,6 @@ const AcceuilAdmin = ({ navigation }) => {
               <Text style={styles.statNumber}>{nombreLivreurs}</Text>
               <Text style={styles.statLabel}>{t('Livreurs_disponibles')}</Text>
             </View>
-
           </View>
 
         </View>
@@ -169,7 +164,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 30,
-    //backgroundColor: '#f5f7fa'
   },
   header: {
     paddingHorizontal: 25,
@@ -180,7 +174,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: '#2c3e50',
-    marginBottom: 5
+    //marginBottom: 5
   },
   subHeader: {
     fontSize: 16,
@@ -189,7 +183,8 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     paddingHorizontal: 15,
-    marginTop: 10
+    //marginTop: 10
+    bottom:15,
   },
   card: {
     flexDirection: 'row',
@@ -253,6 +248,6 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   viewContainer: {
-    bottom: 20,
+    bottom: 30,
   }
 });

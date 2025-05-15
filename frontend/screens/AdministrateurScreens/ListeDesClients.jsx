@@ -16,7 +16,7 @@ const ListeDesClients = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch("http://192.168.38.149:8080/api/v1/consommateur/tousConsommateur");
+      const response = await fetch("http://192.168.1.33:8080/api/v1/consommateur/tousConsommateur");
 
       const data = await response.json();
       setClients(data);
@@ -34,7 +34,7 @@ const ListeDesClients = () => {
         text: "Supprimer",
         onPress: async () => {
           try {
-            await fetch(`http://192.168.38.149:8080/api/v1/consommateur/supConsommateur/${id}`, { method: "DELETE" });
+            await fetch(`http://192.168.1.33:8080/api/v1/consommateur/supConsommateur/${id}`, { method: "DELETE" });
 
             setClients(clients.filter((client) => client._id !== id));
           } catch (error) {
@@ -47,7 +47,7 @@ const ListeDesClients = () => {
 
   const toggleStatus = async (id) => {
     try {
-      const response = await fetch(`http://192.168.38.149:8080/api/v1/consommateur/status/${id}`, {
+      const response = await fetch(`http://192.168.1.33:8080/api/v1/consommateur/status/${id}`, {
 
         method: "PUT",
         headers: { "Content-Type": "application/json" }, 
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'center', 
     alignItems: 'center',
     backgroundColor: '#F5F7FB'
   },

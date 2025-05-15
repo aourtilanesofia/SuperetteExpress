@@ -11,6 +11,7 @@ const livreurSchema = new mongoose.Schema(
     numTel: { 
       type: String,
       required: [true, "Le champ est obligatoire"],
+       unique: true,
     },
     categorie: {
       type: String,
@@ -29,24 +30,21 @@ const livreurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
-    isValidated: { 
-      type: Boolean, 
-      default: false 
-    },
+     isActive: { type: Boolean, default: false },
     profilePic: {  
       type: String
     },
     // Nouveaux champs pour la géolocalisation
-    /*position: {
+    position: {
       type: {
         type: String,
         enum: ['Point'], // GeoJSON type
         default: 'Point',
-        required: true,
+        required: false,
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
-        required: true,
+        required: false,
         validate: {
           validator: function(v) {
             return v.length === 2 && 
@@ -58,9 +56,10 @@ const livreurSchema = new mongoose.Schema(
       },
       lastUpdated: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+         required: false,
       }
-    },*/
+    },
   },
   { 
     timestamps: true 
@@ -100,4 +99,4 @@ livreurSchema.methods.deleteAccount = async function () {
 const livreurModel = mongoose.model("Livreurs", livreurSchema);
 
 export default livreurModel;
-
+ 

@@ -113,3 +113,79 @@ export const createSuperette = async (req, res) => {
     });
   }
 };
+
+
+// Récupérer toutes les supérettes
+export const getAllSuperettes = async (req, res) => {
+  try {
+    const superettes = await SuperetteModel.find();
+    res.status(200).json(superettes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Récupérer une supérette par son ID
+export const getSuperetteById = async (req, res) => {
+  try {
+    const superette = await SuperetteModel.findById(req.params.id);
+    if (!superette) {
+      return res.status(404).json({ message: "Supérette non trouvée" });
+    }
+    res.status(200).json(superette);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// Ajouter une nouvelle supérette
+export const addSuperette = async (req, res) => {
+  const { name, address, location } = req.body;
+
+  try {
+    const newSuperette = new SuperetteModel({
+      name,
+      address,
+      location: {
+        type: "Point",
+        coordinates: location.coordinates,
+      },
+    });
+
+    const savedSuperette = await newSuperette.save();
+    res.status(201).json(savedSuperette);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Modifier une supérette
+export const updateSuperette = async (req, res) => {
+  try {
+    const superette = await SuperetteModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!superette) {
+      return res.status(404).json({ message: "Supérette non trouvée" });
+    }
+    res.status(200).json(superette);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Supprimer une supérette
+export const deleteSuperette = async (req, res) => {
+  try {
+    const superette = await SuperetteModel.findByIdAndDelete(req.params.id);
+    if (!superette) {
+      return res.status(404).json({ message: "Supérette non trouvée" });
+    }
+    res.status(200).json({ message: "Supérette supprimée avec succès" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

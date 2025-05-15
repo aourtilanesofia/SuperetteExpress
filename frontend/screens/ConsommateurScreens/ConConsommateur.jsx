@@ -32,7 +32,7 @@ const ConConsommateur = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.38.149:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.1.36:8080/api/v1/consommateur/connexion", {
 
 
                 method: "POST",
@@ -86,7 +86,7 @@ const ConConsommateur = ({ navigation }) => {
                         <View style={styles.inputContainer}>
                             <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
-                                style={styles.textInput}
+                                style={styles.textInput} 
                                 placeholder='Numéro Téléphone'
                                 placeholderTextColor="#939494"
                                 keyboardType='phone-pad'
@@ -142,7 +142,7 @@ const ConConsommateur = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </KeyboardAvoidingView>
+                </KeyboardAvoidingView> 
             </LinearGradient>
         </TouchableWithoutFeedback>
     );

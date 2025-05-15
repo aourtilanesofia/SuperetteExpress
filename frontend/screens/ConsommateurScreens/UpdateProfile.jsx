@@ -50,11 +50,11 @@ const UpdateProfile = ({ navigation }) => {
         try {
             if (!/^(05|06|07)[0-9]{8}$/.test(formData.numTel)) {
                 Alert.alert("Format incorrect", "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres");
-                return;  
+                return;
             }
             if (!/^[A-Za-zÀ-ÿ\s]+$/.test(formData.name)) {
                 Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
-                return; 
+                return;
             }
 
             setIsLoading(true);
@@ -77,7 +77,7 @@ const UpdateProfile = ({ navigation }) => {
             };
 
 
-            const response = await fetch('http://192.168.38.149:8080/api/v1/consommateur/profile-update', {
+            const response = await fetch('http://192.168.1.36:8080/api/v1/consommateur/profile-update', {
 
                 method: 'PUT',
                 headers: {
@@ -111,6 +111,45 @@ const UpdateProfile = ({ navigation }) => {
         }
     };
 
+    const getAvatarColor = (name) => {
+        if (!name) return 'rgb(102, 187, 106)';
+
+        const colors = [
+            'rgb(228, 134, 127)',     // rouge
+            'rgb(233, 30, 99)',     // rose
+            'rgb(156, 39, 176)',    // violet
+            'rgb(103, 58, 183)',    // violet foncé
+            'rgb(63, 81, 181)',     // bleu
+            'rgb(33, 150, 243)',    // bleu clair
+            'rgb(3, 169, 244)',     // cyan
+            'rgb(0, 188, 212)',     // turquoise
+            'rgb(0, 150, 136)',     // vert foncé
+            'rgb(76, 175, 80)',     // vert
+            'rgb(139, 195, 74)',    // vert clair
+            'rgb(205, 220, 57)',    // citron
+            'rgb(225, 214, 111)',    // jaune
+            'rgb(240, 201, 62)',    // jaune foncé
+            'rgb(255, 152, 0)',     // orange
+            'rgb(121, 85, 72)'      // marron
+        ];
+
+        const charCode = name.charCodeAt(0) + (name.length > 1 ? name.charCodeAt(1) : 0);
+        return colors[charCode % colors.length];
+    };
+    // Fonction pour générer les initiales
+    const getInitials = (name) => {
+        if (!name) return '';
+
+        const names = name.split(' ');
+        let initials = names[0][0].toUpperCase();
+
+        if (names.length > 1) {
+            initials += names[names.length - 1][0].toUpperCase();
+        }
+
+        return initials;
+    };
+
     return (
         <Layout>
             <LinearGradient
@@ -123,10 +162,14 @@ const UpdateProfile = ({ navigation }) => {
                             {profilePic ? (
                                 <Image source={{ uri: profilePic }} style={styles.avatar} />
                             ) : (
-                                <View style={styles.avatarFallback}>
+                                <View style={[
+                                    styles.avatarFallback,
+                                    { backgroundColor: getAvatarColor(formData.name) }
+                                ]}>
                                     <Text style={styles.avatarText}>
-                                        {formData.name ? formData.name[0].toUpperCase() : ''}
+                                        {getInitials(formData.name)}
                                     </Text>
+
                                 </View>
                             )}
                         </View>
@@ -218,11 +261,25 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingBottom: 30,
+        marginTop:40,
     },
-    profileHeader: {
-        alignItems: 'center',
+   profileHeader: {
+       alignItems: 'center',
         marginBottom: 30,
-        marginTop: 40,
+        marginTop: 20,
+    },
+    avatarFallback: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
     },
     avatarContainer: {
         width: 100,
@@ -236,22 +293,20 @@ const styles = StyleSheet.create({
         marginTop: 25,
     },
     avatarText: {
-        fontSize: 40,
+        fontSize: 36,
         fontWeight: 'bold',
         color: '#fff',
-        backgroundColor: '#66BB6A',  
-        width: 80,  
-        height: 80,  
-        borderRadius: 40,  
-        justifyContent: 'center',
-        alignItems: 'center',
         textAlign: 'center',
-        lineHeight: 90,  
+        textShadowColor: 'rgba(0,0,0,0.2)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2, // Centrer la lettre verticalement
     },
     avatar: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 60,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 3,
+        borderColor: '#fff',
     },
     editIcon: {
         position: 'absolute',
@@ -268,7 +323,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     formContainer: {
-        marginTop: 20,
+        marginTop: 25,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -277,7 +332,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: 15,
         height: 56,
-        marginBottom: 20,
+        marginBottom: 25,
         borderWidth: 1,
         borderColor: '#E0E0E0',
         shadowColor: '#000',

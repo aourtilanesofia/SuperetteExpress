@@ -34,7 +34,7 @@ const ConCommercant = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.38.149:8080/api/v1/commercant/connexion", {
+            const response = await fetch("http://192.168.1.36:8080/api/v1/commercant/connexion", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -109,7 +109,7 @@ const ConCommercant = ({ navigation }) => {
                                 value={mdp}
                                 onChangeText={setMdp}
                                 autoCapitalize="none"
-                            />
+                            /> 
                             <TouchableOpacity
                                 onPress={() => setSecureEntry(prev => !prev)}
                                 style={styles.eyeIcon}

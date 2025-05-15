@@ -41,7 +41,7 @@ const ListeShops = ({ navigation }) => {
 
   const fetchShops = async (lat, lng) => {
     try {
-      const response = await fetch(`http://192.168.38.149:8080/api/superettes/nearby?lat=${lat}&lng=${lng}&radius=10000`);
+      const response = await fetch(`http://192.168.1.36:8080/api/superettes/nearby?lat=${lat}&lng=${lng}&radius=10000`);
 
       const data = await response.json();
   

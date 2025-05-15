@@ -16,7 +16,7 @@ const AjouterCategories = ({ navigation }) => {
         }
         try {
 
-            await fetch('http://192.168.38.149:8080/api/categories/add', {
+            await fetch('http://192.168.1.36:8080/api/categories/add', {
 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

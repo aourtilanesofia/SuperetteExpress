@@ -1,16 +1,16 @@
-
 import {
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
+    TouchableOpacity, 
     View,
     ScrollView,
     KeyboardAvoidingView,
     Platform,
     Alert,
     Modal,
-    Pressable
+    Pressable,
+    ActivityIndicator
 } from 'react-native';
 import React, { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,12 +19,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { ActivityIndicator } from 'react-native';
-
 
 const InsLivreur = ({ navigation }) => {
+    // États du formulaire
     const [secureEntry, setSecureEntry] = useState(true);
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [acceptedConditions, setAcceptedConditions] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         nom: '',
         numTel: '',
@@ -33,9 +35,20 @@ const InsLivreur = ({ navigation }) => {
         matricule: '',
         mdp: ''
     });
-    const [isLoading, setIsLoading] = useState(false);
 
     const categories = ['Voiture', 'Scooter', 'Moto'];
+
+    const conditions = [
+        "Ne pas être accompagné durant la course",
+        "Ne jamais rappeler le/la client(e) après la course",
+        "Ne pas demander un autre tarif que celui affiché sur l'application",
+        "Ne pas utiliser un autre véhicule que celui enregistré",
+        "Tenue vestimentaire correcte (pas de short/claquettes)",
+        "Prévoir des petites coupures pour rendre la monnaie",
+        "Respect strict du code de la route",
+        "Véhicule en parfait état technique",
+        "Interdiction de fumer/vapoter pendant les livraisons",
+    ];
 
     const handleChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -47,9 +60,14 @@ const InsLivreur = ({ navigation }) => {
     };
 
     const handleSignup = async () => {
+        if (!acceptedConditions) {
+            Alert.alert("Conditions non acceptées", "Vous devez accepter la charte du livreur");
+            return;
+        }
+
         const { nom, numTel, categorie, marque, matricule, mdp } = formData;
 
-
+        // Validation des champs...
         if (!nom || !numTel || !categorie || !marque || !matricule || !mdp) {
             Alert.alert("Champs manquants", "Veuillez remplir tous les champs");
             return;
@@ -65,7 +83,7 @@ const InsLivreur = ({ navigation }) => {
             return;  
         }
 
-        //Matricule
+        // Validation matricule...
         const matriculePattern = /^(\d{5})([1-2]{1})(\d{2})(\d{2})$/;
         const rawMatricule = formData.matricule.replace(/\s/g, '');
         const match = rawMatricule.match(matriculePattern);
@@ -75,32 +93,17 @@ const InsLivreur = ({ navigation }) => {
             return;
         }
 
-        const typeVehicule = match[2];
-        const annee = parseInt(match[3], 10);
-        const wilaya = parseInt(match[4], 10);
-
-        // Vérification de l'année (01 à 25)
-        if (annee < 1 || annee > 25) {
-            Alert.alert("Année invalide", "L'année doit être comprise entre 01 et 25 (jusqu'à 2025)");
-            return;
-        }
-
-        // Vérification de la wilaya (01 à 58)
-        if (wilaya < 1 || wilaya > 58) {
-            Alert.alert("Wilaya invalide", "Le numéro de wilaya doit être entre 01 et 58");
-            return;
-        }
-
-
-
-
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.38.149:8080/api/v1/livreur/inscriptionL", {
+            const response = await fetch("http://192.168.1.36:8080/api/v1/livreur/inscriptionL", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    conditionsAccepted: true,
+                    conditionsVersion: "1.0"
+                }),
             });
 
             const data = await response.json();
@@ -114,7 +117,6 @@ const InsLivreur = ({ navigation }) => {
                 { text: "OK", onPress: () => navigation.navigate("ConLivreur") }
             ]);
 
-            // Réinitialisation du formulaire
             setFormData({
                 nom: '',
                 numTel: '',
@@ -139,6 +141,56 @@ const InsLivreur = ({ navigation }) => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
         >
+            {/* Modal des conditions */}
+            <Modal
+                visible={!acceptedConditions}
+                transparent={false}
+                animationType="slide"
+            >
+                <LinearGradient
+                    colors={['#FFFFFF', '#E8F5E9']}
+                    style={styles.conditionsModal}
+                >
+                    <ScrollView contentContainerStyle={styles.conditionsContainer}>
+                        <Text style={styles.conditionsTitle}>Charte du Livreur</Text>
+                        
+                        <View style={styles.conditionsList}>
+                            {conditions.map((item, index) => (
+                                <View key={index} style={styles.conditionItem}>
+                                    <MaterialIcons name="check-circle" size={20} color="#2E7D32" />
+                                    <Text style={styles.conditionText}>{item}</Text>
+                                </View>
+                            ))}
+                        </View>
+
+                        <View style={styles.acceptContainer}>
+                            <TouchableOpacity 
+                                style={styles.checkBox}
+                                onPress={() => setAcceptedConditions(!acceptedConditions)}
+                            >
+                                {acceptedConditions ? (
+                                    <MaterialIcons name="check-box" size={24} color="#2E7D32" />
+                                ) : (
+                                    <MaterialIcons name="check-box-outline-blank" size={24} color="#939494" />
+                                )}
+                            </TouchableOpacity>
+                            <Text style={styles.acceptText}>
+                                Je certifie avoir lu et accepté la charte du livreur
+                            </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.acceptButton, !acceptedConditions && styles.disabledButton]}
+                            disabled={!acceptedConditions}
+                            onPress={() => setAcceptedConditions(true)}
+                        >
+                            <Text style={styles.acceptButtonText}>Continuer l'inscription</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </LinearGradient>
+            </Modal>
+
+            {/* Formulaire d'inscription */}
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
@@ -168,7 +220,7 @@ const InsLivreur = ({ navigation }) => {
 
                         {/* Numéro de Téléphone */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='phone-portrait-outline' size={20} color={'#2E7D32'} style={styles.icon} />
+                           <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
                                 placeholder='Numéro de téléphone'
@@ -221,12 +273,10 @@ const InsLivreur = ({ navigation }) => {
                                     );
                                     handleChange('matricule', formatted);
                                 }}
-
                                 autoCapitalize="characters"
                                 maxLength={13}
                             />
                         </View>
-
 
                         {/* Mot de passe */}
                         <View style={styles.inputContainer}>
@@ -254,9 +304,9 @@ const InsLivreur = ({ navigation }) => {
 
                         {/* Bouton d'inscription */}
                         <TouchableOpacity
-                            style={[styles.signupButton, isLoading && styles.disabledButton]}
+                            style={[styles.signupButton, (isLoading || !acceptedConditions) && styles.disabledButton]}
                             onPress={handleSignup}
-                            disabled={isLoading}
+                            disabled={isLoading || !acceptedConditions}
                             activeOpacity={0.8}
                         >
                             {isLoading ? (
@@ -374,7 +424,6 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 16,
         marginTop: 26,
-
     },
     eyeIcon: {
         padding: 5,
@@ -442,6 +491,63 @@ const styles = StyleSheet.create({
     dropdownItemText: {
         fontSize: 16,
         color: '#333',
+    },
+    // Styles pour la modal des conditions
+    conditionsModal: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+    },
+    conditionsContainer: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 25,
+        maxHeight: '90%',
+    },
+    conditionsTitle: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#2E7D32',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    conditionsList: {
+        marginBottom: 25,
+    },
+    conditionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    conditionText: {
+        marginLeft: 10,
+        fontSize: 15,
+        color: '#333',
+        flexShrink: 1,
+    },
+    acceptContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 25,
+    },
+    checkBox: {
+        marginRight: 10,
+    },
+    acceptText: {
+        fontSize: 15,
+        color: '#616161',
+        flex: 1,
+    },
+    acceptButton: {
+        backgroundColor: '#2E7D32',
+        borderRadius: 12,
+        padding: 16,
+        alignItems: 'center',
+    },
+    acceptButtonText: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 16,
     },
 });
 
