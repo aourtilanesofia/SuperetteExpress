@@ -43,7 +43,7 @@ const InsConsommateur = ({ navigation }) => {
 
         try {
 
-            const response = await fetch("http://192.168.38.149:8080/api/v1/consommateur/inscription", {
+            const response = await fetch("http://192.168.1.36:8080/api/v1/consommateur/inscription", {
 
 
                 method: "POST",
@@ -92,7 +92,7 @@ const InsConsommateur = ({ navigation }) => {
                     <View style={styles.header}>
                         <Text style={styles.title}>Créez votre compte</Text>
                         <Text style={styles.subtitle}>Rejoignez notre communauté</Text>
-                    </View>
+                    </View> 
 
                     <View style={styles.formContainer}>
                         {/* Nom Complet */}
@@ -110,7 +110,7 @@ const InsConsommateur = ({ navigation }) => {
 
                         {/* Numéro de Téléphone */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='phone-portrait-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
                                 placeholder='Numéro de téléphone'
@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
         color: '#616161',
     },
     formContainer: {
+        marginTop:50,
         paddingHorizontal: 30,
     },
     inputContainer: {

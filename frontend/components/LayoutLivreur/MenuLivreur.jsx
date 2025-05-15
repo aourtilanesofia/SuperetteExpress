@@ -9,7 +9,7 @@ import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
 
-const socket = io("http://192.168.38.149:8080"); // Mets l'URL de ton backend
+const socket = io("http://192.168.1.36:8080"); // Mets l'URL de ton backend
 
 const MenuLivreur = () => {
   const route = useRoute();
@@ -20,7 +20,7 @@ const MenuLivreur = () => {
   
 
    useEffect(() => {
-    fetch("http://192.168.38.149:8080/api/v1/notifications")
+    fetch("http://192.168.1.36:8080/api/v1/notifications")
 
   
       .then((res) => res.json())
@@ -91,11 +91,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+
   },
   menuContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  
+    
   },
   icon: {
     color: '#000',
@@ -110,9 +111,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     borderRadius: 10,
     paddingHorizontal: 5,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badgeText: {
     color: 'white',
     fontSize: 12,
+    fontWeight: 'bold',
   },
-})
+});

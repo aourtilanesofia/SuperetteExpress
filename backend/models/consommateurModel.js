@@ -11,6 +11,7 @@ const consommateurSchema = new mongoose.Schema(
     numTel: {
       type: String,
       required: [true, "Le champ est obligatoire"],
+       unique: true,
     },
     adresse: {
       type: String,
@@ -36,7 +37,7 @@ consommateurSchema.methods.generateToken = function () {
 consommateurSchema.methods.deleteAccount = async function () {
   try {
     // Vérifier que l'utilisateur existe
-    if (!this._id) {
+    if (!this._id) { 
       throw new Error("Aucun utilisateur trouvé");
     }
 

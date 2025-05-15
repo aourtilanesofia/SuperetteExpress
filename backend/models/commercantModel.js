@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import JWT from "jsonwebtoken";
 
-const commercantSchema = new mongoose.Schema(
+const commercantSchema = new mongoose.Schema( 
   {
     nom: {
       type: String,
@@ -15,6 +15,7 @@ const commercantSchema = new mongoose.Schema(
     adresseBoutique: {
       type: String,
       required: [true, "Le champ est obligatoire"],
+       unique: true,
     },   
     
     mdp: {

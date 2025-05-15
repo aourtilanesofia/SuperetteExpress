@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
-const socket = io("http://192.168.38.149:8080"); // Remplace par l'URL de ton backend
+const socket = io("http://192.168.1.33:8080"); // Remplace par l'URL de ton backend
 
 
 
@@ -15,7 +15,7 @@ const NotificationsAdmin = () => {
   
     useEffect(() => {
 
-      fetch("http://192.168.38.149:8080/api/v1/notifications")
+      fetch("http://192.168.1.33:8080/api/v1/notifications")
 
 
         .then((res) => res.json())
@@ -39,7 +39,7 @@ const NotificationsAdmin = () => {
   
     const markAsRead = (id) => {
 
-      fetch(`http://192.168.38.149:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
+      fetch(`http://192.168.1.33:8080/api/v1/notifications/${id}/read`, { method: "PUT" })
 
 
         .then(() => {
@@ -50,7 +50,7 @@ const NotificationsAdmin = () => {
   
     const deleteNotification = (id) => {
 
-      fetch(`http://192.168.38.149:8080/api/v1/notifications/${id}`, { method: "DELETE" })
+      fetch(`http://192.168.1.33:8080/api/v1/notifications/${id}`, { method: "DELETE" })
 
       .then(() => {
           setNotifications((prev) => prev.filter(n => n._id !== id));

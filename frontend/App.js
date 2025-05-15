@@ -70,6 +70,7 @@ import Liv1 from './screens/ConsommateurScreens/Liv1';
 import Liv2 from './screens/ConsommateurScreens/Liv2';
 import DetailsCommandeLivreur from './screens/LivreurScreens/DetailsCommandeLivreur';
 import CommandeRefusee from './screens/LivreurScreens/CommandeRefusee';
+import GestionDesSuperettes from './screens/AdministrateurScreens/GestionDesSuperettes';
 
 
 
@@ -145,6 +146,7 @@ export default function App() {
         <Stack.Screen name='Liv2' component={Liv2} options={{headerTitle:''}}/>
         <Stack.Screen name='DetailsCommandeLivreur' component={DetailsCommandeLivreur} options={{headerTitle:''}}/>
         <Stack.Screen name='CommandeRefusee' component={CommandeRefusee} options={{headerTitle:''}}/>
+        <Stack.Screen name='GestionDesSuperettes' component={GestionDesSuperettes} options={{headerTitle:''}}/>
       </Stack.Navigator>
     </NavigationContainer>
 

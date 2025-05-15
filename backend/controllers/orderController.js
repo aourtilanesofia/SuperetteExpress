@@ -179,30 +179,6 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    // Création de la notification
-    const notificationMessage =
-      statut === "Confirmée"
-        ? `Votre commande numéro #${order.numeroCommande} a été confirmée.`
-        : `Votre commande numéro #${order.numeroCommande} a été annulée.`;
-
-    //console.log("User ID associé à la commande :", order.userId);
-
-    const notification = new Notification({
-      message: notificationMessage,
-      isRead: false,
-      role: "client", // Notification destinée au client
-      consommateurId: new mongoose.Types.ObjectId(order.userId),
-    });
-
-    await notification.save();
-
-    // Envoi de la notification via WebSocket
-    if (req.app.get("io")) {
-      const io = req.app.get("io");
-      io.emit(`notification_${order.userId}`, notification); // Émettre uniquement au client concerné
-      //console.log("Notification envoyée au client :", notificationMessage);
-    }
-
     res.status(200).json(order);
   } catch (error) {
     console.error("Erreur lors de la mise à jour du statut :", error);
@@ -277,43 +253,6 @@ export const mettreAJourPaiement = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    const notificationMessage =
-      updatedStatus === 'Payée'
-        ? `La commande numéro #${order.numeroCommande} a été payée.`
-        : updatedStatus === 'annulée'
-          ? `Votre commande numéro #${order.numeroCommande} a été annulée.`
-          : `La commande numéro #${order.numeroCommande} est en attente de paiement.`;
-
-    const notification = new Notification({
-      message: notificationMessage,
-      isRead: false,
-      role: "commercant",
-      consommateurId: new mongoose.Types.ObjectId(order.userId),
-    });
-
-    await notification.save();
-
-    // Émission de la notification au consommateur
-    if (req.app.get("io")) {
-      const io = req.app.get("io");
-      io.emit(`notification_${order.userId}`, notification);
-    }
-
-    // Notification au livreur
-    const notificationLivreur = new Notification({
-      message: `Une nouvelle commande à livrer: la commande N° #${order.numeroCommande}.`,
-      isRead: false,
-      role: "livreur",
-      livreurId: new mongoose.Types.ObjectId(order.livreur), // Assure-toi que ce champ existe
-    });
-
-    await notificationLivreur.save();
-
-    // Émission de la notification au livreur
-    if (req.app.get("io")) {
-      const io = req.app.get("io");
-      io.emit(`notification_${order.livreur}`, notificationLivreur);
-    }
 
     res.status(200).json(order);
   } catch (error) {

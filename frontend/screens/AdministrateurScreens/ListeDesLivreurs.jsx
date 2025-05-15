@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import LayoutAdmin from './../../components/LayoutAdmin/LayoutAdmin';
 
-const ListeDesLivreurs = () => { 
+const ListeDesLivreurs = () => {
   const [livreurs, setLivreurs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,66 +16,73 @@ const ListeDesLivreurs = () => {
 
   const fetchLivreurs = async () => {
     try {
-      const response = await fetch("http://192.168.38.149:8080/api/v1/livreur/tousLivreurs");
-
+      const response = await fetch("http://192.168.1.33:8080/api/v1/livreur/tousLivreurs");
       const data = await response.json();
-      
+
       if (!Array.isArray(data)) {
         throw new Error("Format des données invalide");
       }
-      
+
       setLivreurs(data);
     } catch (error) {
       console.error("Erreur :", error);
+      Alert.alert("Erreur", "Impossible de charger les livreurs");
     } finally {
       setLoading(false);
     }
   };
 
   const deleteLivreur = async (id) => {
-    Alert.alert("Confirmation", "Voulez-vous supprimer cet utilisateur ?", [
-      {text: "Annuler", style: "cancel" },
-      {
-        text: "Supprimer",
-        onPress: async () => {
-          try {
-            await fetch(`http://192.168.38.149:8080/api/v1/livreur/refuser/${id}`, { method: "DELETE" });
-
-            setLivreurs(livreurs.filter((livreur) => livreur._id !== id ));
-          } catch (error) {
-            console.error("Erreur suppression :", error);
-          }
+    Alert.alert(
+      t('confirmation'),
+      t('Voulez vous supprimer ce livreur ?'),
+      [
+        { text: t('Annuler'), style: "cancel" },
+        {
+          text: t('Supprimer'),
+          onPress: async () => {
+            try {
+              await fetch(`http://192.168.1.33:8080/api/v1/livreur/refuser/${id}`, {
+                method: "DELETE"
+              });
+              setLivreurs(livreurs.filter((livreur) => livreur._id !== id));
+            } catch (error) {
+              console.error("Erreur suppression :", error);
+              Alert.alert("Erreur", t('Erreur de suppression'));
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
-  const validerLivreur = async (id) => {
-    if (!id) {
-      console.error("Erreur : ID du livreur est undefined !");
-      return;
-    }
-
+  const toggleStatus = async (id) => {
     try {
-      const response = await fetch(`http://192.168.38.149:8080/api/v1/livreur/valider/${id}`, {
+      const livreur = livreurs.find(l => l._id === id);
+      const endpoint = livreur.isValidated
+        ? `http://192.168.1.33:8080/api/v1/livreur/invalider/${id}`
+        : `http://192.168.1.33:8080/api/v1/livreur/valider/${id}`;
 
+      const response = await fetch(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });
 
-      const result = await response.json();
+      const updatedLivreur = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.message || "Erreur lors de la validation du livreur");
-      }
+      setLivreurs(livreurs.map(l =>
+        l._id === id ? { ...l, isValidated: !l.isValidated } : l
+      ));
 
-      setLivreurs(
-        livreurs.map((livreur) => (livreur._id === id ? result.livreur : livreur))
+      Alert.alert(
+        "Succès",
+        livreur.isValidated
+          ? t('Livreur Désactive')
+          : t('Livreur Active')
       );
-
-      Alert.alert("Succès", "Compte validé !");
     } catch (error) {
-      console.error("Erreur validation :", error);
+      console.error("Erreur changement statut :", error);
+      Alert.alert("Erreur", t('Erreur lors le changement du statut'));
     }
   };
 
@@ -89,56 +96,56 @@ const ListeDesLivreurs = () => {
 
   return (
     <LayoutAdmin>
-    <View style={styles.container}>
-      <Text style={styles.title}>{t('Liste_des_livreurs')}</Text>
-      
-      <FlatList
-        data={livreurs}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={[styles.livreurItem, styles.cardShadow]}>
-            <View style={styles.livreurInfo}>
-              <Text style={styles.livreurName}>{item.nom}</Text>
-              <Text style={styles.livreurEmail}>{item.numTel}</Text>
-              <Text style={styles.livreurEmail}>{item.email}</Text>
-              {item.isValidated && (
-                <View style={styles.validationBadge}>
-                  <Ionicons name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.validationText}>Validé</Text>
-                </View>
-              )}
-            </View>
-            
-            <View style={styles.actionsContainer}>
-              {!item.isValidated && (
-                <TouchableOpacity 
-                  style={[styles.actionButton, styles.validateButton]}
-                  onPress={() => validerLivreur(item._id)}
+      <View style={styles.container}>
+        <Text style={styles.title}>{t('Liste_des_livreurs')}</Text>
+
+        <FlatList
+          data={livreurs}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={[styles.livreurItem, styles.cardShadow]}>
+              <View style={styles.livreurInfo}>
+                <Text style={styles.livreurName}>{item.nom}</Text>
+                <Text style={styles.livreurDetail}>{item.numTel}</Text>
+              </View>
+
+              <View style={styles.actionsContainer}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.deleteButton]}
+                  onPress={() => deleteLivreur(item._id)}
                 >
-                  <Ionicons name="checkmark-outline" size={18} color="white" />
-                  <Text style={styles.buttonText}>{t("valider")}</Text>
+                  <Ionicons name="trash-outline" size={18} color="white" />
+                  <Text style={styles.buttonText}>{t('supprimer')}</Text>
                 </TouchableOpacity>
-              )}
-              
-              <TouchableOpacity 
-                style={[styles.actionButton, styles.deleteButton]}
-                onPress={() => deleteLivreur(item._id)}
-              >
-                <Ionicons name="trash-outline" size={18} color="white" />
-                <Text style={styles.buttonText}>{t('supprimer')}</Text>
-              </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    item.isValidated ? styles.deactivateButton : styles.activateButton
+                  ]}
+                  onPress={() => toggleStatus(item._id)}
+                >
+                  <Ionicons
+                    name={item.isActive ? "close-circle-outline" : "checkmark-circle-outline"}
+                    size={18}
+                    color="white"
+                  />
+                  <Text style={styles.buttonText}>
+                    {item.isValidated ? t('dasact') : t('act')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="people-outline" size={50} color="#CBD5E0" />
-            <Text style={styles.emptyText}>Aucun livreur disponible</Text>
-          </View>
-        }
-      />
-    </View>
+          )}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="people-outline" size={50} color="#CBD5E0" />
+              <Text style={styles.emptyText}>{t('aucun_livreur')}</Text>
+            </View>
+          }
+        />
+      </View>
     </LayoutAdmin>
   );
 };
@@ -146,10 +153,11 @@ const ListeDesLivreurs = () => {
 export default ListeDesLivreurs;
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: "#F5F7FB" 
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    backgroundColor: "#F5F7FB",
   },
   loadingContainer: {
     flex: 1,
@@ -157,15 +165,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5F7FB'
   },
-  title: { 
-    fontSize: 24, 
-    fontWeight: "bold", 
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 20,
     color: "#2D3748",
     textAlign: 'center'
   },
   listContent: {
-    paddingBottom: 20
+    paddingBottom: 40, // Augmenté pour laisser de l'espace en bas
   },
   livreurItem: {
     backgroundColor: "white",
@@ -179,43 +187,48 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1, 
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   livreurInfo: {
     marginBottom: 12
   },
-  livreurName: { 
-    fontSize: 18, 
+  livreurName: {
+    fontSize: 18,
     fontWeight: "600",
     color: "#2D3748",
     marginBottom: 4
   },
-  livreurEmail: { 
-    fontSize: 14, 
+  livreurDetail: {
+    fontSize: 14,
     color: "#718096",
-    marginBottom: 8
+    marginBottom: 4
   },
-  validationBadge: {
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
     alignSelf: 'flex-start',
-    marginTop: 4
+    marginTop: 8
   },
-  validationText: {
-    color: '#10B981',
+  validatedBadge: {
+    backgroundColor: '#10B981',
+  },
+  notValidatedBadge: {
+    backgroundColor: '#EF4444',
+  },
+  statusText: {
+    color: 'white',
     fontSize: 12,
     fontWeight: '500',
     marginLeft: 4
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     marginTop: 8
   },
   actionButton: {
@@ -225,13 +238,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginLeft: 8
-  },
-  validateButton: {
-    backgroundColor: "#10B981",
+    flex: 1,
+    marginHorizontal: 4
   },
   deleteButton: {
     backgroundColor: "#EF4444",
+  },
+  activateButton: {
+    backgroundColor: "#10B981",
+  },
+  deactivateButton: {
+    backgroundColor: "#F59E0B",
   },
   buttonText: {
     color: "white",
@@ -243,7 +260,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40
+    padding: 40,
+    marginTop: 20,
   },
   emptyText: {
     color: "#CBD5E0",

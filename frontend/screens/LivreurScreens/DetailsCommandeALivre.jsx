@@ -6,7 +6,8 @@ import {
     TouchableOpacity,
     Alert,
     ScrollView,
-    ActivityIndicator
+    ActivityIndicator,
+    Linking
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
@@ -27,6 +28,15 @@ const DetailsCommandeALivre = ({ route }) => {
     const [adresse, setAdresse] = useState(commande.destination?.adresse || t("non_specifiee"));
     const [infoSupplementaire, setInfoSupplementaire] = useState(commande.destination?.infoSup || "");
     const [total, setTotal] = useState(commande.total || 0);
+
+    const handleCallClient = () => {
+        const phoneNumber = numTel || telephoneClient;
+        if (phoneNumber) {
+            Linking.openURL(`tel:${phoneNumber}`);
+        } else {
+            Alert.alert(t("erreur"), t("num_tel_non_disponible"));
+        }
+    };
 
     useEffect(() => {
         const loadCommandeDetails = async () => {
@@ -50,8 +60,6 @@ const DetailsCommandeALivre = ({ route }) => {
         loadCommandeDetails();
     }, [commande.numeroCommande]);
 
-
-
     const updateLivraisonStatus = async () => {
         if (commande.livraison === "Livré" || commande.livraison === "Non Livré") {
             Alert.alert("Erreur", "Commande déjà traitée !");
@@ -60,7 +68,6 @@ const DetailsCommandeALivre = ({ route }) => {
     
         setLoading(true);
         try {
-            // Récupérer la position actuelle du livreur
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error("Permission de localisation refusée");
@@ -69,10 +76,8 @@ const DetailsCommandeALivre = ({ route }) => {
             const location = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = location.coords;
     
-            // Envoyer la position du livreur et mettre à jour le statut
             const livreurId = await AsyncStorage.getItem('livreurId');
-            const response = await fetch(`http://192.168.38.149:8080/api/commandes/livstat/${commande._id}`, {
-
+            const response = await fetch(`http://192.168.1.36:8080/api/commandes/livstat/${commande._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -93,9 +98,7 @@ const DetailsCommandeALivre = ({ route }) => {
                 throw new Error(result.message || "Échec de la mise à jour");
             }
     
-            // Envoyer la position initiale du livreur au serveur
-            await fetch('http://192.168.38.149:8080/api/livreur/position', {
-
+            await fetch('http://192.168.1.36:8080/api/livreur/position', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,9 +129,6 @@ const DetailsCommandeALivre = ({ route }) => {
             setLoading(false);
         }
     };
-    
-
-
 
     const updateStatutCommande = async (nouveauStatut) => {
         if (statut === "Confirmée" || statut === "Annulée") {
@@ -142,8 +142,7 @@ const DetailsCommandeALivre = ({ route }) => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://192.168.38.149:8080/api/commandes/${commande._id}`,
-
+                `http://192.168.1.36:8080/api/commandes/${commande._id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -202,7 +201,6 @@ const DetailsCommandeALivre = ({ route }) => {
                 <View style={styles.container}>
                     <View style={styles.header}>
                         <Text style={styles.title}>{t('detailComm')}</Text>
-
                     </View>
 
                     <View style={styles.infoCard}>
@@ -234,16 +232,24 @@ const DetailsCommandeALivre = ({ route }) => {
                                 </View>
                             </View>
 
-                            <View style={styles.infoRow}>
-                                <View style={styles.iconContainer}>
-                                    <Icon name="phone" size={20} color="#2E7D32" />
+                            <View style={[styles.infoRow, { justifyContent: 'space-between' }]}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <View style={styles.iconContainer}>
+                                        <Icon name="phone" size={20} color="#2E7D32" />
+                                    </View>
+                                    <View>
+                                        <Text style={styles.infoLabel}>{t('num')}</Text>
+                                        <Text style={styles.infoText}>
+                                            {numTel || t("non_specifie")}
+                                        </Text>
+                                    </View>
                                 </View>
-                                <View>
-                                    <Text style={styles.infoLabel}>{t('num')}</Text>
-                                    <Text style={styles.infoText}>
-                                        {numTel || t("non_specifie")}
-                                    </Text>
-                                </View>
+                                <TouchableOpacity 
+                                    style={styles.callButton} 
+                                    onPress={handleCallClient}
+                                >
+                                    <Icon name="call" size={20} color="#2E7D32" />
+                                </TouchableOpacity>
                             </View>
                         </View>
 
@@ -305,7 +311,6 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         paddingBottom: 120,
-        //backgroundColor: "#F5F7FA",
     },
     container: {
         flex: 1,
@@ -404,6 +409,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#34495E",
         lineHeight: 20,
+    },
+    callButton: {
+        padding: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#2E7D32',
+        marginLeft: 10,
     },
     footer: {
         position: "absolute",

@@ -61,7 +61,7 @@ router.get('/tousLivreurs', getAllLivreurs);
 router.get("/count", getLivreurCountController);
 router.put("/valider/:id", validerLivreur);
 router.delete('/refuser/:id', deleteLivreur);
-
+ 
 // Nouvelle route pour l'upload
 router.post(
     '/upload-profile-pic',

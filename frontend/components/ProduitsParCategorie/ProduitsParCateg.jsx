@@ -5,7 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 
 
-const backendUrl = "http://192.168.38.149:8080";
+const backendUrl = "http://192.168.1.36:8080";
 
 
 

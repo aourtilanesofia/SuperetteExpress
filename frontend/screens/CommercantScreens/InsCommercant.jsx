@@ -40,7 +40,7 @@ const InsCommercant = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.38.149:8080/api/v1/commercant/inscription", {
+            const response = await fetch("http://192.168.1.36:8080/api/v1/commercant/inscription", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -106,7 +106,7 @@ const InsCommercant = ({ navigation }) => {
 
                         {/* Numéro de Téléphone */}
                         <View style={styles.inputContainer}>
-                            <Ionicons name='phone-portrait-outline' size={20} color={'#329171'} style={styles.icon} />
+                            <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
                                 style={styles.textInput}
                                 placeholder='Téléphone professionnel'
@@ -129,7 +129,7 @@ const InsCommercant = ({ navigation }) => {
                                 onChangeText={(text) => handleChange('adresseBoutique', text)}
                             />
                         </View>
-
+ 
                         {/* Mot de passe */}
                         <View style={styles.inputContainer}>
                             <Ionicons name='lock-closed-outline' size={20} color={'#329171'} style={styles.icon} />
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         paddingHorizontal: 30,
+        marginTop:15,
     },
     inputContainer: {
         flexDirection: 'row',

@@ -22,21 +22,18 @@ const ListeDesCommandes = () => {
     const navigation = useNavigation();
     const { t } = useTranslation();
 
-    const supprimerCommande = (idCommande) => {
-        setCommandes((prevCommandes) => prevCommandes.filter((commande) => commande._id !== idCommande));
-    };
-
-    useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
+            setRefreshing(true);
             const userId = await AsyncStorage.getItem("userId");
             if (!userId) {
                 console.log("Aucun utilisateur connecté");
                 setLoading(false);
+                setRefreshing(false);
                 return;
             }
 
-            const response = await fetch(`http://192.168.38.149:8080/api/commandes/user/${userId}`);
+            const response = await fetch(`http://192.168.1.36:8080/api/commandes/user/${userId}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -51,18 +48,21 @@ const ListeDesCommandes = () => {
             setLoading(false);
             setRefreshing(false);
         }
-    };
+    }, []);
 
-    fetchOrders();  
-
-}, []); 
-
+    useEffect(() => {
+        fetchOrders();  
+    }, [fetchOrders]); 
 
     useFocusEffect(
         useCallback(() => {
             fetchOrders();
-        }, [])
+        }, [fetchOrders])
     );
+
+    const supprimerCommande = (idCommande) => {
+        setCommandes((prevCommandes) => prevCommandes.filter((commande) => commande._id !== idCommande));
+    };
 
     const onRefresh = () => {
         fetchOrders();
@@ -113,7 +113,6 @@ const ListeDesCommandes = () => {
                     <View style={styles.statusContainer}>
                         <Text style={styles.total}>{t("total")} : {item.total} DA</Text>
                     </View>
-
                 </TouchableOpacity>
             </View>
         );
