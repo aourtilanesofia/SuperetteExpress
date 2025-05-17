@@ -11,6 +11,7 @@ const AcceuilAdmin = ({ navigation }) => {
   const [nombreConsommateursActifs, setNombreConsommateursActifs] = useState(0);
   const [nombreConsommateursNotActifs, setNombreConsommateursNotActifs] = useState(0);
   const [nombreLivreurs, setNombreLivreurs] = useState(0);
+  const [nombreSup, setNombreSup] = useState(0);
   const [nombreSuperettes, setNombreSuperettes] = useState(0);
 
   // Récupérer le nombre des commerçants
@@ -46,20 +47,21 @@ const AcceuilAdmin = ({ navigation }) => {
   }, []);
 
   // Récupérer le nombre des consommateurs non actifs
-  useEffect(() => {
-    fetch("http://192.168.1.33:8080/api/v1/consommateur/nonactiveConsommateurs/count")
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setNombreConsommateursNotActifs(data.count);  
-        } else {
-          console.error("Erreur : " + data.message);
-        }
-      })
-      .catch(error => {
-        console.error("Erreur lors du chargement des consommateurs actifs", error);
-      });
-  }, []);
+ useEffect(() => {
+  fetch("http://192.168.1.33:8080/api/superettes/count")
+    .then(response => response.json())
+    .then(data => {
+      //console.log("Réponse de l'API :", data); // Ajoutez ce log
+      if (data.success) {
+        setNombreSup(data.count);  
+      } else {
+        console.error("Erreur : " + data.message);
+      }
+    })
+    .catch(error => {
+      console.error("Erreur lors du chargement des supérettes", error);
+    });
+}, []);
 
   // Récupérer le nombre des livreurs
   useEffect(() => {
@@ -121,14 +123,14 @@ const AcceuilAdmin = ({ navigation }) => {
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreConsommateursActifs}</Text>
-              <Text style={styles.statLabel}>{t('Clients_actifs')}</Text>
+              <Text style={styles.statLabel}>{t('Clients')}</Text>
             </View>
           </View>
           
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
-              <Text style={styles.statNumber}>{nombreConsommateursNotActifs}</Text>
-              <Text style={styles.statLabel}>{t('clientDes')}</Text>
+              <Text style={styles.statNumber}>{nombreSup}</Text>
+              <Text style={styles.statLabel}>{t('Supérettes')}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreLivreurs}</Text>

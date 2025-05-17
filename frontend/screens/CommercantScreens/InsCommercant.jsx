@@ -40,7 +40,7 @@ const InsCommercant = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.36:8080/api/v1/commercant/inscription", {
+            const response = await fetch("http://192.168.1.33:8080/api/v1/commercant/inscription", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

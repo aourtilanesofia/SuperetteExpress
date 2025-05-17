@@ -34,7 +34,7 @@ const ConCommercant = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.36:8080/api/v1/commercant/connexion", {
+            const response = await fetch("http://192.168.1.33:8080/api/v1/commercant/connexion", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -45,7 +45,7 @@ const ConCommercant = ({ navigation }) => {
             const data = await response.json();
 
             if (!response.ok || !data.commercant || !data.token) {
-                Alert.alert("Accès refusé", data.message || "Identifiants incorrects. Veuillez réessayer.");
+                Alert.alert("Accès refusé", data.message || "Identifiants incorrects. Veuillez réessayer !");
                 return;
             }
 

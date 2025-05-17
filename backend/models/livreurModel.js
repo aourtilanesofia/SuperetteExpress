@@ -30,7 +30,7 @@ const livreurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
-     isActive: { type: Boolean, default: false },
+     isActive: { type: Boolean, default: true },
     profilePic: {  
       type: String
     },
@@ -39,7 +39,7 @@ const livreurSchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ['Point'], // GeoJSON type
-        default: 'Point',
+        //default: 'Point',
         required: false,
       },
       coordinates: {
@@ -56,7 +56,7 @@ const livreurSchema = new mongoose.Schema(
       },
       lastUpdated: {
         type: Date,
-        default: Date.now,
+        //default: Date.now,
          required: false,
       }
     },

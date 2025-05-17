@@ -14,7 +14,8 @@ import {
     findNearbyLivreurs,
     getCommandesAssignees,
      accepterCommande,
-     refuserCommande
+     refuserCommande,
+     toggleStatus,
     
 } from '../controllers/livreurController.js';
 import isAuthL from './../middlewares/authMiddelwareL.js';
@@ -61,6 +62,10 @@ router.get('/tousLivreurs', getAllLivreurs);
 router.get("/count", getLivreurCountController);
 router.put("/valider/:id", validerLivreur);
 router.delete('/refuser/:id', deleteLivreur);
+
+//Activer désactiver un livreur 
+
+router.put('/status/:id',toggleStatus);
  
 // Nouvelle route pour l'upload
 router.post(

@@ -8,7 +8,7 @@ const CommandeRefusee = ({ navigation, route }) => {
  
   const updateLivraison = async () => {
     try {
-      await fetch(`http://192.168.1.36:8080/api/commandes/${numeroCommande}/livraison`, {
+      await fetch(`http://192.168.1.33:8080/api/commandes/${numeroCommande}/livraison`, {
 
         method: 'PUT',
         headers: {

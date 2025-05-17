@@ -73,7 +73,7 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 ...(formData.newPassword && { mdp: formData.newPassword })
             };
 
-            const response = await fetch('http://192.168.1.36:8080/api/v1/commercant/modifier', {
+            const response = await fetch('http://192.168.1.33:8080/api/v1/commercant/modifier', {
 
                 method: 'PUT',
                 headers: {

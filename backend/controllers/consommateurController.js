@@ -2,7 +2,7 @@
 import consommateurModel from "../models/consommateurModel.js";
 import Notification from '../models/NotificationModel.js';
 
-// INSCRIPTION
+// INSCRIPTION 
 export const inscriptionController = async (req, res) => { 
     try {
         const { nom, numTel, adresse, mdp } = req.body;
@@ -74,7 +74,7 @@ export const connexionController = async (req, res) => {
         if (!numTel || !mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Veuillez entrer votre e-mail et votre mot de passe!",
+                message: "Veuillez entrer votre numéro de téléphone et votre mot de passe !",
             });
         }
 
@@ -83,14 +83,14 @@ export const connexionController = async (req, res) => {
         if (!consommateur) {
             return res.status(404).send({
                 success: false,
-                message: "Utilisateur non trouvé!",
+                message: "Numéro de téléphone incorrects. Veuillez réessayer !",
             });
         }
 
         if (mdp !== consommateur.mdp) {
             return res.status(400).send({
                 success: false,
-                message: "Mot de passe invalide ! ",
+                message: "Mot de passe invalide. Veuillez réessayer ! ",
             });
         }
 
@@ -269,18 +269,15 @@ export const toggleStatus = async (req, res) => {
     }
   };
 
- 
+  
 // Récupérer le nombre de consommateurs actifs
 export const getActiveConsommateurCountController = async (req, res) => {
     try {
         // Recherche des consommateurs actifs
-        const activeCount = await consommateurModel.countDocuments({ isActive: true });
-
-        
-
+        const count = await consommateurModel.countDocuments();
         res.status(200).json({
             success: true,
-            count: activeCount,  // Renvoie le nombre de consommateurs actifs
+            count,
         });
     } catch (error) {
         console.error("Erreur lors de la récupération du nombre de consommateurs actifs :", error);

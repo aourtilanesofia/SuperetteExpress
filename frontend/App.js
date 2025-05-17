@@ -71,6 +71,8 @@ import Liv2 from './screens/ConsommateurScreens/Liv2';
 import DetailsCommandeLivreur from './screens/LivreurScreens/DetailsCommandeLivreur';
 import CommandeRefusee from './screens/LivreurScreens/CommandeRefusee';
 import GestionDesSuperettes from './screens/AdministrateurScreens/GestionDesSuperettes';
+import AjouterSuperette from './screens/AdministrateurScreens/AjouterSuperette';
+import ModifierSuperette from './screens/AdministrateurScreens/ModifierSuperette';
 
 
 
@@ -147,6 +149,8 @@ export default function App() {
         <Stack.Screen name='DetailsCommandeLivreur' component={DetailsCommandeLivreur} options={{headerTitle:''}}/>
         <Stack.Screen name='CommandeRefusee' component={CommandeRefusee} options={{headerTitle:''}}/>
         <Stack.Screen name='GestionDesSuperettes' component={GestionDesSuperettes} options={{headerTitle:''}}/>
+        <Stack.Screen name='AjouterSuperette' component={AjouterSuperette} options={{headerTitle:''}}/>
+        <Stack.Screen name='ModifierSuperette' component={ModifierSuperette} options={{headerTitle:''}}/>
       </Stack.Navigator>
     </NavigationContainer>
 

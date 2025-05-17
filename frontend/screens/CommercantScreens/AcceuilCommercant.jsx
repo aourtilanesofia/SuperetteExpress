@@ -17,7 +17,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchCategorieCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.36:8080/api/categories/count');
+        const response = await fetch('http://192.168.1.33:8080/api/categories/count');
 
         if (!response.ok) {
           throw new Error('Erreur de récupération des données');
@@ -37,7 +37,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchProductsCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.36:8080/api/produits/count');
+        const response = await fetch('http://192.168.1.33:8080/api/produits/count');
 
         const text = await response.text();
         //console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
@@ -57,7 +57,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchTodayOrdersCount = async () => {
       try {
-        const response = await fetch('http://192.168.1.36:8080/api/commandes/count/today');
+        const response = await fetch('http://192.168.1.33:8080/api/commandes/count/today');
         if (!response.ok) throw new Error('Erreur de récupération des commandes');
         const data = await response.json();
         setTodayOrdersCount(data.count);
@@ -88,7 +88,7 @@ const AcceuilCommerçant = ({ navigation }) => {
       color: '#2196F3'
     },
     {
-      title: t('Gestion_des_commandes'),
+      title: t('Liste des commandes'),
       icon: <FontAwesome name="list-alt" style={styles.icone} />,
       nav: 'GestionDesCommandes',
       color: '#FF9800'

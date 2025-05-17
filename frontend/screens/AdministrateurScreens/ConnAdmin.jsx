@@ -12,29 +12,35 @@ const ConnAdmin = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
-        setIsLoading(true);
-        
-        try {
-            if (email === "admin@gmail.com" && mdp === "admin123") {
-                await AsyncStorage.multiSet([
-                    ['userRole', 'admin'],
-                    ['userEmail', email]
-                ]);
-                
-                navigation.navigate("AcceuilAdmin");
-                Alert.alert("Connexion réussie", "Bienvenue dans votre espace administrateur");
-            } else {
-                Alert.alert("Accès refusé", "Identifiants incorrects");
-            }
-        } catch (error) {
-            console.error("Erreur de connexion:", error);
-            Alert.alert("Erreur", "Problème de connexion");
-        } finally {
-            setIsLoading(false);
-            setEmail('');
-            setMdp('');
+    if (!email.trim() || !mdp.trim()) {
+        Alert.alert("Champs requis", "Veuillez remplir tous les champs !");
+        return;
+    }
+
+    setIsLoading(true);
+
+    try {
+        if (email === "admin@gmail.com" && mdp === "admin123") {
+            await AsyncStorage.multiSet([
+                ['userRole', 'admin'],
+                ['userEmail', email]
+            ]);
+
+            navigation.navigate("AcceuilAdmin");
+            Alert.alert("Connexion réussie", "Bienvenue dans votre espace administrateur");
+        } else {
+            Alert.alert("Accès refusé", "Identifiants incorrects, veuillez réessayer s'il vous plaît!");
         }
-    };
+    } catch (error) {
+        console.error("Erreur de connexion:", error);
+        Alert.alert("Erreur", "Problème de connexion");
+    } finally {
+        setIsLoading(false);
+        setEmail('');
+        setMdp('');
+    }
+};
+
 
     return (
         <LinearGradient

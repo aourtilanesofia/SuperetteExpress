@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from '@expo/vector-icons';
 
 
-const backendUrl = "http://192.168.1.36:8080";
+const backendUrl = "http://192.168.1.33:8080";
 
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);

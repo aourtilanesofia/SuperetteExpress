@@ -28,7 +28,7 @@ router.put('/profile-update',isAuth,updateProfileController);
 
 // Supprimer le compte
 router.delete('/delete-account', isAuth, deleteAccountController);
-
+ 
 //récupere les consommateur 
 
 router.get('/tousConsommateur', getAllConsommateurs);
