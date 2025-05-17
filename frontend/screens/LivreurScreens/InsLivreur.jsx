@@ -8,7 +8,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     Alert,
-    Modal,
+    Modal, 
     Pressable,
     ActivityIndicator
 } from 'react-native';
@@ -69,7 +69,7 @@ const InsLivreur = ({ navigation }) => {
 
         // Validation des champs...
         if (!nom || !numTel || !categorie || !marque || !matricule || !mdp) {
-            Alert.alert("Champs manquants", "Veuillez remplir tous les champs");
+            Alert.alert("Champs manquants", "Veuillez remplir tous les champs !");
             return;
         }
 
@@ -96,7 +96,7 @@ const InsLivreur = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.36:8080/api/v1/livreur/inscriptionL", {
+            const response = await fetch("http://192.168.1.33:8080/api/v1/livreur/inscriptionL", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

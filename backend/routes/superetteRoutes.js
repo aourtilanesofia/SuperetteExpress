@@ -6,6 +6,7 @@ import {
   addSuperette,
   updateSuperette,
   deleteSuperette,
+  getSupCountController
 } from "../controllers/superetteController.js";
 
 const router = express.Router();
@@ -15,8 +16,11 @@ router.get("/nearby", getNearbySuperettes);
 
 // POST /api/superettes (pour ajouter des superettes)
 router.post("/", createSuperette);
+
 //récupérer toutes les supérettes
 router.get("/", getAllSuperettes);
+
+router.get('/count',getSupCountController);
 
 //récupérer une superette par id
 router.get("/:id", getSuperetteById);

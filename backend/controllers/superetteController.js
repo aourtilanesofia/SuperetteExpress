@@ -1,7 +1,7 @@
 import SuperetteModel from "../models/SuperetteModel.js";
 import mongoose from 'mongoose'; 
 
-/**
+/** 
  * Récupère les superettes à proximité
  * @param {number} lat - Latitude de l'utilisateur
  * @param {number} lng - Longitude de l'utilisateur
@@ -141,22 +141,64 @@ export const getSuperetteById = async (req, res) => {
 
 // Ajouter une nouvelle supérette
 export const addSuperette = async (req, res) => {
-  const { name, address, location } = req.body;
-
   try {
+    console.log('Données reçues:', JSON.stringify(req.body, null, 2));
+
+    const { name, address, location } = req.body;
+
+    if (!name || !address || !location?.coordinates) {
+      return res.status(400).json({ 
+        message: "Tous les champs sont requis" 
+      });
+    }
+
+    // Normalisation des coordonnées
+    let coordinates = location.coordinates;
+    
+    if (typeof coordinates === 'string') {
+      try {
+        coordinates = JSON.parse(coordinates.replace(/'/g, '"'));
+      } catch (e) {
+        return res.status(400).json({ 
+          message: "Format des coordonnées invalide" 
+        });
+      }
+    }
+
+    // Création avec données normalisées
     const newSuperette = new SuperetteModel({
       name,
       address,
       location: {
-        type: "Point",
-        coordinates: location.coordinates,
-      },
+        type: 'Point',
+        coordinates: Array.isArray(coordinates) ? coordinates : []
+      }
     });
 
+    // Validation explicite
+    await newSuperette.validate(); 
+    
     const savedSuperette = await newSuperette.save();
-    res.status(201).json(savedSuperette);
+    return res.status(201).json(savedSuperette);
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Erreur détaillée:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => ({
+        path: err.path,
+        message: err.message
+      }));
+      return res.status(400).json({ 
+        message: "Erreur de validation",
+        errors 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: "Erreur serveur",
+      error: error.message 
+    });
   }
 };
 
@@ -188,4 +230,24 @@ export const deleteSuperette = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+//récupérer le nombre des supérettes
+
+export const getSupCountController = async (req, res) => {
+    try {
+        // Recherche des consommateurs actifs
+        const count = await SuperetteModel.countDocuments();
+        res.status(200).json({
+            success: true,
+            count,
+        });
+    } catch (error) {
+        console.error("Erreur lors de la récupération du nombre des supérettes :", error);
+        res.status(500).json({
+            success: false,
+            message: "Erreur serveur",
+            error: error.message || error,  
+        });
+    }
 };

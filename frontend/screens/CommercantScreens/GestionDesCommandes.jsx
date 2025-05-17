@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
-const socket = io("http://192.168.1.36:8080");
+const socket = io("http://192.168.1.33:8080");
 
 
 
@@ -51,7 +51,7 @@ const GestionDesCommandes = () => {
 
     const fetchLivreurInfo = async (livreurId) => {
         try {
-            const response = await fetch(`http://192.168.1.36:8080/api/v1/livreur/${livreurId}`);
+            const response = await fetch(`http://192.168.1.33:8080/api/v1/livreur/${livreurId}`);
             return await response.json();
         } catch (error) {
             console.error("Erreur récupération livreur", error);
@@ -62,7 +62,7 @@ const GestionDesCommandes = () => {
     const fetchCommandes = async () => {
         try {
 
-            const response = await fetch("http://192.168.1.36:8080/api/commandes/");
+            const response = await fetch("http://192.168.1.33:8080/api/commandes/");
 
             const data = await response.json();
             

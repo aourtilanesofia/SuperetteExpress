@@ -55,6 +55,12 @@ const ListeDesCommercants = () => {
       const text = await response.text();
       const updatedUser = JSON.parse(text); 
       setCommercant(commercant.map((commercant) => (commercant._id === id ? updatedUser : commercant)));
+       Alert.alert(
+                  t('Succès'),
+                  updatedUser.isActive
+                    ? t('Le commerçant a été activé avec succès')
+                    : t('Le commerçant a été désactivé avec succès')
+                );
     } catch (error) {
       console.error("Erreur activation :", error);
     }

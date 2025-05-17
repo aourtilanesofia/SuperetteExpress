@@ -43,7 +43,7 @@ const ListeDesClients = () => {
         },
       },
     ]);
-  };
+  }; 
 
   const toggleStatus = async (id) => {
     try {
@@ -56,6 +56,12 @@ const ListeDesClients = () => {
       const text = await response.text();
       const updatedUser = JSON.parse(text); 
       setClients(clients.map((client) => (client._id === id ? updatedUser : client)));
+      Alert.alert(
+            t('Succès'),
+            updatedUser.isActive
+              ? t('Le consommateur a été activé avec succès')
+              : t('Le consommateur a été désactivé avec succès')
+          );
     } catch (error) {
       console.error("Erreur activation :", error);
     }

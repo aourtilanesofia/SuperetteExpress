@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const socket = io("http://192.168.1.36:8080");
+const socket = io("http://192.168.1.33:8080");
 
 
 
@@ -95,7 +95,7 @@ const ListeCommandeALivre = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://192.168.1.36:8080/api/v1/livreur/${id}/commandes-assignees`
+        `http://192.168.1.33:8080/api/v1/livreur/${id}/commandes-assignees`
       );
       const data = await response.json();
 
@@ -145,7 +145,7 @@ const ListeCommandeALivre = () => {
 
   const accepterCommande = async (numeroCommande, numTel, nom) => {
     try {
-      const API_URL = `http://192.168.1.36:8080/api/v1/livreur/${numeroCommande}/accept`;
+      const API_URL = `http://192.168.1.33:8080/api/v1/livreur/${numeroCommande}/accept`;
 
       const token = await AsyncStorage.getItem('token');
 
@@ -193,7 +193,7 @@ const ListeCommandeALivre = () => {
       await AsyncStorage.setItem('commandesAssignees', JSON.stringify(updatedCommandes));
 
       const response = await fetch(
-        `http://192.168.1.36:8080/api/v1/livreur/${numeroCommande}/refuser`,
+        `http://192.168.1.33:8080/api/v1/livreur/${numeroCommande}/refuser`,
 
         {
           method: 'PUT',

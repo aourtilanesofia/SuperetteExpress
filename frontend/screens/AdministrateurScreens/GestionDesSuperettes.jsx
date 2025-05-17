@@ -33,7 +33,7 @@ const GestionDesSuperettes = () => {
             setRefreshing(true);
             const response = await fetch('http://192.168.1.33:8080/api/superettes/');
             const data = await response.json();
-            console.log("Réponse de l'API:", data);
+            //console.log("Réponse de l'API:", data);
             setSuperettes(data);
         } catch (error) {
             console.error("Erreur lors du chargement des supérettes", error);
@@ -46,7 +46,7 @@ const GestionDesSuperettes = () => {
     const handleDelete = async (id) => {
         Alert.alert(
             t('confirmation'),
-            t('supprimer_superette_confirmation'),
+            t('Voulez vous vraiment supprimer la supérette ?'),
             [
                 { text: t('annuler'), style: "cancel" },
                 {
@@ -57,10 +57,10 @@ const GestionDesSuperettes = () => {
                                 method: 'DELETE' 
                             });
                             fetchSuperettes();
-                            Alert.alert(t('succes'), t('superette_supprimee'));
+                            Alert.alert(t('succes'), t('Supérette supprimée !'));
                         } catch (error) {
                             console.error("Erreur lors de la suppression", error);
-                            Alert.alert(t('erreur'), t('erreur_suppression'));
+                            Alert.alert(t('erreur'), t('Erreur suppression'));
                         }
                     },
                     style: "destructive"
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     },
     actionsContainer: {
         flexDirection: 'row',
+       // marginTop:60,
     },
     actionButton: {
         width: 40,
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
-        bottom:70,
+        //bottom:100,
     },
     editButton: {
         backgroundColor: '#2196F3',
@@ -206,12 +207,12 @@ const styles = StyleSheet.create({
     },
     addButton: {
         position: 'absolute',
-        bottom: 30,
-        right: 30,
+        bottom: 80,
+        right: 20,
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#007BFF',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,

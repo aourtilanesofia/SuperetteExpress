@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const ConConsommateur = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
-    const [numTel, setnumTel] = useState('');
+    const [numTel, setnumTel] = useState(''); 
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +32,7 @@ const ConConsommateur = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.36:8080/api/v1/consommateur/connexion", {
+            const response = await fetch("http://192.168.1.33:8080/api/v1/consommateur/connexion", {
 
 
                 method: "POST",

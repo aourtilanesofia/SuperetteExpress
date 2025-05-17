@@ -73,12 +73,20 @@ export const connexionControllerL = async (req, res) => {
     const livreur = await livreurModel.findOne({ numTel });
 
     if (!livreur) {
-      return res.status(404).json({ success: false, message: "Utilisateur non trouvé!" });
+      return res.status(404).json({ success: false, message: "Numéro de téléphone incorrects. Veuillez réessayer !" });
     }
 
     if (mdp !== livreur.mdp) {
-      return res.status(400).json({ success: false, message: "Mot de passe invalide" });
+      return res.status(400).json({ success: false, message: "Mot de passe invalide. Veuillez réessayer !" });
+
     }
+
+     if (!livreur.isActive) {
+            return res.status(403).json({ 
+                success: false, 
+                message: " Votre compte est désactivé !" 
+            });
+        }
 
     const token = livreur.generateToken();
 
@@ -185,11 +193,28 @@ export const getAllLivreurs = async (req, res) => {
 }
 
 // Valider livreur par l'Admin 
+export const toggleStatus = async (req, res) => {
+    try {
+      const livreur = await livreurModel.findById(req.params.id);
+      
+      if (!livreur) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+  
+      livreur.isActive = !livreur.isActive;
+      await livreur.save();
+  
+      res.json(livreur);
+    } catch (error) {
+      console.error("Erreur lors de l'activation/désactivation :", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
 
 export const validerLivreur = async (req, res) => {
   try {
     const { id } = req.params;
-    const livreur = await livreurModel.findByIdAndUpdate(id, { isValidated: true }, { new: true });
+    const livreur = await livreurModel.findByIdAndUpdate(id, { isValidated: false }, { new: true });
 
     if (!livreur) {
       return res.status(404).json({ message: "Livreur non trouvé" });
@@ -230,7 +255,7 @@ export const getLivreurCountController = async (req, res) => {
     const count = await livreurModel.countDocuments();
     res.status(200).json({
       success: true,
-      count,
+      count, 
     });
   } catch (error) {
     console.error("Erreur lors de la récupération du nombre de livreurs :", error);

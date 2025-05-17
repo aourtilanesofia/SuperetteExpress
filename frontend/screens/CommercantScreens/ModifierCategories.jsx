@@ -12,7 +12,7 @@ const ModifierCategories = ({ route, navigation }) => {
     const handleUpdate = async () => {
         try {
 
-            await fetch(`http://192.168.1.36:8080/api/categories/update/${category._id}`, {
+            await fetch(`http://192.168.1.33:8080/api/categories/update/${category._id}`, {
 
 
                 method: 'PUT',

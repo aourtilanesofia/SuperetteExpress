@@ -159,7 +159,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
     setDisabledButtons(true);
     try {
       const response = await fetch(
-        `http://192.168.1.36:8080/api/commandes/ModifierStat/${commande._id}`,
+        `http://192.168.1.33:8080/api/commandes/ModifierStat/${commande._id}`,
 
         {
           method: 'PUT',
@@ -216,14 +216,8 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
             style={styles.emptyImage}
           />
           <Text style={styles.emptyTitle}>{t('Aucune livraison en cours')}</Text>
-          <Text style={styles.emptySubtitle}>{t('Aucune commande à afficher pour le moment')}</Text>
           
-          <TouchableOpacity 
-            style={styles.retryButton}
-            onPress={loadAllData}
-          >
-            <Text style={styles.retryButtonText}>{t('Réessayer')}</Text>
-          </TouchableOpacity>
+          
         </View>
       </LayoutLivreur>
     );
@@ -559,6 +553,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
+    marginBottom:70
   },
   emptyImage: {
     width: 120,

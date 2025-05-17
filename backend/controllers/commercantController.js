@@ -72,18 +72,21 @@ export const connexionCommercantController = async (req, res) => {
 
         const commercant = await commercantModel.findOne({ numTel });
 
+        
+
         if (!commercant) {
             return res.status(404).send({
                 success: false,
-                message: "Commerçant non trouvé!",
+                message: "Numéro de téléphone. Veuillez réessayer !",
             });
         }
 
+        
 
         if (mdp !== commercant.mdp) {
             return res.status(400).send({
                 success: false,
-                message: " Mot de passe invalide!",
+                message: " Mot de passe invalide. Veuillez réessayer !",
             });
         }
 

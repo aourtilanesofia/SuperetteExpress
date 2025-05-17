@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 
-const backendUrl = "http://192.168.1.36:8080";
+const backendUrl = "http://192.168.1.33:8080";
 
 
 

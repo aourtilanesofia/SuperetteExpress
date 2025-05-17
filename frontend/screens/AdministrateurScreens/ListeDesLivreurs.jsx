@@ -58,31 +58,24 @@ const ListeDesLivreurs = () => {
 
   const toggleStatus = async (id) => {
     try {
-      const livreur = livreurs.find(l => l._id === id);
-      const endpoint = livreur.isValidated
-        ? `http://192.168.1.33:8080/api/v1/livreur/invalider/${id}`
-        : `http://192.168.1.33:8080/api/v1/livreur/valider/${id}`;
+      const response = await fetch(`http://192.168.1.33:8080/api/v1/livreur/status/${id}`, {
 
-      const response = await fetch(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });
 
-      const updatedLivreur = await response.json();
-
-      setLivreurs(livreurs.map(l =>
-        l._id === id ? { ...l, isValidated: !l.isValidated } : l
-      ));
-
-      Alert.alert(
-        "Succès",
-        livreur.isValidated
-          ? t('Livreur Désactive')
-          : t('Livreur Active')
-      );
+      const text = await response.text();
+      const updatedUser = JSON.parse(text);
+      setLivreurs(livreurs.map((livreur) => (livreur._id === id ? updatedUser : livreur)));
+      
+       Alert.alert(
+      t('Succès'),
+      updatedUser.isActive
+        ? t('Le livreur a été activé avec succès')
+        : t('Le livreur a été désactivé avec succès')
+    );
     } catch (error) {
-      console.error("Erreur changement statut :", error);
-      Alert.alert("Erreur", t('Erreur lors le changement du statut'));
+      console.error("Erreur activation :", error);
     }
   };
 
@@ -121,7 +114,7 @@ const ListeDesLivreurs = () => {
                 <TouchableOpacity
                   style={[
                     styles.actionButton,
-                    item.isValidated ? styles.deactivateButton : styles.activateButton
+                    item.isActive ? styles.deactivateButton : styles.activateButton
                   ]}
                   onPress={() => toggleStatus(item._id)}
                 >
@@ -131,7 +124,7 @@ const ListeDesLivreurs = () => {
                     color="white"
                   />
                   <Text style={styles.buttonText}>
-                    {item.isValidated ? t('dasact') : t('act')}
+                    {item.isActive ? t('dasact') : t('act')}
                   </Text>
                 </TouchableOpacity>
               </View>
