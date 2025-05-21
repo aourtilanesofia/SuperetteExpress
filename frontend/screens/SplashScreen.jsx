@@ -7,11 +7,12 @@ const SplashScreen = ({ navigation }) => {
     const scaleAnim = useRef(new Animated.Value(0.8)).current;
     const rotateAnim = useRef(new Animated.Value(0)).current;
     const positionAnim = useRef(new Animated.Value(0)).current;
+    const textFadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         // Animation en séquence
         Animated.sequence([
-            // Fade in + scale up
+            // Animation du panier (fade in + scale up)
             Animated.parallel([
                 Animated.timing(fadeAnim, {
                     toValue: 1,
@@ -25,7 +26,7 @@ const SplashScreen = ({ navigation }) => {
                     useNativeDriver: true,
                 }),
             ]),
-            // Bounce effect
+            // Bounce effect du panier
             Animated.sequence([
                 Animated.timing(positionAnim, {
                     toValue: -20,
@@ -45,13 +46,19 @@ const SplashScreen = ({ navigation }) => {
                 easing: Easing.linear,
                 useNativeDriver: true,
             }),
+            // Fade in du texte après la rotation du panier
+            Animated.timing(textFadeAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
         ]).start();
 
-        // Redirection après 3 secondes
+        // Redirection après 4 secondes (un peu plus long pour laisser voir l'animation)
         setTimeout(() => {
             navigation.replace("FirstScreen");
-        }, 3000);
-    }, [fadeAnim, scaleAnim, rotateAnim, positionAnim, navigation]);
+        }, 4000);
+    }, [fadeAnim, scaleAnim, rotateAnim, positionAnim, textFadeAnim, navigation]);
 
     // Interpolation pour la rotation
     const rotateInterpolate = rotateAnim.interpolate({
@@ -61,31 +68,38 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Animated.View 
-                style={[
-                    styles.content,
-                    {
-                        opacity: fadeAnim,
-                        transform: [
-                            { scale: scaleAnim },
-                            { translateY: positionAnim },
-                        ],
-                    }
-                ]}
-            >
-                <Text style={styles.txt}>Superette Express</Text>
+            <View style={styles.content}>
+                <Animated.Text 
+                    style={[
+                        styles.txt,
+                        {
+                            opacity: textFadeAnim,
+                            transform: [
+                                { translateX: textFadeAnim.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [-50, 0] // Slide from left
+                                })}
+                            ]
+                        }
+                    ]}
+                >
+                    Supérette Express
+                </Animated.Text>
                 <Animated.Image 
                     source={require('../assets/panier.png')} 
                     style={[
                         styles.img,
                         {
+                            opacity: fadeAnim,
                             transform: [
+                                { scale: scaleAnim },
+                                { translateY: positionAnim },
                                 { rotate: rotateInterpolate },
                             ],
                         }
                     ]} 
                 />
-            </Animated.View>
+            </View>
         </View>
     );
 };

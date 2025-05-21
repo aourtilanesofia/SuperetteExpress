@@ -127,6 +127,17 @@ const resources = {
       livre:"Delivered",
       nonlivre:"Not Delivered",
       Fraisdeservice:"Service fees",
+      Clients:"Customers",
+      sup:"Store",
+      Liste_des_supérettes:"List of stores",
+      Modifier_supérette:"Edit store",
+      Latitude:"Latitude",
+      Longitude:"Longitude",
+      Ajouter_une_supérette:"Add store",
+      Stat:"Convenience Store Statistics",
+      Liste_des_commandes:"List of order",
+      supr:"Associated store",
+      Mes_Commandes:"My orders",
     }
   },
   fr: {
@@ -255,6 +266,17 @@ const resources = {
       livre:"Livré",
       nonlivre:"Non Livré",
       Fraisdeservice:"Frais de service",
+      Clients:"Clients",
+      sup:"Supérettes",
+      Liste_des_supérettes:"Liste des supérettes",
+      Modifier_supérette:"Modifier supérette",
+      Latitude:"Latitude",
+      Longitude:"Longitude",
+      Ajouter_une_supérette:"Ajouter une supérette",
+      Stat:"Statistiques des Supérette",
+      Liste_des_commandes:"Liste des commandes",
+      supr:"Supérette associée",
+      Mes_Commandes:"Mes Commandes",
     }
   },
   ar: {
@@ -379,6 +401,17 @@ const resources = {
       livre:"تم التوصيل",
       nonlivre:"لم يتم التوصيل",
       Fraisdeservice:"رسوم الخدمة",
+      Clients:"عملاء",
+      sup:"متجر",
+      Liste_des_supérettes:"قائمة المتاجر",
+      Modifier_supérette:"تعديل المتجر",
+      Latitude:"خط العرض",
+      Longitude:"خط الطول",
+      Ajouter_une_supérette:" إضافة متجر",
+      Stat:"إحصائيات المتاجر",
+      Liste_des_commandes:"قائمة الطلبيات" ,
+      supr:"المتجر",
+      Mes_Commandes:"طلباتي",
     }
 
   }

@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 
 
-const backendUrl = "http://192.168.1.33:8080";
+const backendUrl = "http://192.168.43.145:8080";
 
 
 

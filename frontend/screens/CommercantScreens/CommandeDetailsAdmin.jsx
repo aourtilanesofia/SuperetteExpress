@@ -18,7 +18,7 @@ const CommandeDetailsAdmin = ({ route }) => {
 
         try {
 
-            const response = await fetch(`http://192.168.1.33:8080/api/commandes/${commande._id}`, {
+            const response = await fetch(`http://192.168.43.145:8080/api/commandes/${commande._id}`, {
 
                 method: "PUT",
                 headers: {

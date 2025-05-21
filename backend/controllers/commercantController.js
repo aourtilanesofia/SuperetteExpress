@@ -1,4 +1,5 @@
 import commercantModel from "../models/commercantModel.js";
+import SuperetteModel from "../models/SuperetteModel.js";
 import Notification from '../models/NotificationModel.js';
 import mongoose from 'mongoose';
 
@@ -6,33 +7,66 @@ import mongoose from 'mongoose';
 // INSCRIPTION
 export const inscriptionCommercantController = async (req, res) => {
     try {
-        const { nom, numTel, adresseBoutique, mdp } = req.body;
+        const { nom, numTel, adresseBoutique, mdp, superetteId } = req.body;
 
-        if (!nom || !numTel || !adresseBoutique || !mdp) {
+        // Validation des champs obligatoires
+        if (!nom || !numTel || !adresseBoutique || !mdp || !superetteId) {
             return res.status(400).send({
                 success: false,
-                message: "Veuillez remplir tous les champs !",
+                message: "Veuillez remplir tous les champs, y compris la sélection de la supérette !",
             });
         }
 
+        // Validation du mot de passe
         if (mdp.length <= 6) {
-            return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
+            return res.status(400).send({ 
+                success: false, 
+                message: "Le mot de passe doit contenir plus de 6 caractères" 
+            });
         }
 
+        // Validation du numéro de téléphone
         const numTelRegex = /^(06|07|05)[0-9]{8}$/;
         if (!numTelRegex.test(numTel)) {
-            return res.status(400).send({ success: false, message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" });
+            return res.status(400).send({ 
+                success: false, 
+                message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" 
+            });
         }
 
+        // Vérifier si la supérette existe et n'est pas déjà associée
+        const superette = await SuperetteModel.findById(superetteId);
+        if (!superette) {
+            return res.status(404).send({
+                success: false,
+                message: "La supérette sélectionnée n'existe pas"
+            });
+        }
 
+        if (superette.commercant) {
+            return res.status(400).send({
+                success: false,
+                message: "Cette supérette est déjà associée à un autre commerçant"
+            });
+        }
 
-        const commercant = await commercantModel.create({ nom, numTel, adresseBoutique, mdp });
- 
+        // Création du commerçant avec référence à la supérette
+        const commercant = await commercantModel.create({ 
+            nom, 
+            numTel, 
+            adresseBoutique, 
+            mdp,
+            superette: superetteId
+        });
 
-        // Créer la notification **avant** d'envoyer la réponse
+        // Mise à jour de la supérette avec référence au commerçant
+        superette.commercant = commercant._id;
+        await superette.save();
+
+        // Création de la notification
         try {
             const notification = new Notification({
-                message: `${nom} vient de s'inscrire en tant que commerçant.`,
+                message: `${nom} vient de s'inscrire en tant que commerçant et a été associé à la supérette ${superette.name}.`,
                 isRead: false,
                 role: "administrateur",
             });
@@ -44,8 +78,9 @@ export const inscriptionCommercantController = async (req, res) => {
 
         res.status(201).send({
             success: true,
-            message: "Vous êtes maintenant inscrit en tant que commerçant, veuillez vous connecter",
+            message: "Inscription réussie et association avec la supérette effectuée",
             commercant,
+            superette
         });
 
     } catch (error) {
@@ -113,8 +148,12 @@ export const connexionCommercantController = async (req, res) => {
 // PROFIL COMMERÇANT
 export const getCommercantProfileController = async (req, res) => {
     try {
-        const commercant = await commercantModel.findById(req.user._id);
-
+        const commercant = await commercantModel.findById(req.user._id).populate({
+                path: 'superette',
+                select: 'name address',  // Sélectionne uniquement le nom et l'adresse
+            });
+        //console.log(commercant.superette);
+         console.log("Supérette peuplée :", commercant.superette);
         res.status(200).send({
             success: true,
             message: "Profil commerçant récupéré avec succès",

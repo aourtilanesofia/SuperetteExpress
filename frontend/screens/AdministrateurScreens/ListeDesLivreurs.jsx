@@ -16,7 +16,7 @@ const ListeDesLivreurs = () => {
 
   const fetchLivreurs = async () => {
     try {
-      const response = await fetch("http://192.168.1.33:8080/api/v1/livreur/tousLivreurs");
+      const response = await fetch("http://192.168.43.145:8080/api/v1/livreur/tousLivreurs");
       const data = await response.json();
 
       if (!Array.isArray(data)) {
@@ -42,7 +42,7 @@ const ListeDesLivreurs = () => {
           text: t('Supprimer'),
           onPress: async () => {
             try {
-              await fetch(`http://192.168.1.33:8080/api/v1/livreur/refuser/${id}`, {
+              await fetch(`http://192.168.43.145:8080/api/v1/livreur/refuser/${id}`, {
                 method: "DELETE"
               });
               setLivreurs(livreurs.filter((livreur) => livreur._id !== id));
@@ -58,7 +58,7 @@ const ListeDesLivreurs = () => {
 
   const toggleStatus = async (id) => {
     try {
-      const response = await fetch(`http://192.168.1.33:8080/api/v1/livreur/status/${id}`, {
+      const response = await fetch(`http://192.168.43.145:8080/api/v1/livreur/status/${id}`, {
 
         method: "PUT",
         headers: { "Content-Type": "application/json" },

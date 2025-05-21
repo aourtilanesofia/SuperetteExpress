@@ -42,7 +42,7 @@ const handleSubmit = async () => {
       return;
     }
 
-    const response = await fetch('http://192.168.1.33:8080/api/superettes/', {
+    const response = await fetch('http://192.168.43.145:8080/api/superettes/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const handleSubmit = async () => {
     return (
         <LayoutAdmin>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.title}>{t('Ajouter une supérette')}</Text>
+                <Text style={styles.title}>{t('Ajouter_une_supérette')}</Text>
                 
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>{t('nom')}</Text>

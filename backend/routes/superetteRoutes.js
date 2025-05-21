@@ -6,8 +6,11 @@ import {
   addSuperette,
   updateSuperette,
   deleteSuperette,
-  getSupCountController
+  getSupCountController,
+  getStatsParSuperette
 } from "../controllers/superetteController.js";
+
+import SuperetteModel from "../models/SuperetteModel.js";
 
 const router = express.Router();
 
@@ -22,6 +25,20 @@ router.get("/", getAllSuperettes);
 
 router.get('/count',getSupCountController);
 
+//routes des statistique 
+
+router.get("/stat", getStatsParSuperette);
+
+router.get('/disponibles', async (req, res) => {
+    try {
+        // Trouver les supérettes sans commerçant associé
+        const superettes = await SuperetteModel.find({ commercant: { $exists: false } });
+        res.json(superettes);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 //récupérer une superette par id
 router.get("/:id", getSuperetteById);
 
@@ -33,5 +50,7 @@ router.put("/:id", updateSuperette);
 
 //supprimer une suppérette
 router.delete("/:id", deleteSuperette);
+
+
 
 export default router; 

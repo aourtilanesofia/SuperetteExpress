@@ -1,10 +1,22 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import React, { useState } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  View, 
+  ScrollView, 
+  KeyboardAvoidingView, 
+  Platform, 
+  Alert,
+  ActivityIndicator
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import { Picker } from '@react-native-picker/picker';
 
 const InsCommercant = ({ navigation }) => {
     const [secureEntry, setSecureEntry] = useState(true);
@@ -12,18 +24,44 @@ const InsCommercant = ({ navigation }) => {
         nom: '',
         numTel: '',
         adresseBoutique: '',
-        mdp: ''
+        mdp: '',
+        superetteId: '' // Nouveau champ pour stocker l'ID de la supérette
     });
+    const [superettes, setSuperettes] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingSuperettes, setIsLoadingSuperettes] = useState(false);
+
+    // Charger les supérettes disponibles
+    useEffect(() => {
+        const fetchSuperettes = async () => {
+            setIsLoadingSuperettes(true);
+            try {
+                const response = await fetch("http://192.168.43.145:8080/api/superettes/disponibles");
+                const data = await response.json();
+                if (response.ok) {
+                    setSuperettes(data);
+                } else {
+                    Alert.alert("Erreur", "Impossible de charger les supérettes");
+                }
+            } catch (error) {
+                console.error("Erreur:", error);
+                Alert.alert("Erreur", "Problème de connexion au serveur");
+            } finally {
+                setIsLoadingSuperettes(false);
+            }
+        };
+        fetchSuperettes();
+    }, []);
 
     const handleChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-  const handleSignup = async () => {
-        const { nom, numTel, adresseBoutique, mdp } = formData;
+    const handleSignup = async () => {
+        const { nom, numTel, adresseBoutique, mdp, superetteId } = formData;
         
-        if (!nom || !numTel || !adresseBoutique || !mdp) {
+        // Validation des champs
+        if (!nom || !numTel || !adresseBoutique || !mdp || !superetteId) {
             Alert.alert("Informations incomplètes", "Veuillez renseigner tous les champs obligatoires");
             return;
         }
@@ -32,7 +70,8 @@ const InsCommercant = ({ navigation }) => {
             Alert.alert("Format incorrect", "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres");
             return;
         }
-         if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
+        
+        if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
             Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
             return; 
         }
@@ -40,8 +79,7 @@ const InsCommercant = ({ navigation }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://192.168.1.33:8080/api/v1/commercant/inscription", {
-
+            const response = await fetch("http://192.168.43.145:8080/api/v1/commercant/inscription", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -58,11 +96,13 @@ const InsCommercant = ({ navigation }) => {
                 { text: "Accéder à mon espace", onPress: () => navigation.navigate("ConCommercant") }
             ]);
 
+            // Réinitialiser le formulaire
             setFormData({
                 nom: '',
                 numTel: '',
                 adresseBoutique: '',
-                mdp: ''
+                mdp: '',
+                superetteId: ''
             });
 
         } catch (error) {
@@ -118,7 +158,33 @@ const InsCommercant = ({ navigation }) => {
                             />
                         </View>
 
-                        {/* Adresse */}
+                       
+
+                             {/* Sélection de la supérette */}
+                        <View style={styles.inputContainer}>
+                            <MaterialCommunityIcons name='store-outline' size={20} color={'#329171'} style={styles.icon} />
+                            {isLoadingSuperettes ? (
+                                <ActivityIndicator size="small" color="#329171" style={styles.loader} />
+                            ) : (
+                                <Picker
+                                    selectedValue={formData.superetteId}
+                                    onValueChange={(itemValue) => handleChange('superetteId', itemValue)}
+                                    style={styles.picker}
+                                    dropdownIconColor="#329171"
+                                >
+                                    <Picker.Item label="Sélectionnez votre supérette" value=""  />
+                                    {superettes.map(superette => (
+                                        <Picker.Item 
+                                            key={superette._id} 
+                                            label={`${superette.name} - ${superette.address}`} 
+                                            value={superette._id} 
+                                        />
+                                    ))}
+                                </Picker>
+                            )}
+                        </View>
+
+                         {/* Adresse */}
                         <View style={styles.inputContainer}>
                             <MaterialCommunityIcons name='map-marker-outline' size={20} color={'#329171'} style={styles.icon} />
                             <TextInput
@@ -152,22 +218,24 @@ const InsCommercant = ({ navigation }) => {
                                     color={'#329171'}
                                 />
                             </TouchableOpacity>
-                        </View>
+                        </View>                        
 
                         {/* Bouton d'inscription */}
                         <TouchableOpacity
-                            style={[styles.signupButton, isLoading && styles.disabledButton]}
+                            style={[styles.signupButton, (isLoading || isLoadingSuperettes) && styles.disabledButton]}
                             onPress={handleSignup}
-                            disabled={isLoading}
+                            disabled={isLoading || isLoadingSuperettes}
                         >
-                            <Text style={styles.signupButtonText}>
-                                {isLoading ? 'Création en cours...' : "S'inscrire"}
-                            </Text>
+                            {isLoading ? (
+                                <ActivityIndicator color="#FFFFFF" />
+                            ) : (
+                                <Text style={styles.signupButtonText}>S'inscrire</Text>
+                            )}
                         </TouchableOpacity>
 
                         {/* Lien vers connexion */}
                         <View style={styles.loginContainer}>
-                            <Text style={styles.loginText}>Vous avez déja un compte ? </Text>
+                            <Text style={styles.loginText}>Vous avez déjà un compte ? </Text>
                             <TouchableOpacity onPress={() => navigation.navigate('ConCommercant')}>
                                 <Text style={styles.loginLink}>Se connecter</Text>
                             </TouchableOpacity>
@@ -235,6 +303,14 @@ const styles = StyleSheet.create({
     },
     eyeIcon: {
         padding: 5,
+    },
+    picker: {
+        flex: 1,
+        height: '100%',
+        color: '#333',
+    },
+    loader: {
+        flex: 1,
     },
     signupButton: {
         backgroundColor: '#2E7D32',

@@ -159,7 +159,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
     setDisabledButtons(true);
     try {
       const response = await fetch(
-        `http://192.168.1.33:8080/api/commandes/ModifierStat/${commande._id}`,
+        `http://192.168.43.145:8080/api/commandes/ModifierStat/${commande._id}`,
 
         {
           method: 'PUT',

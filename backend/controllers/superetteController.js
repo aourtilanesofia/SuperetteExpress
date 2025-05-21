@@ -1,5 +1,6 @@
 import SuperetteModel from "../models/SuperetteModel.js";
-import mongoose from 'mongoose'; 
+import { CommandeModel } from "../models/OrderModel.js";
+import mongoose from 'mongoose';
 
 /** 
  * Récupère les superettes à proximité
@@ -40,8 +41,8 @@ export const getNearbySuperettes = async (req, res) => {
     // 3. Formatage des résultats
     const formattedResults = results.map(shop => ({
       ...shop,
-      distance: shop.location?.coordinates 
-        ? Math.round(calculateDistance(coords, shop.location.coordinates)) 
+      distance: shop.location?.coordinates
+        ? Math.round(calculateDistance(coords, shop.location.coordinates))
         : null
     }));
 
@@ -68,21 +69,21 @@ export const getNearbySuperettes = async (req, res) => {
 // Fonction helper pour calcul de distance
 function calculateDistance(coord1, coord2) {
   const R = 6371e3; // Rayon de la Terre en mètres
-  const φ1 = coord1[1] * Math.PI/180;
-  const φ2 = coord2[1] * Math.PI/180;
-  const Δφ = (coord2[1]-coord1[1]) * Math.PI/180;
-  const Δλ = (coord2[0]-coord1[0]) * Math.PI/180;
+  const φ1 = coord1[1] * Math.PI / 180;
+  const φ2 = coord2[1] * Math.PI / 180;
+  const Δφ = (coord2[1] - coord1[1]) * Math.PI / 180;
+  const Δλ = (coord2[0] - coord1[0]) * Math.PI / 180;
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
 }
 
 
-  
+
 
 /**
  * Crée une nouvelle superette (optionnel)
@@ -147,20 +148,20 @@ export const addSuperette = async (req, res) => {
     const { name, address, location } = req.body;
 
     if (!name || !address || !location?.coordinates) {
-      return res.status(400).json({ 
-        message: "Tous les champs sont requis" 
+      return res.status(400).json({
+        message: "Tous les champs sont requis"
       });
     }
 
     // Normalisation des coordonnées
     let coordinates = location.coordinates;
-    
+
     if (typeof coordinates === 'string') {
       try {
         coordinates = JSON.parse(coordinates.replace(/'/g, '"'));
       } catch (e) {
-        return res.status(400).json({ 
-          message: "Format des coordonnées invalide" 
+        return res.status(400).json({
+          message: "Format des coordonnées invalide"
         });
       }
     }
@@ -176,28 +177,28 @@ export const addSuperette = async (req, res) => {
     });
 
     // Validation explicite
-    await newSuperette.validate(); 
-    
+    await newSuperette.validate();
+
     const savedSuperette = await newSuperette.save();
     return res.status(201).json(savedSuperette);
 
   } catch (error) {
     console.error('Erreur détaillée:', error);
-    
+
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => ({
         path: err.path,
         message: err.message
       }));
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: "Erreur de validation",
-        errors 
+        errors
       });
     }
-    
-    return res.status(500).json({ 
+
+    return res.status(500).json({
       message: "Erreur serveur",
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -235,19 +236,76 @@ export const deleteSuperette = async (req, res) => {
 //récupérer le nombre des supérettes
 
 export const getSupCountController = async (req, res) => {
-    try {
-        // Recherche des consommateurs actifs
-        const count = await SuperetteModel.countDocuments();
-        res.status(200).json({
-            success: true,
-            count,
-        });
-    } catch (error) {
-        console.error("Erreur lors de la récupération du nombre des supérettes :", error);
-        res.status(500).json({
-            success: false,
-            message: "Erreur serveur",
-            error: error.message || error,  
-        });
-    }
+  try {
+    // Recherche des consommateurs actifs
+    const count = await SuperetteModel.countDocuments();
+    res.status(200).json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération du nombre des supérettes :", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+      error: error.message || error,
+    });
+  }
+};
+
+//récupérer les statistique 
+
+export const getStatsParSuperette = async (req, res) => {
+  try {
+    const FRAIS_LIVRAISON = 100;
+    const FRAIS_SERVICE = 30;
+
+    // 1. Récupérer TOUTES les superettes (noms seulement)
+    const toutesSuperettes = await SuperetteModel.find().select('name').lean();
+
+    // 2. Calculs UNIQUEMENT pour Supérette A
+    const stats = await Promise.all(
+      toutesSuperettes.map(async (superettes) => {
+        if (superettes.name === "Supérette A") {
+          console.log("Recherche des commandes pour Supérette A...");
+
+         const commandes = await CommandeModel.find({ livraison: "Livré" }).lean();
+         const nb = commandes.length;
+
+          console.log(`Nombre de commandes trouvées: ${commandes.length}`);
+          console.log("Exemple de commande:", commandes[0]);
+
+          
+          const totalPaye = commandes.reduce((sum, cmd) => sum + (cmd.total || 0), 0);
+
+          console.log("Total payé calculé:", totalPaye);
+
+          return {
+            nom: "Supérette A",
+            totalPaye,
+            totalLivraison: nb * FRAIS_LIVRAISON,
+            totalMarge: nb * FRAIS_SERVICE,
+            totalAchats: totalPaye - (nb * FRAIS_LIVRAISON) - (nb * FRAIS_SERVICE)
+          };
+        }
+
+        // Valeurs statiques pour les autres
+        return {
+          nom: superettes.name,
+          totalPaye: 0,
+          totalLivraison: 0,
+          totalMarge: 0,
+          totalAchats: 0
+        };
+      })
+    );
+    console.log("Stats envoyées:", stats);
+    res.json(stats);
+  } catch (err) {
+    console.error("Erreur:", err);
+    res.status(500).json({
+      message: "Erreur serveur",
+      error: err.message
+    });
+  }
 };

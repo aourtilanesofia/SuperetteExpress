@@ -52,7 +52,7 @@ const ModifierSuperette = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`http://192.168.1.33:8080/api/superettes/${superette._id}`, {
+            const response = await fetch(`http://192.168.43.145:8080/api/superettes/${superette._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const ModifierSuperette = () => {
     return (
         <LayoutAdmin>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.title}>{t('Modifier supérette')}</Text>
+                <Text style={styles.title}>{t('Modifier_supérette')}</Text>
                 
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>{t('nom')}</Text>

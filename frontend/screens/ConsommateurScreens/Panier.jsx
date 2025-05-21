@@ -63,7 +63,7 @@ const Panier = () => {
             return;
           }
       
-          const response = await fetch("http://192.168.1.33:8080/api/commandes/add", {
+          const response = await fetch("http://192.168.43.145:8080/api/commandes/add", {
 
             method: "POST",
             headers: { "Content-Type": "application/json" },

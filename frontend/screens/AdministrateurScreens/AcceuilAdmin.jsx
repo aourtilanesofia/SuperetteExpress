@@ -16,7 +16,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   // Récupérer le nombre des commerçants
   useEffect(() => {
-    fetch("http://192.168.1.33:8080/api/v1/commercant/count")
+    fetch("http://192.168.43.145:8080/api/v1/commercant/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -32,7 +32,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   // Récupérer le nombre des consommateurs actifs
   useEffect(() => {
-    fetch("http://192.168.1.33:8080/api/v1/consommateur/activeConsommateurs/count")
+    fetch("http://192.168.43.145:8080/api/v1/consommateur/activeConsommateurs/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -48,7 +48,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   // Récupérer le nombre des consommateurs non actifs
  useEffect(() => {
-  fetch("http://192.168.1.33:8080/api/superettes/count")
+  fetch("http://192.168.43.145:8080/api/superettes/count")
     .then(response => response.json())
     .then(data => {
       //console.log("Réponse de l'API :", data); // Ajoutez ce log
@@ -65,7 +65,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   // Récupérer le nombre des livreurs
   useEffect(() => {
-    fetch("http://192.168.1.33:8080/api/v1/livreur/count")
+    fetch("http://192.168.43.145:8080/api/v1/livreur/count")
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -81,7 +81,7 @@ const AcceuilAdmin = ({ navigation }) => {
 
   const menuItems = [
     {
-      title: t('Liste des supérettes'),
+      title: t('Liste_des_supérettes'),
       icon: <Entypo name="shopping-basket" style={styles.icone} />,
       nav: 'GestionDesSuperettes',
       color: '#FF9800'
@@ -130,7 +130,7 @@ const AcceuilAdmin = ({ navigation }) => {
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreSup}</Text>
-              <Text style={styles.statLabel}>{t('Supérettes')}</Text>
+              <Text style={styles.statLabel}>{t('sup')}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{nombreLivreurs}</Text>

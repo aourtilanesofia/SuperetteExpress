@@ -534,7 +534,7 @@ export const getTodayOrdersLiv = async (req, res) => {
           ]
         },
         {
-          livraison: { $in: ["Payée", "En attente de paiement"] }
+          livraison: { $in:"Livré" }
         }
       ]
     });

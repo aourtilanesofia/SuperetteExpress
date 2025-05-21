@@ -32,10 +32,10 @@ const styles = StyleSheet.create({
     flex: 1,  // Permet au contenu d'occuper tout l'espace disponible
   },
   footer: {
-    position: "absolute",
-    bottom: 10,
+     position: "absolute", 
+    bottom: 0,
     width: "100%",
-    height: 50,
+    height: 60,
     borderTopWidth: 0.5,
     borderColor: "lightgray",
     backgroundColor: "white",

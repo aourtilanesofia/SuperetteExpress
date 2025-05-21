@@ -37,7 +37,7 @@ const AutresOptionsLivreur = ({ navigation }) => {
                                 return;
                             }
 
-                            const response = await fetch('http://192.168.1.33:8080/api/v1/livreur/delete-accountL', {
+                            const response = await fetch('http://192.168.43.145:8080/api/v1/livreur/delete-accountL', {
 
 
                                 method: 'DELETE',

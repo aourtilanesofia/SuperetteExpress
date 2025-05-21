@@ -33,7 +33,7 @@ const ListeDesCommandes = () => {
                 return;
             }
 
-            const response = await fetch(`http://192.168.1.33:8080/api/commandes/user/${userId}`);
+            const response = await fetch(`http://192.168.43.145:8080/api/commandes/user/${userId}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -121,7 +121,7 @@ const ListeDesCommandes = () => {
     return (
         <Layout>
             <View style={styles.header}>
-                <Text style={styles.title}>{t("Mes Commandes")}</Text>
+                <Text style={styles.title}>{t("Mes_Commandes")}</Text>
                 <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
                     <Icon name="refresh" size={24} color="#329171" />
                 </TouchableOpacity>

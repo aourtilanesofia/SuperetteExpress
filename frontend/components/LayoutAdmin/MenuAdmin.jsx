@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 
 
-const socket = io("http://192.168.1.33:8080"); // Mets l'URL de ton backend
+const socket = io("http://192.168.43.145:8080"); // Mets l'URL de ton backend
 
 
 
@@ -27,7 +27,7 @@ const MenuAdmin = () => {
 
  useEffect(() => {
 
-  fetch("http://192.168.1.33:8080/api/v1/notifications")
+  fetch("http://192.168.43.145:8080/api/v1/notifications")
 
 
     .then((res) => res.json())
@@ -62,6 +62,10 @@ const MenuAdmin = () => {
     <View style={styles.container}>
       <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('AcceuilCommerçant')}>
         <AntDesign name='home' style={[styles.icon, route.name === "AcceuilCommerçant" && styles.active]} size={25} />
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('Calcule')}>
+        <AntDesign name='linechart' style={[styles.icon, route.name === "Calcule" && styles.active]} size={25} />
       </TouchableOpacity>
 
       <TouchableOpacity 

@@ -39,122 +39,122 @@ const AcceuilLivreur = ({ navigation }) => {
   };
 
 
-const updatePosition = async (coords) => {
-  try {
-    const token = await getToken();
-    if (!token) return;
+  const updatePosition = async (coords) => {
+    try {
+      const token = await getToken();
+      if (!token) return;
 
-    const response = await fetch('http://192.168.1.33:8080/api/v1/livreur/position', { 
+      const response = await fetch('http://192.168.43.145:8080/api/v1/livreur/position', {
 
-      method: 'POST', // Gardez POST pour matcher le backend
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        longitude: coords.longitude,
-        latitude: coords.latitude
-      })
-    });
+        method: 'POST', // Gardez POST pour matcher le backend
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          longitude: coords.longitude,
+          latitude: coords.latitude
+        })
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Erreur serveur');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Erreur position:", error);
-    // Gestion d'erreur plus robuste
-    if (error.message.includes('Failed to fetch')) {
-      Alert.alert('Erreur réseau', 'Impossible de se connecter au serveur');
-    }
-    throw error;
-  }
-};
-
-// Modifiez également la fonction setupLocation
-const setupLocation = async () => {
-  try {
-    // Vérifier si la géolocalisation est activée
-    const enabled = await Location.hasServicesEnabledAsync();
-    if (!enabled) {
-      Alert.alert(
-        'Géolocalisation désactivée',
-        'Veuillez activer la géolocalisation pour continuer',
-        [
-          {
-            text: 'Annuler',
-            style: 'cancel'
-          },
-          {
-            text: 'Paramètres',
-            onPress: () => Location.openSettings()
-          }
-        ]
-      );
-      return;
-    }
-
-    // Demander les permissions
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission requise',
-        'L\'application a besoin de votre position pour fonctionner',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-
-    // Configurer les options
-    const locationOptions = {
-      accuracy: Location.Accuracy.High,
-      distanceInterval: 100,
-      timeInterval: 30000
-    };
-
-    // Envoyer la position initiale
-    const initialLocation = await Location.getCurrentPositionAsync({});
-    await updatePosition(initialLocation.coords);
-
-    // Démarrer le suivi continu
-    await Location.watchPositionAsync(
-      locationOptions,
-      async (location) => {
-        try {
-          await updatePosition(location.coords);
-        } catch (error) {
-          console.warn("Erreur suivi position:", error.message);
-        }
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur serveur');
       }
-    );
 
-  } catch (error) {
-    console.error("Erreur setup location:", error);
-    Alert.alert(
-      'Erreur',
-      'Impossible d\'accéder à la géolocalisation: ' + error.message
-    );
-  }
-};
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur position:", error);
+      // Gestion d'erreur plus robuste
+      if (error.message.includes('Failed to fetch')) {
+        Alert.alert('Erreur réseau', 'Impossible de se connecter au serveur');
+      }
+      throw error;
+    }
+  };
+
+  // Modifiez également la fonction setupLocation
+  const setupLocation = async () => {
+    try {
+      // Vérifier si la géolocalisation est activée
+      const enabled = await Location.hasServicesEnabledAsync();
+      if (!enabled) {
+        Alert.alert(
+          'Géolocalisation désactivée',
+          'Veuillez activer la géolocalisation pour continuer',
+          [
+            {
+              text: 'Annuler',
+              style: 'cancel'
+            },
+            {
+              text: 'Paramètres',
+              onPress: () => Location.openSettings()
+            }
+          ]
+        );
+        return;
+      }
+
+      // Demander les permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission requise',
+          'L\'application a besoin de votre position pour fonctionner',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      // Configurer les options
+      const locationOptions = {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: 100,
+        timeInterval: 30000
+      };
+
+      // Envoyer la position initiale
+      const initialLocation = await Location.getCurrentPositionAsync({});
+      await updatePosition(initialLocation.coords);
+
+      // Démarrer le suivi continu
+      await Location.watchPositionAsync(
+        locationOptions,
+        async (location) => {
+          try {
+            await updatePosition(location.coords);
+          } catch (error) {
+            console.warn("Erreur suivi position:", error.message);
+          }
+        }
+      );
+
+    } catch (error) {
+      console.error("Erreur setup location:", error);
+      Alert.alert(
+        'Erreur',
+        'Impossible d\'accéder à la géolocalisation: ' + error.message
+      );
+    }
+  };
   // Récupérer les statistiques
   const fetchStats = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const API_URL = 'http://192.168.1.33:8080/api/commandes';
+
+      const API_URL = 'http://192.168.43.145:8080/api/commandes';
 
       const endpoints = [
         '/count/livre',
         '/count/en-attente',
-        '/count/non-livre', 
+        '/count/non-livre',
         '/count/today'
       ];
 
       const responses = await Promise.all(
-        endpoints.map(endpoint => 
+        endpoints.map(endpoint =>
           fetch(`${API_URL}${endpoint}`)
             .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
         )
@@ -164,12 +164,14 @@ const setupLocation = async () => {
       const taux = Math.round((livrees.count / (today.count || 1)) * 100);
 
       setStats({
-        livrees: livrees.count || 0,
+        livrees: livrees.data?.count || 0,
         enAttente: enAttente.count || 0,
         nonLivrees: nonLivrees.count || 0,
         tauxLivraison: `${taux}%`
       });
       setTodayOrdersCount(today.count || 0);
+      console.log('Réponse livrées:', livrees);
+      console.log('Réponse aujourd\'hui:', today);
 
     } catch (err) {
       console.error('Erreur stats:', err);
@@ -184,7 +186,7 @@ const setupLocation = async () => {
       try {
         await setupLocation();
         await fetchStats();
-        
+
         // Rafraîchissement périodique des stats
         const interval = setInterval(fetchStats, 30000);
         return () => clearInterval(interval);
@@ -196,7 +198,7 @@ const setupLocation = async () => {
     initialize();
   }, []);
 
-  
+
 
   return (
     <Layout>
@@ -208,8 +210,8 @@ const setupLocation = async () => {
         end={{ x: 1, y: 0 }}
       >
         <Text style={styles.headerTitle}>{t('Dashboard')}</Text>
-        <TouchableOpacity 
-          style={styles.menuButton} 
+        <TouchableOpacity
+          style={styles.menuButton}
           onPress={() => navigation.navigate('AutresOptionsLivreur')}
         >
           <AntDesign name="bars" size={26} color="#fff" />
@@ -229,8 +231,8 @@ const setupLocation = async () => {
       )}
 
       {/* Contenu principal */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Section Bienvenue */}
@@ -255,7 +257,7 @@ const setupLocation = async () => {
 
         {/* Statistiques secondaires */}
         <Text style={styles.sectionTitle}>{t('detailcommande')}</Text>
-        
+
         <View style={styles.statsGrid}>
           {/* Carte Commandes livrées */}
           <View style={[styles.gridCard, styles.cardDelivered]}>
@@ -424,7 +426,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cardDelivered: {
-    backgroundColor: 'rgb(66, 186, 98)',},
+    backgroundColor: 'rgb(66, 186, 98)',
+  },
   cardPending: {
     backgroundColor: 'rgb(248, 199, 51)',
   },
