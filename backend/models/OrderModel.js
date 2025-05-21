@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 const commandeSchema = new mongoose.Schema({
   numeroCommande: { type: Number, unique: true, required: true }, 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Consommateurs", required: true },
+  superetteId: { type: mongoose.Schema.Types.ObjectId, ref: "Superette" },
   produits: [
     {
       nom: String,
       prix: Number,
-      quantite: Number
+      quantite: Number 
     }
   ],
   total: { type: Number, required: true },

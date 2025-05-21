@@ -21,7 +21,7 @@ const GestionDesCategories = () => {
         try {
 
 
-            const response = await fetch('http://192.168.1.33:8080/api/categories');
+            const response = await fetch('http://192.168.43.145:8080/api/categories');
 
             const data = await response.json();
             setCategories(data);
@@ -42,7 +42,7 @@ const GestionDesCategories = () => {
                         try {
 
 
-                            await fetch(`http://192.168.1.33:8080/api/categories/delete/${id}`, { method: 'DELETE' });
+                            await fetch(`http://192.168.43.145:8080/api/categories/delete/${id}`, { method: 'DELETE' });
 
 
                             fetchCategories();
@@ -69,7 +69,7 @@ const GestionDesCategories = () => {
 
                         <Image 
 
-                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.1.33:8080${item.image}` }} 
+                            source={{ uri: item.image.startsWith('http') ? item.image : `http://192.168.43.145:8080${item.image}` }} 
 
 
                             style={styles.image} 

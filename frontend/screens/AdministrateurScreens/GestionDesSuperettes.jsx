@@ -31,7 +31,7 @@ const GestionDesSuperettes = () => {
     const fetchSuperettes = async () => {
         try {
             setRefreshing(true);
-            const response = await fetch('http://192.168.1.33:8080/api/superettes/');
+            const response = await fetch('http://192.168.43.145:8080/api/superettes/');
             const data = await response.json();
             //console.log("Réponse de l'API:", data);
             setSuperettes(data);
@@ -53,7 +53,7 @@ const GestionDesSuperettes = () => {
                     text: t('supprimer'),
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.1.33:8080/api/superettes/${id}`, { 
+                            await fetch(`http://192.168.43.145:8080/api/superettes/${id}`, { 
                                 method: 'DELETE' 
                             });
                             fetchSuperettes();
@@ -112,7 +112,7 @@ const GestionDesSuperettes = () => {
                     />
                 }
             >
-                <Text style={styles.title}>{t('Liste des supérettes')}</Text>
+                <Text style={styles.title}>{t('Liste_des_supérettes')}</Text>
                 
                 <FlatList
                     data={superettes}

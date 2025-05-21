@@ -6,6 +6,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
+import { Picker } from '@react-native-picker/picker';
 
 const UpdateProfilCommercant = ({ navigation }) => {
     const [formData, setFormData] = useState({
@@ -17,12 +18,16 @@ const UpdateProfilCommercant = ({ navigation }) => {
     });
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingSuperettes, setIsLoadingSuperettes] = useState(false);
     const [profilePic, setProfilePic] = useState(null);
+    const [superettes, setSuperettes] = useState([]);
+    const [selectedSuperette, setSelectedSuperette] = useState('');
     const { t } = useTranslation();
 
     useEffect(() => {
-        const loadProfile = async () => {
+        const loadProfileAndSuperettes = async () => {
             try {
+                setIsLoadingSuperettes(true);
                 const userData = await AsyncStorage.getItem('user');
                 if (userData) {
                     const user = JSON.parse(userData);
@@ -34,12 +39,31 @@ const UpdateProfilCommercant = ({ navigation }) => {
                         newPassword: ''
                     });
                     setProfilePic(user.profilePic || null);
+                    
+                    // Charger les supérettes disponibles
+                    const token = await AsyncStorage.getItem('token');
+                    const response = await fetch('http://192.168.43.145:8080/api/superettes/disponibles', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }); 
+                    const superettesData = await response.json();
+                    setSuperettes(superettesData);
+                    
+                    // Pré-sélectionner la supérette actuelle si elle existe
+                    if (user.superette) {
+                        setSelectedSuperette(user.superette._id);
+                    }
                 }
             } catch (error) {
-                console.error("Error loading profile:", error);
+                console.error("Error loading data:", error);
+                Alert.alert(t('erreur'), t('Erreur de chargement des données'));
+            } finally {
+                setIsLoadingSuperettes(false);
             }
         };
-        loadProfile();
+        
+        loadProfileAndSuperettes();
     }, []);
 
     const handleChange = (name, value) => {
@@ -65,16 +89,15 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 return;
             }
 
-
             const updateData = {
                 nom: formData.name,
                 numTel: formData.numTel.toString(),
                 adresseBoutique: formData.adresseBoutique,
-                ...(formData.newPassword && { mdp: formData.newPassword })
+                ...(formData.newPassword && { mdp: formData.newPassword }),
+                ...(selectedSuperette && { superetteId: selectedSuperette })
             };
 
-            const response = await fetch('http://192.168.1.33:8080/api/v1/commercant/modifier', {
-
+            const response = await fetch('http://192.168.43.145:8080/api/v1/commercant/modifier', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,18 +107,23 @@ const UpdateProfilCommercant = ({ navigation }) => {
             });
 
             const data = await response.json();
-            //console.log("Réponse du serveur:", data);
+            
             if (!response.ok) {
                 throw new Error(data.message || t('Erreur de mise à jour'));
             }
 
-            await AsyncStorage.setItem('user', JSON.stringify({
+            // Mettre à jour les données locales
+            const updatedUser = {
                 ...JSON.parse(await AsyncStorage.getItem('user')),
                 nom: formData.name,
-                email: formData.email,
                 numTel: formData.numTel,
                 adresseBoutique: formData.adresseBoutique,
-            }));
+                ...(selectedSuperette && { 
+                    superette: superettes.find(s => s._id === selectedSuperette) 
+                })
+            };
+            
+            await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
             Alert.alert(t('succes'), t('Mise à jour reussie'), [
                 { text: "OK", onPress: () => navigation.goBack() }
@@ -108,42 +136,41 @@ const UpdateProfilCommercant = ({ navigation }) => {
             setIsLoading(false);
         }
     };
+
     const getAvatarColor = (name) => {
         if (!name) return 'rgb(102, 187, 106)';
         
         const colors = [
-    'rgb(228, 134, 127)',     // rouge
-    'rgb(233, 30, 99)',     // rose
-    'rgb(156, 39, 176)',    // violet
-    'rgb(103, 58, 183)',    // violet foncé
-    'rgb(63, 81, 181)',     // bleu
-    'rgb(33, 150, 243)',    // bleu clair
-    'rgb(3, 169, 244)',     // cyan
-    'rgb(0, 188, 212)',     // turquoise
-    'rgb(0, 150, 136)',     // vert foncé
-    'rgb(76, 175, 80)',     // vert
-    'rgb(139, 195, 74)',    // vert clair
-    'rgb(205, 220, 57)',    // citron
-    'rgb(225, 214, 111)',    // jaune
-    'rgb(240, 201, 62)',    // jaune foncé
-    'rgb(255, 152, 0)',     // orange
-    'rgb(121, 85, 72)'      // marron
-  ];
+            'rgb(228, 134, 127)',     // rouge
+            'rgb(233, 30, 99)',     // rose
+            'rgb(156, 39, 176)',    // violet
+            'rgb(103, 58, 183)',    // violet foncé
+            'rgb(63, 81, 181)',     // bleu
+            'rgb(33, 150, 243)',    // bleu clair
+            'rgb(3, 169, 244)',     // cyan
+            'rgb(0, 188, 212)',     // turquoise
+            'rgb(0, 150, 136)',     // vert foncé
+            'rgb(76, 175, 80)',     // vert
+            'rgb(139, 195, 74)',    // vert clair
+            'rgb(205, 220, 57)',    // citron
+            'rgb(225, 214, 111)',    // jaune
+            'rgb(240, 201, 62)',    // jaune foncé
+            'rgb(255, 152, 0)',     // orange
+            'rgb(121, 85, 72)'      // marron
+        ];
         
         const charCode = name.charCodeAt(0) + (name.length > 1 ? name.charCodeAt(1) : 0);
         return colors[charCode % colors.length];
     };
-     // Fonction pour générer les initiales
+
     const getInitials = (name) => {
-        if (!name) return '';
-        
-        const names = name.split(' ');
-        let initials = names[0][0].toUpperCase();
-        
+        if (!name || typeof name !== 'string') return '';
+        const names = name.trim().split(' ').filter(Boolean);
+        if (names.length === 0) return '';
+        let initials = names[0][0]?.toUpperCase() || '';
         if (names.length > 1) {
-            initials += names[names.length - 1][0].toUpperCase();
+            initials += names[names.length - 1][0]?.toUpperCase() || '';
         }
-        
         return initials;
     };
 
@@ -156,20 +183,19 @@ const UpdateProfilCommercant = ({ navigation }) => {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.container}>
                         <View style={styles.profileHeader}>
-                                                    {profilePic ? (
-                                                        <Image source={{ uri: profilePic }} style={styles.avatar} />
-                                                    ) : (
-                                                        <View style={[
-                                                            styles.avatarFallback, 
-                                                            { backgroundColor: getAvatarColor(formData.name) }
-                                                        ]}>
-                                                            <Text style={styles.avatarText}>
-                                                                {getInitials(formData.name)}
-                                                            </Text>
-                                                            
-                                                        </View>
-                                                    )}
-                                                </View>
+                            {profilePic ? (
+                                <Image source={{ uri: profilePic }} style={styles.avatar} />
+                            ) : (
+                                <View style={[
+                                    styles.avatarFallback, 
+                                    { backgroundColor: getAvatarColor(formData.name) }
+                                ]}>
+                                    <Text style={styles.avatarText}>
+                                        {getInitials(formData.name)}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
 
                         <View style={styles.formContainer}>
                             <View style={styles.inputContainer}>
@@ -188,7 +214,6 @@ const UpdateProfilCommercant = ({ navigation }) => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.numTel}
-
                                     onChangeText={(text) => handleChange('numTel', text)}
                                     placeholder={t('telephone')}
                                     placeholderTextColor="#9E9E9E"
@@ -206,6 +231,29 @@ const UpdateProfilCommercant = ({ navigation }) => {
                                     placeholder="Adresse de la boutique"
                                     placeholderTextColor="#9E9E9E"
                                 />
+                            </View>
+
+                            <View style={styles.inputContainer}>
+                                <Icon name="store" size={24} color="#2E7D32" style={styles.inputIcon} />
+                                {isLoadingSuperettes ? (
+                                    <ActivityIndicator size="small" color="#2E7D32" style={styles.loader} />
+                                ) : (
+                                    <Picker
+                                        selectedValue={selectedSuperette}
+                                        onValueChange={(itemValue) => setSelectedSuperette(itemValue)}
+                                        style={styles.picker}
+                                        dropdownIconColor="#2E7D32"
+                                    >
+                                        <Picker.Item label="Sélectionnez une supérette" value="" />
+                                        {superettes.map(superette => (
+                                            <Picker.Item 
+                                                key={superette._id} 
+                                                label={`${superette.name} - ${superette.address}`} 
+                                                value={superette._id} 
+                                            />
+                                        ))}
+                                    </Picker>
+                                )}
                             </View>
 
                             <View style={styles.inputContainer}>
@@ -231,9 +279,9 @@ const UpdateProfilCommercant = ({ navigation }) => {
                             </View>
 
                             <TouchableOpacity
-                                style={styles.saveButton}
+                                style={[styles.saveButton, (isLoading || isLoadingSuperettes) && styles.disabledButton]}
                                 onPress={handleUpdateProfile}
-                                disabled={isLoading}
+                                disabled={isLoading || isLoadingSuperettes}
                             >
                                 {isLoading ? (
                                     <ActivityIndicator color="#FFFFFF" />
@@ -260,10 +308,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingBottom: 30,
-        marginTop:30,
+        marginTop: 30,
     },
-  profileHeader: {
-       alignItems: 'center',
+    profileHeader: {
+        alignItems: 'center',
         marginBottom: 30,
         marginTop: 20,
     },
@@ -280,17 +328,6 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
     },
-    avatarContainer: {
-        width: 100,
-        height: 100,
-        borderRadius: 60,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 15,
-        overflow: 'hidden',
-        marginTop: 25,
-    },
     avatarText: {
         fontSize: 36,
         fontWeight: 'bold',
@@ -298,7 +335,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textShadowColor: 'rgba(0,0,0,0.2)',
         textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 2, // Centrer la lettre verticalement
+        textShadowRadius: 2,
     },
     avatar: {
         width: 100,
@@ -306,20 +343,6 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         borderWidth: 3,
         borderColor: '#fff',
-    },
-    editIcon: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: '#2E7D32',
-        borderRadius: 20,
-        padding: 5,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#2E7D32',
-        marginBottom: 10,
     },
     formContainer: {
         marginTop: 25,
@@ -349,6 +372,14 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 16,
     },
+    picker: {
+        flex: 1,
+        height: '100%',
+        color: '#333',
+    },
+    loader: {
+        flex: 1,
+    },
     eyeIcon: {
         padding: 10,
     },
@@ -364,6 +395,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 5,
         elevation: 5,
+    },
+    disabledButton: {
+        opacity: 0.6,
     },
     saveButtonText: {
         color: '#FFFFFF',

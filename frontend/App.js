@@ -73,6 +73,7 @@ import CommandeRefusee from './screens/LivreurScreens/CommandeRefusee';
 import GestionDesSuperettes from './screens/AdministrateurScreens/GestionDesSuperettes';
 import AjouterSuperette from './screens/AdministrateurScreens/AjouterSuperette';
 import ModifierSuperette from './screens/AdministrateurScreens/ModifierSuperette';
+import Calcule from './screens/AdministrateurScreens/Calcule';
 
 
 
@@ -151,6 +152,7 @@ export default function App() {
         <Stack.Screen name='GestionDesSuperettes' component={GestionDesSuperettes} options={{headerTitle:''}}/>
         <Stack.Screen name='AjouterSuperette' component={AjouterSuperette} options={{headerTitle:''}}/>
         <Stack.Screen name='ModifierSuperette' component={ModifierSuperette} options={{headerTitle:''}}/>
+        <Stack.Screen name='Calcule' component={Calcule} options={{headerTitle:''}}/>
       </Stack.Navigator>
     </NavigationContainer>
 

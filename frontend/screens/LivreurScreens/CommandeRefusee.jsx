@@ -5,10 +5,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const CommandeRefusee = ({ navigation, route }) => {
   const { numeroCommande } = route.params;
- 
+
   const updateLivraison = async () => {
     try {
-      await fetch(`http://192.168.1.33:8080/api/commandes/${numeroCommande}/livraison`, {
+      await fetch(`http://192.168.43.145:8080/api/commandes/${numeroCommande}/livraison`, {
 
         method: 'PUT',
         headers: {
@@ -41,7 +41,7 @@ const CommandeRefusee = ({ navigation, route }) => {
               style={[styles.button, styles.primaryButton]}
               onPress={async () => {
                 await updateLivraison();
-                navigation.pop(2);         
+                navigation.pop(2);
               }}
             >
               <Text style={styles.buttonText}>Retour à la commande</Text>
@@ -49,9 +49,13 @@ const CommandeRefusee = ({ navigation, route }) => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={async() =>{ 
+              onPress={async () => {
                 await updateLivraison();
-                navigation.navigate('AcceuilConsommateur')}}
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'AcceuilConsommateur' }],
+                });
+              }}
             >
               <Text style={[styles.buttonText, { color: '#2E7D32' }]}>Retour à l'accueil</Text>
             </TouchableOpacity>
@@ -67,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    bottom:30,
+    bottom: 30,
   },
   content: {
     backgroundColor: 'white',

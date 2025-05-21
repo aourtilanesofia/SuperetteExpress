@@ -17,7 +17,7 @@ const ListeShops = ({ navigation }) => {
   const getLocation = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -29,9 +29,9 @@ const ListeShops = ({ navigation }) => {
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-      
+
       setLocation(location.coords);
-      fetchShops(location.coords.latitude, location.coords.longitude); 
+      fetchShops(location.coords.latitude, location.coords.longitude);
     } catch (err) {
       console.error(err);
       setError('Impossible de récupérer votre position');
@@ -41,10 +41,10 @@ const ListeShops = ({ navigation }) => {
 
   const fetchShops = async (lat, lng) => {
     try {
-      const response = await fetch(`http://192.168.1.33:8080/api/superettes/nearby?lat=${lat}&lng=${lng}&radius=10000`);
+      const response = await fetch(`http://192.168.43.145:8080/api/superettes/nearby?lat=${lat}&lng=${lng}&radius=10000`);
 
       const data = await response.json();
-  
+
       if (data.success) {
         setShops(data.data.length > 0 ? data.data : [{
           _id: "test123",
@@ -73,9 +73,13 @@ const ListeShops = ({ navigation }) => {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.shopCard}
-      onPress={() => navigation.navigate('WelcomePage')}
+      onPress={() => {
+        if (item.name === 'Supérette A') {
+          navigation.navigate('WelcomePage');
+        }
+      }}
       activeOpacity={0.7}
     >
       <View style={styles.shopIcon}>
@@ -90,8 +94,8 @@ const ListeShops = ({ navigation }) => {
         <View style={styles.shopDistanceContainer}>
           <MaterialIcons name="directions-walk" size={16} color="#4285f4" />
           <Text style={styles.shopDistance}>
-            {typeof item.distance === 'number' ? 
-              `${Math.round(item.distance)} m` : 
+            {typeof item.distance === 'number' ?
+              `${Math.round(item.distance)} m` :
               'Distance inconnue'}
           </Text>
         </View>
@@ -107,14 +111,14 @@ const ListeShops = ({ navigation }) => {
           <View style={styles.locationIconContainer}>
             <MaterialIcons name="location-searching" size={80} color="#2E7D32" />
           </View>
-          
+
           <Text style={styles.promptTitle}>Découvrez les superettes près de vous</Text>
           <Text style={styles.promptText}>
             Nous avons besoin de votre position pour vous montrer les superettes les plus proches
           </Text>
-          
-          <TouchableOpacity 
-            style={[styles.locationButton, loading && styles.disabledButton]} 
+
+          <TouchableOpacity
+            style={[styles.locationButton, loading && styles.disabledButton]}
             onPress={getLocation}
             disabled={loading}
           >
@@ -127,7 +131,7 @@ const ListeShops = ({ navigation }) => {
               </>
             )}
           </TouchableOpacity>
-          
+
           {error ? (
             <View style={styles.errorContainer}>
               <MaterialIcons name="error-outline" size={20} color="#d32f2f" />
@@ -142,19 +146,19 @@ const ListeShops = ({ navigation }) => {
               <Text style={styles.title}>Superettes à proximité</Text>
               <Text style={styles.subtitle}>Triées par distance</Text>
             </View>
-            <TouchableOpacity 
-              onPress={handleRefresh} 
+            <TouchableOpacity
+              onPress={handleRefresh}
               style={styles.refreshButton}
               disabled={refreshing}
             >
-              <MaterialIcons 
-                name="refresh" 
-                size={24} 
-                color={refreshing ? '#2E7D32' : '#666'} 
+              <MaterialIcons
+                name="refresh"
+                size={24}
+                color={refreshing ? '#2E7D32' : '#666'}
               />
             </TouchableOpacity>
           </View>
-          
+
           <FlatList
             data={shops}
             renderItem={renderItem}
@@ -165,7 +169,7 @@ const ListeShops = ({ navigation }) => {
                 <MaterialIcons name="storefront" size={50} color="#e0e0e0" />
                 <Text style={styles.noResults}>Aucune superette trouvée</Text>
                 <Text style={styles.noResultsSub}>Essayez d'élargir votre zone de recherche</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.retryButton}
                   onPress={handleRefresh}
                 >

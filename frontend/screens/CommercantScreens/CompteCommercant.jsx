@@ -20,9 +20,35 @@ const CompteCommercant = ({ navigation }) => {
                     setLoading(true);
                     const userData = await AsyncStorage.getItem('user');
                     if (userData) {
-                        setUser(JSON.parse(userData));
+                        const parsedUser = JSON.parse(userData);
+                        console.log('User data from storage:', parsedUser);
+
+                        // Si la supérette est un string (ID), nous devrions la convertir en objet
+                        if (parsedUser.superette && typeof parsedUser.superette === 'string') {
+                            try {
+                                const token = await AsyncStorage.getItem('token');
+                                const response = await fetch(`http://192.168.43.145:8080/api/superettes/${parsedUser.superette}`, {
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`
+                                    }
+                                });
+
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    parsedUser.superette = data; // car ton controller retourne directement la superette
+                                } else {
+                                    console.log('Erreur de récupération de la supérette');
+                                }
+                            } catch (error) {
+                                console.log('Erreur fetch supérette', error);
+                            }
+                        }
+
+
+                        setUser(parsedUser);
                     }
                 } catch (error) {
+                    console.error('Error loading user:', error);
                     Alert.alert(t('erreur'), t('impossible_charger_info'));
                 } finally {
                     setLoading(false);
@@ -53,7 +79,7 @@ const CompteCommercant = ({ navigation }) => {
                             const token = await AsyncStorage.getItem('token');
                             const user = JSON.parse(await AsyncStorage.getItem('user'));
 
-                            const response = await fetch(`http://192.168.1.33:8080/api/v1/commercant/delete-account`, {
+                            const response = await fetch(`http://192.168.43.145:8080/api/v1/commercant/delete-account`, {
 
                                 method: 'DELETE',
                                 headers: {
@@ -140,17 +166,22 @@ const CompteCommercant = ({ navigation }) => {
     };
     // Fonction pour générer les initiales
     const getInitials = (name) => {
-        if (!name) return '';
+        if (!name || typeof name !== 'string') return '';
 
-        const names = name.split(' ');
-        let initials = names[0][0].toUpperCase();
+        const names = name.trim().split(' ').filter(Boolean);
+        if (names.length === 0) return '';
+
+        let initials = names[0][0]?.toUpperCase() || '';
 
         if (names.length > 1) {
-            initials += names[names.length - 1][0].toUpperCase();
+            initials += names[names.length - 1][0]?.toUpperCase() || '';
         }
 
         return initials;
     };
+    console.log('USER:', user);
+    console.log("User object:", JSON.stringify(user, null, 2));
+
 
 
 
@@ -188,6 +219,24 @@ const CompteCommercant = ({ navigation }) => {
                             </View>
                         </View>
 
+                        <View style={styles.separator} />
+  
+
+
+                        <View style={styles.infoItem}>
+                            <Icon name="store" size={24} color="#2E7D32" style={styles.icon} />
+                            <View style={styles.infoTextContainer}>
+                                <Text style={styles.infoLabel}>{t('supr')}</Text>
+                                {user.superette && user.superette.name ? (
+                                    <>
+                                        <Text style={styles.infoValue}>{user.superette.name}</Text>
+                                        
+                                    </>
+                                ) : (
+                                    <Text style={styles.infoValue}>Aucune supérette associée</Text>
+                                )}
+                            </View>
+                        </View>
                         <View style={styles.separator} />
 
                         <View style={styles.infoItem}>
@@ -235,7 +284,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        marginTop:30,
+        marginTop: 30,
     },
     loadingContainer: {
         flex: 1,
@@ -252,7 +301,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#FF3B30',
     },
-   profileHeader: {
+    profileHeader: {
         alignItems: 'center',
         marginBottom: 30,
         marginTop: 20,
@@ -301,7 +350,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
         color: '#000',
-        marginTop:20,
+        marginTop: 20,
     },
     profileInfo: {
         backgroundColor: '#FFFFFF',

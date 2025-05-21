@@ -13,7 +13,7 @@ const consommateurSchema = new mongoose.Schema(
       required: [true, "Le champ est obligatoire"],
        unique: true,
     },
-    adresse: {
+    adresse: { 
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
@@ -23,6 +23,10 @@ const consommateurSchema = new mongoose.Schema(
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
     isActive: { type: Boolean, default: true },
+    superetteId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Superette",
+},
   },
   { timestamps: true }
 );

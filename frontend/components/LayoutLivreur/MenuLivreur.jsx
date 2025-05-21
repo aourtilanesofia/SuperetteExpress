@@ -9,7 +9,7 @@ import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 
 
-const socket = io("http://192.168.1.33:8080"); // Mets l'URL de ton backend
+const socket = io("http://192.168.43.145:8080"); // Mets l'URL de ton backend
 
 const MenuLivreur = () => {
   const route = useRoute();
@@ -20,7 +20,7 @@ const MenuLivreur = () => {
   
 
    useEffect(() => {
-    fetch("http://192.168.1.33:8080/api/v1/notifications")
+    fetch("http://192.168.43.145:8080/api/v1/notifications")
 
   
       .then((res) => res.json())

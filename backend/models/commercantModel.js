@@ -1,23 +1,28 @@
 import mongoose from "mongoose";
 import JWT from "jsonwebtoken";
 
-const commercantSchema = new mongoose.Schema( 
+const commercantSchema = new mongoose.Schema(
   {
     nom: {
       type: String,
       required: [true, "Le champ est obligatoire"],
     },
     numTel: {
-        type: String,
-        required: [true, "Le champ est obligatoire"],
-      },
-    
+      type: String,
+      required: [true, "Le champ est obligatoire"],
+    },
+    superette: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Superette',
+      unique: true
+    },
+
     adresseBoutique: {
       type: String,
       required: [true, "Le champ est obligatoire"],
-       unique: true,
-    },   
-    
+      unique: true,
+    },
+
     mdp: {
       type: String,
       required: [true, "Le champ est obligatoire"],
@@ -25,9 +30,10 @@ const commercantSchema = new mongoose.Schema(
     },
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true,
-    collection: "Commercant", 
-   }
+  {
+    timestamps: true,
+    collection: "Commercant",
+  }
 );
 
 // JWT token

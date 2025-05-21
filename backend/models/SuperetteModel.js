@@ -34,6 +34,11 @@ const superetteSchema = new mongoose.Schema({
     required: [true, "L'adresse est obligatoire"],
     trim: true
   },
+  commercant: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Commercant',
+    unique: true 
+  },
   location: {
     type: {
       type: String,
@@ -66,4 +71,4 @@ const superetteSchema = new mongoose.Schema({
 superetteSchema.index({ location: "2dsphere" });
 
 const SuperetteModel = mongoose.model('Superette', superetteSchema);
-export default SuperetteModel;
+export default SuperetteModel;  

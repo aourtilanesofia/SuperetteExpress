@@ -32,7 +32,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
     const getAbsoluteUrl = (path) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
-        return `http://192.168.1.33:8080${path}`;
+        return `http://192.168.43.145:8080${path}`;
 
     };
 
@@ -89,11 +89,11 @@ const UpdateProfileLivreur = ({ navigation }) => {
     };
 
     const uploadImage = async (uri) => {
-        console.log("Tentative de connexion à :", `http://192.168.1.33:8080`);
+        console.log("Tentative de connexion à :", `http://192.168.43.145:8080`);
 
         try {
             // Test préalable de la connexion
-            await fetch(`http://192.168.1.33:8080`, { method: 'HEAD' });
+            await fetch(`http://192.168.43.145:8080`, { method: 'HEAD' });
 
             const formData = new FormData();
             formData.append('profilePic', {
@@ -102,7 +102,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
                 type: 'image/jpeg',
             });
 
-            const response = await fetch(`http://192.168.1.33:8080/api/v1/livreur/upload-profile-pic`, {
+            const response = await fetch(`http://192.168.43.145:8080/api/v1/livreur/upload-profile-pic`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${await AsyncStorage.getItem('token')}`,
@@ -202,7 +202,7 @@ const UpdateProfileLivreur = ({ navigation }) => {
         };
 
         // Envoi des données au serveur
-        const response = await fetch('http://192.168.1.33:8080/api/v1/livreur/profile-updateL', {
+        const response = await fetch('http://192.168.43.145:8080/api/v1/livreur/profile-updateL', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

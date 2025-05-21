@@ -77,7 +77,7 @@ const DetailsCommandeALivre = ({ route }) => {
             const { latitude, longitude } = location.coords;
     
             const livreurId = await AsyncStorage.getItem('livreurId');
-            const response = await fetch(`http://192.168.1.33:8080/api/commandes/livstat/${commande._id}`, {
+            const response = await fetch(`http://192.168.43.145:8080/api/commandes/livstat/${commande._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,7 +98,7 @@ const DetailsCommandeALivre = ({ route }) => {
                 throw new Error(result.message || "Échec de la mise à jour");
             }
     
-            await fetch('http://192.168.1.33:8080/api/livreur/position', {
+            await fetch('http://192.168.43.145:8080/api/livreur/position', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -142,7 +142,7 @@ const DetailsCommandeALivre = ({ route }) => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://192.168.1.33:8080/api/commandes/${commande._id}`,
+                `http://192.168.43.145:8080/api/commandes/${commande._id}`,
                 {
                     method: "PUT",
                     headers: {

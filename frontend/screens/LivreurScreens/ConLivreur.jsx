@@ -31,7 +31,7 @@ const ConLivreur = ({ navigation }) => {
 
         try {
 
-            const response = await fetch("http://192.168.1.33:8080/api/v1/livreur/connexionL", {
+            const response = await fetch("http://192.168.43.145:8080/api/v1/livreur/connexionL", {
 
 
                 method: "POST",
@@ -63,7 +63,6 @@ const ConLivreur = ({ navigation }) => {
             setIsLoading(false);
         }
     };
-
     return (
         <LinearGradient
             colors={['#FFFFFF', '#E8F5E9']}
