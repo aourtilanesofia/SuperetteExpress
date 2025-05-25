@@ -14,6 +14,7 @@ import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useTranslation } from 'react-i18next';
 
 const socket = io("http://192.168.43.145:8080");
 
@@ -28,6 +29,8 @@ const ListeCommandeALivre = () => {
   const [refusedCommande, setRefusedCommande] = useState(null);
   const [acceptedCommands, setAcceptedCommands] = useState([]);
   const [orderDetails, setOrderDetails] = useState({});
+  const { t } = useTranslation();
+  
 
   const loadOrderDetails = async (commandes) => {
     const details = {};
@@ -251,7 +254,7 @@ const ListeCommandeALivre = () => {
         {/* En-tête de la carte */}
         <View style={styles.cardHeader}>
           <View style={styles.commandeInfo}>
-            <Text style={styles.commandeNumero}>Commande #{item.numeroCommande}</Text>
+            <Text style={styles.commandeNumero}>{t('commande')} #{item.numeroCommande}</Text>
             <View style={styles.infoRow}>
               <Icon name="access-time" size={16} color="#555" />
               <Text style={styles.dateText}>
@@ -296,7 +299,7 @@ const ListeCommandeALivre = () => {
               {item.livraison || 'En attente'}
             </Text>
           </View>
-          <Text style={styles.total}>Total: {(details.total)+130 || 0} DA</Text>
+          <Text style={styles.total}>{t('total')}: {(details.total)+130 || 0} DA</Text>
         </View>
           
         {/* Boutons d'action */}
@@ -306,13 +309,13 @@ const ListeCommandeALivre = () => {
               style={[styles.button, styles.acceptButton]} 
               onPress={() => accepterCommande(item.numeroCommande, item.userId?.numTel, item.userId?.nom)}
             >
-              <Text style={styles.buttonText}>Accepter</Text>
+              <Text style={styles.buttonText}>{t('accepter')}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.button, styles.rejectButton]} 
               onPress={() => refuserCommande(item.numeroCommande)}
             >
-              <Text style={styles.buttonText}>Refuser</Text>
+              <Text style={styles.buttonText}>{t('refuser')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -323,7 +326,7 @@ const ListeCommandeALivre = () => {
   return (
     <LayoutLivreur loading={loading}>
       <View style={styles.header}>
-        <Text style={styles.title}>Commandes Assignées</Text>
+        <Text style={styles.title}>{t('commAs')}</Text>
         <TouchableOpacity onPress={() => onRefresh()} style={styles.refreshButton}>
           <Icon name="refresh" size={24} color="#2E7D32" />
         </TouchableOpacity>
@@ -350,7 +353,7 @@ const ListeCommandeALivre = () => {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Icon name="assignment" size={50} color="#cccccc" />
-              <Text style={styles.emptyText}>Aucune commande assignée</Text>
+              <Text style={styles.emptyText}>{t('NcommAs')}</Text>
             </View>
           }
         />

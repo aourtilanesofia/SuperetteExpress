@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 
 const Confirmation = ({ navigation, route }) => {
   // Récupération des données de la commande
   const params = route.params || {};
+   const { t } = useTranslation();
 
   const {
     total = params.total || '0 DA',
@@ -50,33 +52,33 @@ const Confirmation = ({ navigation, route }) => {
       </View>
 
       {/* Titre */}
-      <Text style={styles.title}>Commande confirmée !</Text>
-      <Text style={styles.subtitle}>Votre paiement en {paymentMethod.toLowerCase()} a été accepté</Text>
+      <Text style={styles.title}>{t('cmdconf')} !</Text>
+      <Text style={styles.subtitle}>Votre paiement {paymentMethod.toLowerCase()} a été accepté</Text>
 
       {/* Carte de récapitulatif */}
       <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Récapitulatif</Text>
+        <Text style={styles.summaryTitle}>{t('summary')}</Text>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>N° Commande:</Text>
+          <Text style={styles.detailLabel}>{t('order_number')}:</Text>
           <Text style={styles.detailValue}>#{numeroCommande}</Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Montant:</Text>
+          <Text style={styles.detailLabel}>{t('amount')}:</Text>
           <Text style={styles.detailValue}>{total} DA</Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Méthode:</Text>
+          <Text style={styles.detailLabel}>{t('method')}:</Text>
           <Text style={styles.detailValue}>{paymentMethod}</Text>
         </View>
 
         <View style={styles.separator} />
 
-        <Text style={styles.sectionTitle}>Livraison à</Text>
+        <Text style={styles.sectionTitle}>{t('delivery_to')}</Text>
         <Text style={styles.address}>{adresse} - {infoSupplementaire}</Text>
-        <Text style={styles.clientInfo}>Livreur : {livreur.nom} - {livreur.numTel}</Text>
+        <Text style={styles.clientInfo}>{t('delivery_person')} : {livreur.nom} - {livreur.numTel}</Text>
       </View>
 
       {/* Boutons d'action */}
@@ -84,7 +86,7 @@ const Confirmation = ({ navigation, route }) => {
         style={styles.primaryButton}
         onPress={() => navigation.navigate('AcceuilConsommateur')}
       >
-        <Text style={styles.buttonText}>Retour à l'accueil</Text>
+        <Text style={styles.buttonText}>{t('back_home')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
@@ -103,7 +105,7 @@ const Confirmation = ({ navigation, route }) => {
           positionClient: null        // À remplir si vous avez déjà la position
       })}
       >
-        <Text style={styles.secondaryButtonText}>Suivre ma commande</Text>
+        <Text style={styles.secondaryButtonText}>{t('track_order')}</Text>
       </TouchableOpacity>
     </View>
   );

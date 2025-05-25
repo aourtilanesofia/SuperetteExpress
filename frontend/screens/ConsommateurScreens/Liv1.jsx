@@ -16,6 +16,7 @@ import Layout from '../../components/Layout/Layout';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,6 +30,7 @@ const Liv1 = ({ route }) => {
   const [commandeAcceptee, setCommandeAcceptee] = useState(false);
 
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const notifyLivreur = async (livreurId) => {
     try {
@@ -247,7 +249,7 @@ const Liv1 = ({ route }) => {
           {loading ? (
             <View style={styles.searchContent}>
               <ActivityIndicator size="large" color="#4CAF50" />
-              <Text style={styles.loadingText}>Recherche du livreur le plus proche...</Text>
+              <Text style={styles.loadingText}>{t('rech')}</Text>
               {Platform.OS === 'android' ? (
                 <ProgressBarAndroid
                   styleAttr="Horizontal"
@@ -303,15 +305,15 @@ const Liv1 = ({ route }) => {
         {/* Section des informations fixes en bas */}
         <View style={styles.bottomSection}>
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>Résumé de la commande</Text>
+            <Text style={styles.summaryTitle}>{t('resumer')}</Text>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Total Net</Text>
+              <Text style={styles.summaryLabel}>{t('total')}</Text>
               <Text style={styles.summaryValue}>{commande?.total ?? '6800'} DA</Text>
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Mode de livraison</Text>
+              <Text style={styles.summaryLabel}>{t('modeliv')}</Text>
               <Text style={styles.summaryValue}>À domicile</Text>
             </View>
           </View>
@@ -320,13 +322,13 @@ const Liv1 = ({ route }) => {
             style={styles.paymentButton}
             onPress={handlePaiement}
           >
-            <Text style={styles.paymentButtonText}>Procéder au paiement</Text>
+            <Text style={styles.paymentButtonText}>{t('procedePaiement')}</Text>
             <Ionicons name="arrow-forward" size={20} color="white" />
           </TouchableOpacity>
 
 
           <TouchableOpacity style={styles.cancelButton} onPress={annulerCommande}>
-            <Text style={styles.cancelButtonText}>Annuler la commande</Text>
+            <Text style={styles.cancelButtonText}>{t('annulercomm')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
