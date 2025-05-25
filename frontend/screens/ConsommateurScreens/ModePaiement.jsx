@@ -58,7 +58,7 @@ const ModePaiement = ({ navigation, route }) => {
   const paymentMethods = [
     {
       id: 'espece',
-      title: 'En Espèce',
+     title: t('espec'),
       icon: 'cash', 
       color: '#4CAF50',
       onPress: () => {
@@ -78,7 +78,7 @@ const ModePaiement = ({ navigation, route }) => {
     },
     {
       id: 'carte',
-      title: 'Par carte',
+      title: t('carte'),
       icon: 'card',
       color: '#2196F3',
       onPress: () => setModalVisible(true)
@@ -109,15 +109,15 @@ const ModePaiement = ({ navigation, route }) => {
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <MaterialIcons name="payment" size={32} color="#2E7D32" />
+          <MaterialIcons name="payment" size={32} color="#27D32" />
           <Title style={styles.mainTitle}>{t('methodepaiemenr')}</Title>
-          <Text style={styles.subTitle}>Sélectionnez votre mode de paiement</Text>
+          <Text style={styles.subTitle}>{t('select')}</Text>
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Résumé de la commande</Text>
+          <Text style={styles.summaryTitle}>{t('resumer')}</Text>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total à payer</Text>
+            <Text style={styles.summaryLabel}>{t('totalpay')}</Text>
             <Text style={styles.summaryAmount}>{commande.total} DA</Text>
           </View>
         </View>

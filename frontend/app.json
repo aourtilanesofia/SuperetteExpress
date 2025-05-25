@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Supérette Express",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/LogoApp.jpg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -21,8 +21,11 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "CAMERA"
-      ]
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +39,11 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "10004efd-fadc-4cce-b958-d9981e4b2bfa"
+      }
+    }
   }
 }

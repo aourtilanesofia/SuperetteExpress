@@ -1,104 +1,100 @@
+
+
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Unsupported top level event type "topInsetsChange" dispatched',
+]);
+
 import { StyleSheet, Text, View, Image, Animated, Easing } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 
 const SplashScreen = ({ navigation }) => {
-    // Création des valeurs animées
+    // Animation values
+    const panierAnim = useRef(new Animated.Value(-200)).current;  // Panier commence hors écran à gauche
+    const textAnim = useRef(new Animated.Value(-300)).current;   // Texte commence encore plus loin
     const fadeAnim = useRef(new Animated.Value(0)).current;
-    const scaleAnim = useRef(new Animated.Value(0.8)).current;
-    const rotateAnim = useRef(new Animated.Value(0)).current;
-    const positionAnim = useRef(new Animated.Value(0)).current;
-    const textFadeAnim = useRef(new Animated.Value(0)).current;
+    const bounceAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
-        // Animation en séquence
+        // Séquence d'animation
         Animated.sequence([
-            // Animation du panier (fade in + scale up)
-            Animated.parallel([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 800,
+           
+            Animated.timing(panierAnim, {
+                toValue: 0,
+                duration: 800,
+                easing: Easing.linear, 
+                useNativeDriver: true,
+            }),
+            
+            
+            Animated.sequence([
+                Animated.timing(bounceAnim, {
+                    toValue: 1.2,
+                    duration: 100,
                     useNativeDriver: true,
                 }),
-                Animated.timing(scaleAnim, {
-                    toValue: 1.2,
-                    duration: 1000,
+                Animated.timing(bounceAnim, {
+                    toValue: 1,
+                    duration: 200,
                     easing: Easing.elastic(1),
                     useNativeDriver: true,
                 }),
             ]),
-            // Bounce effect du panier
-            Animated.sequence([
-                Animated.timing(positionAnim, {
-                    toValue: -20,
-                    duration: 200,
+            
+           
+            Animated.parallel([
+                Animated.timing(textAnim, {
+                    toValue: 0,
+                    duration: 500,
+                    easing: Easing.out(Easing.quad),
                     useNativeDriver: true,
                 }),
-                Animated.timing(positionAnim, {
-                    toValue: 0,
-                    duration: 200,
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 600,
                     useNativeDriver: true,
                 }),
             ]),
-            // Rotation du panier
-            Animated.timing(rotateAnim, {
-                toValue: 1,
-                duration: 800,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }),
-            // Fade in du texte après la rotation du panier
-            Animated.timing(textFadeAnim, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }),
         ]).start();
 
-        // Redirection après 4 secondes (un peu plus long pour laisser voir l'animation)
+        // Redirection après 3.5 secondes
         setTimeout(() => {
             navigation.replace("FirstScreen");
-        }, 4000);
-    }, [fadeAnim, scaleAnim, rotateAnim, positionAnim, textFadeAnim, navigation]);
-
-    // Interpolation pour la rotation
-    const rotateInterpolate = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg'],
-    });
+        }, 3500);
+    }, []);
 
     return (
         <View style={styles.container}>
             <View style={styles.content}>
+                {/* Panier avec animation de translation et de rebond */}
+                <Animated.Image 
+                    source={require('../assets/panier.png')} 
+                    style={[
+                        styles.img,
+                        {
+                            transform: [
+                                { translateX: panierAnim },
+                                { scale: bounceAnim },
+                            ],
+                        }
+                    ]} 
+                />
+                
+                {/* Texte qui suit avec effet de fondu */}
                 <Animated.Text 
                     style={[
                         styles.txt,
                         {
-                            opacity: textFadeAnim,
+                            opacity: fadeAnim,
                             transform: [
-                                { translateX: textFadeAnim.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: [-50, 0] // Slide from left
-                                })}
+                                { translateX: textAnim }
                             ]
                         }
                     ]}
                 >
                     Supérette Express
                 </Animated.Text>
-                <Animated.Image 
-                    source={require('../assets/panier.png')} 
-                    style={[
-                        styles.img,
-                        {
-                            opacity: fadeAnim,
-                            transform: [
-                                { scale: scaleAnim },
-                                { translateY: positionAnim },
-                                { rotate: rotateInterpolate },
-                            ],
-                        }
-                    ]} 
-                />
             </View>
         </View>
     );
@@ -121,7 +117,7 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 'bold',
         color: '#fff',
-        marginRight: 15,
+        marginLeft: 15,
         textShadowColor: 'rgba(0, 0, 0, 0.3)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,

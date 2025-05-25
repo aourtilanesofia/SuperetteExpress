@@ -235,7 +235,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
       >
         <View style={styles.container}>
           <View style={styles.headerContainer}>
-            <Text style={styles.header}>{t('Suivi de livraison')}</Text>
+            <Text style={styles.header}>{t('Suivi_de_livraison')}</Text>
             <View style={styles.headerLine} />
           </View>
 
@@ -257,7 +257,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('Informations client')}</Text>
+              <Text style={styles.sectionTitle}>{t('Informations_client')}</Text>
               <View style={styles.infoContainer}>
                 <View style={styles.infoRow}>
                   <Icon name="person" size={20} color="#2E7D32" style={styles.icon} />
@@ -292,7 +292,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('Détails de la commande')}</Text>
+              <Text style={styles.sectionTitle}>{t('Détails_de_la_commande')}</Text>
               <View style={styles.detailsContainer}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>{t('Statut')}:</Text>
@@ -320,7 +320,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                 
 
                 <View style={[styles.detailRow, styles.totalRow]}>
-                  <Text style={styles.totalLabel}>{t('Total')}:</Text>
+                  <Text style={styles.totalLabel}>{t('total')}:</Text>
                   <Text style={styles.totalValue}>{(commande.total + 130)} DA</Text>
                 </View>
               </View>
@@ -344,7 +344,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                 disabled={isDisabled}
               >
                 <Icon name="cancel" size={20} color="#fff" style={styles.buttonIcon} />
-                <Text style={styles.buttonText}>{t('Non livrée')}</Text>
+                <Text style={styles.buttonText}>{t('NonL')}</Text>
               </TouchableOpacity>
             </View>
           )}

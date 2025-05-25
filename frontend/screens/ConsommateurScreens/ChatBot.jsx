@@ -11,79 +11,15 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import Layout from '../../components/Layout/Layout';
+import { useTranslation } from 'react-i18next';
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([
     { id: 1, text: 'Bonjour ! Comment puis-je vous aider aujourd\'hui ?', isUser: false },
   ]);
   const [inputText, setInputText] = useState('');
-  const catégories = [
-  {
-    id: 1,
-    nom: "Fruits",
-    image: "/assets/fruits.png"
-  },
-  {
-    id: 2,
-    nom: "Légumes",
-    image: "/assets/legumes.png"
-  },
-  {
-    id: 3,
-    nom: "Produits laitiers",
-    image: "/assets/lait.png"
-  },
-  {
-    id: 4,
-    nom: "Snacks",
-    image: "/assets/chocolat.png"
-  },
-  {
-    id: 5,
-    nom: "Boissons",
-    image: "/assets/boisson.png"
-  },
-  {
-    id: 6,
-    nom: "Articles de ménages",
-    image: "/assets/menages.png"
-  },
-  {
-    id: 7,
-    nom: "Légumineuses",
-    image: "/assets/legumineuses.png"
-  },
-  {
-    id: 8,
-    nom: "Conserves",
-    image: "/assets/conserve.png"
-  },
-  {
-    id: 9,
-    nom: "Boulangerie",
-    image: "/assets/boulangerie.png"
-  },
-  {
-    id: 10,
-    nom: "Cosmétiques",
-    image: "/assets/cosm.png"
-  },
-  {
-    id: 11,
-    nom: "Pâtes",
-    image: "/assets/pates.png"
-  },
-  {
-    id: 12,
-    nom: "Huiles, miel et sauces",
-    image: "/assets/huile.png"
-  },
-  {
-    id: 13,
-    nom: "Blé, riz et farine",
-    image: "/assets/ble.png"
-  }
-];
+  const { t } = useTranslation();
+ 
 
 const produits = [
   {

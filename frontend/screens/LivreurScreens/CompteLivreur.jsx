@@ -123,7 +123,7 @@ const CompteLivreur = ({ navigation }) => {
             const userResponse = await fetch('http://192.168.43.145:8080/api/v1/livreur/me', {
 
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`, 
                 },
             });
             const updatedUserData = await userResponse.json();
@@ -283,7 +283,7 @@ const CompteLivreur = ({ navigation }) => {
                         <View style={styles.infoItem}>
                             <MaterialCommunityIcons name="car-info" size={24} color="#2E7D32" style={styles.icon} />
                             <View style={styles.infoTextContainer}>
-                                <Text style={styles.infoLabel}>{t('Marque de véhicule')}</Text>
+                                <Text style={styles.infoLabel}>{t('Marque_de_véhicule')}</Text>
                                 <Text style={styles.infoValue}>{user.marque || 'Non spécifiée'}</Text>
                             </View>
                         </View>
