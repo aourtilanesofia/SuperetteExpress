@@ -176,20 +176,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#2E7D32',
   },
   imageContainer: {
-    width: '100%',
-    height: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F9F9F9',
-    position: 'relative',
-  },
-  image: {
-    width: '80%',
-    height: '80%',
-  },
+  width: '100%',
+  height: 300,
+  backgroundColor: '#F9F9F9',
+},
+
+image: {
+  width: '100%',
+  height: '100%',
+  resizeMode: 'cover',
+},
+
   stockBadge: {
     position: 'absolute',
-    top: 20,
+    top: 0,
     right: 20,
     backgroundColor: '#FF3B30',
     paddingHorizontal: 12,

@@ -27,7 +27,7 @@ const DetailsCommandeALivre = ({ route }) => {
     const [telephoneClient, setTelephoneClient] = useState(commande.userId?.numTel || t("non_specifie"));
     const [adresse, setAdresse] = useState(commande.destination?.adresse || t("non_specifiee"));
     const [infoSupplementaire, setInfoSupplementaire] = useState(commande.destination?.infoSup || "");
-    const [total, setTotal] = useState(commande.total || 0);
+    const [total, setTotal] = useState(commande.totalNet || 0);
 
     const handleCallClient = () => {
         const phoneNumber = numTel || telephoneClient;
@@ -105,7 +105,7 @@ const DetailsCommandeALivre = ({ route }) => {
                     "Authorization": `Bearer ${await AsyncStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
-                    longitude,
+                    longitude, 
                     latitude
                 }),
             });
@@ -287,7 +287,7 @@ const DetailsCommandeALivre = ({ route }) => {
             <View style={styles.footer}>
                 <View style={styles.totalContainer}>
                     <Text style={styles.totalLabel}>{t('totalapayer')}</Text>
-                    <Text style={styles.totalValue}>{(commande.total + 130)} DA</Text>
+                    <Text style={styles.totalValue}>{(commande.totalNet)} DA</Text>
                 </View>
 
                 <TouchableOpacity

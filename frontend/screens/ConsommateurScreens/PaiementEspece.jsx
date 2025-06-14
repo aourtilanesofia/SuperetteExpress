@@ -55,6 +55,7 @@ const PaiementEspece = ({ navigation, route }) => {
         paymentMethod: 'En Espèce',
         infoSupplementaire,
         numeroCommande,
+        methodePaiement:'Espèce',
         livreur:livreur,
       });
     } catch (error) {
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#2E7D32', 
     marginTop: 10,
   },
   card: {

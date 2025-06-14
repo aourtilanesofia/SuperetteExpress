@@ -75,7 +75,8 @@ const Panier = () => {
                 prix: item.prix,
                 quantite: item.qty
               })),
-              total: totalPrice
+              total: totalPrice,
+               methodePaiement: "Non spécifie",
             })
           });
       

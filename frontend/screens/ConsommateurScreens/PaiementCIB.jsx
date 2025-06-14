@@ -69,6 +69,7 @@ const PaiementCIB = ({ navigation, route }) => {
         telephoneClient,
         paymentMethod: 'Carte CIB',
         numeroCommande,
+        methodePaiement: 'CIB',
         infoSupplementaire,
         livreur
       });
@@ -79,6 +80,25 @@ const PaiementCIB = ({ navigation, route }) => {
     }
    
   };  
+
+  // Après validation du paiement
+const handlePaymentSuccess = async () => {
+  try {
+    const response = await fetch('http://192.168.43.145:8080/api/commandes/updatePaymentMethod', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        numeroCommande: commande.numeroCommande,
+        methodePaiement: route.params.methodePaiement // 'CIB', 'DAHABIYA' ou 'Espèce'
+      })
+    });
+
+    const data = await response.json();
+    navigation.navigate('Confirmation', { commande: data });
+  } catch (error) {
+    console.error("Erreur:", error);
+  }
+};
   
 
   return (
@@ -178,7 +198,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: 14, 
     marginTop: 15,
     marginBottom: 5,
     color: '#333',

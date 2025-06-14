@@ -8,10 +8,16 @@ const commandeSchema = new mongoose.Schema({
     {
       nom: String,
       prix: Number,
-      quantite: Number 
+      quantite: Number  
     }
   ],
   total: { type: Number, required: true },
+  totalNet: { type: Number },
+  methodePaiement: { 
+  type: String,
+  enum: ['Espèce', 'CIB', 'DAHABIYA', 'Non spécifié'],
+  default: 'Non spécifié'
+},
   statut: {
     type: String,
     enum: ['En attente', 'Assignée'], 
@@ -25,7 +31,7 @@ const commandeSchema = new mongoose.Schema({
     enum: ['Payée', 'Non', 'En attente de paiement'],
     default: 'En attente de paiement' 
   },
-  destination: {
+  destination: { 
     adresse: { type: String },
     infoSup: { type: String } 
   },

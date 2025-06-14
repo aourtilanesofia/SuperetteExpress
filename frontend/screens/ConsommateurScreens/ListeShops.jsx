@@ -76,7 +76,7 @@ const ListeShops = ({ navigation }) => {
     <TouchableOpacity
       style={styles.shopCard}
       onPress={() => {
-        if (item.name === 'Supérette A') {
+        if (item.name === 'Supérette C') {
           navigation.navigate('WelcomePage');
         }
       }}

@@ -8,7 +8,7 @@ import {
   Alert, 
   RefreshControl
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,6 +29,7 @@ const ListeCommandeALivre = () => {
   const [refusedCommande, setRefusedCommande] = useState(null);
   const [acceptedCommands, setAcceptedCommands] = useState([]);
   const [orderDetails, setOrderDetails] = useState({});
+  const [orderData, setOrderData] = useState(null);
   const { t } = useTranslation();
   
 
@@ -42,11 +43,13 @@ const ListeCommandeALivre = () => {
           const orderData = JSON.parse(savedOrder);
           details[commande.numeroCommande] = {
             paymentMethod: orderData.paymentMethod || 'Non spécifiée',
+           // totalNet: orderData.totalNet
             //total: (commande.total || 0) + 130
           };
         } else {
           details[commande.numeroCommande] = {
             paymentMethod: commande.methodePaiement || 'Non spécifiée',
+            //totalNet: orderData.totalNet,
             total: commande.total || 0
           };
         }
@@ -299,7 +302,7 @@ const ListeCommandeALivre = () => {
               {item.livraison || 'En attente'}
             </Text>
           </View>
-          <Text style={styles.total}>{t('total')}: {(details.total)+130 || 0} DA</Text>
+          <Text style={styles.total}>{t('total')}: {item.totalNet || 0} DA</Text>
         </View>
           
         {/* Boutons d'action */}
