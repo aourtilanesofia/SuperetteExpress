@@ -447,12 +447,13 @@ const produits = [
       "comment commander": "Ajoutez des produits au panier, cliquez sur 'Commander', choisissez un mode de paiement.",
       "contact": "Nous contacter : Téléphone - 05 23 45 67 89 | Email - superettexpressbejaia@exemple.com | Adresse - 10 rue des Commerçants, Béjaïa.",
       "livrez-vous partout": "Nous livrons uniquement dans la ville de Béjaïa pour le moment.",
-      "frais de livraison": "Les frais de livraison sont de 100 DA qui est un prix fixe.",
+      "frais de livraison": "Les frais de livraison varient selon la distance.",
+       "prix de livraison": "Le prix de livraison dépend de la distance parcourue.",
       "Livrez-vous à domicile":"Oui, la livraison à domicile est disponible.",
       "Livrez vous à domicile":"Oui, la livraison à domicile est disponible.",
       
 
-      "livraison": "La livraison dure entre 20 et 30 minutes en moyenne. En cas de forte affluence, de mauvais temps ou si vous êtes éloigné, cela peut prendre un peu plus. Vous pouvez suivre votre commande en temps réel depuis l'application.",
+      "livraison": "La livraison dure entre 5 et 20 minutes en moyenne. En cas de forte affluence, de mauvais temps ou si vous êtes éloigné, cela peut prendre un peu plus. Vous pouvez suivre votre commande en temps réel depuis l'application.",
       "suivi": "Pour suivre votre commande, allez dans la section 'Mes commandes' puis cliquez sur la commande en cours.",
       "retard": "Un retard peut être causé par la circulation, la météo ou un grand nombre de commandes. Merci pour votre patience.",
       "où est ma commande": "Vous pouvez la suivre dans la section 'Mes commandes'.",

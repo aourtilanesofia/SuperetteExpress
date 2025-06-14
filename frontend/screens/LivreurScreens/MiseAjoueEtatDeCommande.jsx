@@ -20,140 +20,73 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [disabledButtons, setDisabledButtons] = useState(false);
   const [livreurId, setLivreurId] = useState(null);
-  const [clientInfo, setClientInfo] = useState({
-    nom: '',
-    numTel: '',
-    adresse: '',
-    infoSupplementaire: '',
-    total: 0
-  });
+  const { 
+  commandeInitiale, 
+  nom, 
+  numTel, 
+  adresse, 
+  infoSupplementaire, 
+  total 
+} = route.params || {};
 
-  const loadAllData = async () => {
+  // Fonction pour récupérer la commande depuis l'API
+  const fetchCommandeByNumero = async (numeroCommande) => {
+    try {
+      const response = await fetch(`http://192.168.43.145:8080/api/commandes/numero/${numeroCommande}`);
+      if (!response.ok) throw new Error('Erreur de récupération');
+      const data = await response.json();
+
+      // Correction du nom de champ si nécessaire
+      return {
+        ...data,
+        methodePaiement: data.methodeParlement || data.methodePaiement,
+        nomClient: data.nomClient || data.userId?.nom,
+        telephoneClient: data.telephoneClient || data.userId?.numTel
+      };
+    } catch (error) {
+      console.error("Erreur fetchCommande:", error);
+      throw error;
+    }
+  };
+
+  // Fonction pour mettre à jour le statut
+  const updateCommandeStatus = async (numeroCommande, newStatus) => {
+    try {
+      const response = await fetch(`http://192.168.43.145:8080/api/commandes/update-status/${numeroCommande}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          livraison: newStatus,
+          livreurId
+        })
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur update:", error);
+      throw error;
+    }
+  };
+
+  // Charge les données
+  const loadData = async () => {
     try {
       setLoading(true);
+      const numeroCommande = route.params?.commandeInitiale?.numeroCommande;
 
-      if (route.params) {
-        const {
-          commandeInitiale,
-          nom,
-          numTel,
-          adresse,
-          infoSupplementaire,
-          total,
-          paymentMethod
-        } = route.params;
-
-        const mergedCommande = {
-          ...commandeInitiale,
-          paymentMethod: paymentMethod || commandeInitiale.paymentMethod || 'Non spécifié',
-          paiement: paymentMethod === 'Carte CIB' ? 'Payée' : 
-                  (paymentMethod === 'Espèces' ? 'En attente de paiement' : 
-                  commandeInitiale.paiement || 'Non spécifié')
-        };
-
-        setCommande(mergedCommande);
-        
-        setClientInfo({
-          nom: nom || '',
-          numTel: numTel || '',
-          adresse: adresse || '',
-          infoSupplementaire: infoSupplementaire || '',
-          total: total || 0
-        });
-
-        return;
-      }
-
-      const savedData = await AsyncStorage.getItem('commandeData');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        const commandeData = parsedData.commande || parsedData.commandeInitiale;
-        
-        if (commandeData) {
-          setCommande({
-            ...commandeData,
-            paymentMethod: commandeData.paymentMethod || 'Non spécifié',
-            paiement: commandeData.paymentMethod === 'Carte CIB' ? 'Payée' : 
-                    (commandeData.paymentMethod === 'Espèces' ? 'En attente de paiement' : 
-                    commandeData.paiement || 'Non spécifié')
-          });
-        }
-        
-        setClientInfo(parsedData.clientInfo || {
-          nom: '',
-          numTel: '',
-          adresse: '',
-          infoSupplementaire: '',
-          total: 0
-        });
+      if (numeroCommande) {
+        const commandeFromAPI = await fetchCommandeByNumero(numeroCommande);
+        setCommande(commandeFromAPI);
       }
     } catch (error) {
-      console.error("Erreur de chargement:", error);
+      console.error("Erreur loadData:", error);
+      Alert.alert("Erreur", "Impossible de charger les données de la commande");
     } finally {
       setLoading(false);
     }
   };
 
-  const saveAllData = async () => {
-    try {
-      const dataToSave = {
-        commande: {
-          ...commande,
-          paymentMethod: commande.paymentMethod || 'Non spécifié'
-        },
-        clientInfo,
-        timestamp: new Date().getTime()
-      };
-      await AsyncStorage.setItem('commandeData', JSON.stringify(dataToSave));
-    } catch (error) {
-      console.error("Erreur de sauvegarde:", error);
-    }
-  };
-
-  const getPaymentDisplay = () => {
-    if (!commande) return 'Non spécifié';
-  
-    switch(commande.paiement) {
-      case 'Payée':
-        return 'Par carte';
-      case 'En attente de paiement':
-        return 'En espèce';
-      case 'Non':
-        return 'Non payée';
-      default:
-        return 'Non spécifié';
-    }
-  };
-
-  useEffect(() => {
-    const initializeData = async () => {
-      try {
-        const id = await AsyncStorage.getItem('livreurId');
-        if (id) {
-          setLivreurId(id);
-          await loadAllData();
-        }
-      } catch (error) {
-        console.error("Erreur d'initialisation:", error);
-      }
-    };
-
-    initializeData();
-
-    const unsubscribe = navigation.addListener('focus', () => {
-      loadAllData();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  useEffect(() => {
-    if (commande && clientInfo.nom) {
-      saveAllData();
-    }
-  }, [commande, clientInfo]);
-
-  const updateCommande = async (newStatus) => {
+  // Mise à jour du statut
+    const updateCommande = async (newStatus) => {
     if (!commande || !livreurId) return;
 
     setDisabledButtons(true);
@@ -196,6 +129,23 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
     }
   };
 
+  // Initialisation
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        const id = await AsyncStorage.getItem('livreurId');
+        if (id) setLivreurId(id);
+        await loadData();
+      } catch (error) {
+        console.error("Erreur d'initialisation:", error);
+      }
+    };
+
+    initialize();
+    const unsubscribe = navigation.addListener('focus', loadData);
+    return unsubscribe;
+  }, [navigation]);
+
   if (loading) {
     return (
       <LayoutLivreur>
@@ -211,28 +161,31 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
     return (
       <LayoutLivreur>
         <View style={styles.emptyContainer}>
-          <Image 
-            source={require('../../assets/empty-box.png')} 
+          <Image
+            source={require('../../assets/empty-box.png')}
             style={styles.emptyImage}
           />
           <Text style={styles.emptyTitle}>{t('Aucune livraison en cours')}</Text>
-          
-          
         </View>
       </LayoutLivreur>
     );
   }
 
-  const isDisabled = disabledButtons ||
-    commande.livraison === "Livré" ||
-    commande.livraison === "Non Livré";
+  const isDisabled = disabledButtons || ['Livré', 'Non Livré'].includes(commande.livraison);
+
+  // Fonction pour afficher le type de paiement
+  const getPaymentMethodDisplay = () => {
+    if (commande.methodePaiement === 'CIB') return 'Carte CIB';
+    if (commande.methodePaiement === 'DAHABIYA') return 'Carte Dahabiya';
+    if (commande.methodePaiement === 'Espèce') return 'Espèces';
+    if (commande.paiement === 'Payée') return 'Payée';
+    if (commande.paiement === 'En attente de paiement') return 'En attente';
+    return 'Non spécifié';
+  };
 
   return (
     <LayoutLivreur>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <Text style={styles.header}>{t('Suivi_de_livraison')}</Text>
@@ -262,29 +215,29 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                 <View style={styles.infoRow}>
                   <Icon name="person" size={20} color="#2E7D32" style={styles.icon} />
                   <Text style={styles.infoText}>
-                    {clientInfo.nom || commande.userId?.nom || t('client_inconnu')}
+                    {nom}
                   </Text>
                 </View>
 
                 <View style={styles.infoRow}>
                   <Icon name="phone" size={20} color="#2E7D32" style={styles.icon} />
                   <Text style={styles.infoText}>
-                    {clientInfo.numTel || commande.userId?.numTel || t('non_disponible')}
+                    {numTel}
                   </Text>
                 </View>
 
                 <View style={styles.infoRow}>
                   <Icon name="location-on" size={20} color="#2E7D32" style={styles.icon} />
                   <Text style={styles.infoText}>
-                    {clientInfo.adresse || commande.destination?.adresse || t('adresse_non_disponible')}
+                    {commande.destination?.adresse || t('adresse_non_disponible')}
                   </Text>
                 </View>
 
-                {clientInfo.infoSupplementaire && (
+                {commande.infoSupplementaire && (
                   <View style={styles.infoRow}>
                     <Icon name="info" size={20} color="#4CAF50" style={styles.icon} />
                     <Text style={styles.infoText}>
-                      {clientInfo.infoSupplementaire}
+                      {commande.infoSupplementaire}
                     </Text>
                   </View>
                 )}
@@ -311,17 +264,16 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                   <Text style={[
                     styles.detailValue,
                     commande.paiement === 'Payée' && styles.statusPayee,
-                    commande.paiement === 'En attente de paiement' && styles.statusEnAttente
+                    commande.paiement === 'En attente de paiement' && styles.statusEnAttente,
+                    ['CIB', 'DAHABIYA'].includes(commande.methodePaiement) && styles.statusCarte
                   ]}>
-                    {getPaymentDisplay()}
+                    {getPaymentMethodDisplay()}
                   </Text>
                 </View>
 
-                
-
                 <View style={[styles.detailRow, styles.totalRow]}>
                   <Text style={styles.totalLabel}>{t('total')}:</Text>
-                  <Text style={styles.totalValue}>{(commande.total + 130)} DA</Text>
+                  <Text style={styles.totalValue}>{commande.totalNet} DA</Text>
                 </View>
               </View>
             </View>
@@ -334,7 +286,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                 onPress={() => updateCommande('Livré')}
                 disabled={isDisabled}
               >
-                <Icon name="check-circle" size={20} color="#fff" style={styles.buttonIcon} />
+                <Icon name="check-circle" size={20} color="#fff" />
                 <Text style={styles.buttonText}>{t('Livrée')}</Text>
               </TouchableOpacity>
 
@@ -343,7 +295,7 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
                 onPress={() => updateCommande('Non Livré')}
                 disabled={isDisabled}
               >
-                <Icon name="cancel" size={20} color="#fff" style={styles.buttonIcon} />
+                <Icon name="cancel" size={20} color="#fff" />
                 <Text style={styles.buttonText}>{t('NonL')}</Text>
               </TouchableOpacity>
             </View>
@@ -354,6 +306,8 @@ const MiseAJoueEtatDeCommande = ({ route, navigation }) => {
   );
 };
 
+// ... (conservez vos styles existants)
+
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
@@ -361,7 +315,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   container: {
-    marginTop:50,
+    marginTop: 50,
     flex: 1,
   },
   headerContainer: {
@@ -437,6 +391,9 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     marginLeft: 5,
+  },
+  statusCarte: {
+    color: '#1976D2',
   },
   infoRow: {
     flexDirection: 'row',
@@ -534,9 +491,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
-  buttonIcon: {
-    marginRight: 5,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -553,7 +507,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
-    marginBottom:70
+    marginBottom: 70
   },
   emptyImage: {
     width: 120,
@@ -567,24 +521,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
     marginBottom: 5,
     textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 15,
-    color: '#95a5a6',
-    textAlign: 'center',
-    marginBottom: 25,
-  },
-  retryButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 15,
-  },
+  }
 });
 
 export default MiseAJoueEtatDeCommande;

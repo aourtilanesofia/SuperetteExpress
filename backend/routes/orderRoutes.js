@@ -3,7 +3,7 @@ import { addOrder, getUserOrders, getOrderByNumber, cancelOrder,
      updateOrderStatus, getAllOrders, getTodayOrdersCount, mettreAJourPaiement,updateOrder,
      getCommandesPayeesOuEnAttente, updateLivraisonCommande,ModifierCommande,getTodayOrdersLiv,
      updatePositionLivreur,getDerniereLocalisation,countCommandesLivrees,countCommandesNonLivrees,
-     countCommandesEnAttente,countAllStatuts,assignerCommande, getStatutLivraison  } from "../controllers/orderController.js";
+     countCommandesEnAttente,countAllStatuts,assignerCommande,getCommandeByNumero, getStatutLivraison , getTotalNetByNumeroCommande, updatePayment } from "../controllers/orderController.js";
 import { CommandeModel } from "../models/OrderModel.js";
 
 
@@ -37,13 +37,21 @@ router.put('/commande/:id/position', updatePositionLivreur);
 
 router.get('/dernierelocalisation', getDerniereLocalisation);
 
+router.put('/update-payment/:numeroCommande', updatePayment);
+
+router.get('/:numeroCommande',getCommandeByNumero);
+
+
+//recupérer le total net pour chaque commande 
+router.get("/totalNet/commande/:numeroCommande", getTotalNetByNumeroCommande);
 
 router.get('/count/livre', countCommandesLivrees);
-router.get('/count/non-livre', countCommandesNonLivrees);
+router.get('/count/non-livre', countCommandesNonLivrees); 
 router.get('/count/en-attente', countCommandesEnAttente);
 router.get('/count/all', countAllStatuts);
  
 router.post('/assigner', assignerCommande);
+
 
 // Récupérer le statut de livraison d'une commande
 router.get('/:numeroCommande/livraison', getStatutLivraison);

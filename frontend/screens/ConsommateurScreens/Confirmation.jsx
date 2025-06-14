@@ -91,7 +91,7 @@ const Confirmation = ({ navigation, route }) => {
 
       <TouchableOpacity 
         style={styles.secondaryButton}
-       
+        
         onPress={() => navigation.navigate('TrackCommande', {
           commandeId: numeroCommande,
           commande:params,  // L'identifiant unique de la commande

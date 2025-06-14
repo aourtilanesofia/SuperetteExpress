@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
@@ -10,21 +10,78 @@ import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
 
 const Paiement = ({ route }) => {
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   const { commande } = route.params;
-  const prixLivraison = 100;
+  const [prixLivraison, setPrixLivraison] = useState(60);
+  const [tempsLivraison, setTempsLivraison] = useState(0);
   const fraistotal = 30;
-  const numeroCommande= commande.numeroCommande;
-  const totalNet = commande.total + prixLivraison + fraistotal;
+  const numeroCommande = commande.numeroCommande;
+  const [totalNet, setTotalNet] = useState(commande.total + 60 + fraistotal);
   const [nomClient, setNomClient] = useState('');
   const [telephoneClient, setTelephoneClient] = useState(commande?.client?.telephone || '');
   const [adresse, setAdresse] = useState("");
   const [position, setPosition] = useState("À ma porte");
   const [infoSupplementaire, setInfoSupplementaire] = useState("");
   const { t } = useTranslation();
- 
+
+  // Coordonnées de la supérette
+  const superetteCoords = {
+    latitude: 36.74095,
+    longitude: 5.065763,
+  };
+
+  // Vitesse moyenne du livreur (40 km/h)
+  const vitesseMoyenne = 40;
+
+  // Fonction pour calculer la distance en km entre 2 points GPS
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
+
+  const getPourcentageLivraison = (montant) => {
+    if (montant < 1000) return 0.15;
+    if (montant < 5000) return 0.10;
+    return 0.05;
+  };
 
 
+  // Mettre à jour le prix et le temps quand la position change
+  useEffect(() => {
+    if (marker?.latitude && marker?.longitude) {
+      const distance = calculateDistance(
+        superetteCoords.latitude,
+        superetteCoords.longitude,
+        marker.latitude,
+        marker.longitude
+      );
+
+      // Prix de livraison
+      const distanceCalculee = Math.max(distance, 0.5); // Minimum 0.5 km
+      const prixParKm = 20; // 30 DA par km
+
+      // Calcul du prix
+      const pourcentage = getPourcentageLivraison(commande.total);
+      const baseLivraison = Math.max(commande.total * pourcentage, 60);
+      const prixCalculé = baseLivraison + (prixParKm * distanceCalculee);
+      const prixArrondi = Math.round(prixCalculé);
+      // Temps de livraison - minimum 5 minutes
+      const temps = Math.max(Math.round((distanceCalculee / vitesseMoyenne) * 60), 5);
+
+      setPrixLivraison(prixArrondi);
+      setTempsLivraison(Math.round(temps));
+
+      const nouveauTotal = commande.total + prixArrondi + fraistotal;
+      setTotalNet(nouveauTotal);
+    }
+  }, [marker, calculateDistance]);
   const handleTextChange = (text) => {
     //console.log('Numéro de téléphone:', text);
     setTelephoneClient(text);
@@ -34,25 +91,17 @@ const Paiement = ({ route }) => {
     // Tu peux aussi fermer le modal ici si besoin
     setActiveModal(null);
   };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-
         const response = await fetch(`http://192.168.43.145:8080/api/v1/consommateur/${commande.userId}`);
-
-
-
-        // Vérifier le statut de la réponse
         if (!response.ok) {
           throw new Error(`Erreur du serveur : ${response.status} - ${response.statusText}`);
         }
-
-        // Si la réponse est OK, essayer de la convertir en JSON
         const data = await response.json();
-        //console.log("Données client :", data);
         setNomClient(data.nom);
         setTelephoneClient(data.telephone);
-
       } catch (error) {
         console.log('Erreur lors du chargement du client', error.message);
       }
@@ -76,6 +125,24 @@ const Paiement = ({ route }) => {
   const [marker, setMarker] = useState(null);
   const [selectedAdresseOption, setSelectedAdresseOption] = useState("carte");
 
+  const calculerPrixLivraison = (lat, lon) => {
+    const distance = calculateDistance(
+      superetteCoords.latitude,
+      superetteCoords.longitude,
+      lat,
+      lon
+    );
+
+    const distanceCalculee = Math.max(distance, 0.5);
+    const pourcentage = getPourcentageLivraison(commande.total);
+    const baseLivraison = Math.max(commande.total * pourcentage, 60);
+    const prix = Math.round(baseLivraison + (20 * distanceCalculee));
+
+    const temps = Math.max(Math.round((distanceCalculee / vitesseMoyenne) * 60), 5);
+
+    return { prix, temps };
+  };
+
   // Obtenir la position actuelle
   const getCurrentLocation = async () => {
     try {
@@ -94,22 +161,28 @@ const Paiement = ({ route }) => {
       };
 
       setRegion(newRegion);
-      setMarker({
+      const newMarker = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-      });
+      };
+      setMarker(newMarker);
+      // CALCUL DU PRIX IMMÉDIAT
+      const { prix, temps } = calculerPrixLivraison(
+        newMarker.latitude,
+        newMarker.longitude
+      );
+      setPrixLivraison(prix);
+      setTempsLivraison(temps);
+      setTotalNet(commande.total + prix + fraistotal);
+
 
       // Obtenir l'adresse à partir des coordonnées
-      let address = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
+      let address = await Location.reverseGeocodeAsync(newMarker);
       if (address[0]) {
         const { name, street, city, country } = address[0];
         const rue = street || name || '';
         const fullAdresse = `${rue}, ${city || ''}, ${country || ''}`;
-        setAdresse(fullAdresse); // ajoute cette ligne
+        setAdresse(fullAdresse);
         setPosition(`À ma porte (${fullAdresse})`);
       }
     } catch (error) {
@@ -120,26 +193,38 @@ const Paiement = ({ route }) => {
 
   // Gérer la sélection sur la carte
   const handleMapPress = async (e) => {
-    const newMarker = e.nativeEvent.coordinate;
+    const newMarker = {
+      latitude: e.nativeEvent.coordinate.latitude,
+      longitude: e.nativeEvent.coordinate.longitude,
+    };
+
+    // Mettre à jour le marqueur IMMÉDIATEMENT
     setMarker(newMarker);
-    setRegion({
-      ...region,
-      latitude: newMarker.latitude,
-      longitude: newMarker.longitude,
-    });
 
-    // Obtenir l’adresse
+    // Calculer le prix SYNCHRONEMENT
+    const distance = calculateDistance(
+      superetteCoords.latitude,
+      superetteCoords.longitude,
+      newMarker.latitude,
+      newMarker.longitude
+    );
+
+    const distanceCalculee = Math.max(distance, 0.5);
+    const nouveauPrix = Math.round(60 + (20 * distanceCalculee));
+
+    // Mise à jour synchrone des états
+    setPrixLivraison(nouveauPrix);
+    setTempsLivraison(Math.max((distanceCalculee / 40) * 60, 5));
+    setTotalNet(commande.total + nouveauPrix + fraistotal);
+
+    // Reverse geocoding (peut rester asynchrone)
     try {
-      let address = await Location.reverseGeocodeAsync({
-        latitude: newMarker.latitude,
-        longitude: newMarker.longitude,
-      });
-
+      let address = await Location.reverseGeocodeAsync(newMarker);
       if (address[0]) {
         const { name, street, city, country } = address[0];
         const rue = street || name || '';
         const fullAdresse = `${rue}, ${city || ''}, ${country || ''}`;
-        setAdresse(fullAdresse); // adresse affichée
+        setAdresse(fullAdresse);
       }
     } catch (err) {
       console.error("Erreur reverse geocoding :", err);
@@ -149,7 +234,6 @@ const Paiement = ({ route }) => {
   const handleValider = async () => {
     try {
       const response = await fetch(`http://192.168.43.145:8080/api/commandes/livraison/${commande.numeroCommande}`, {
-
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -158,6 +242,7 @@ const Paiement = ({ route }) => {
           numeroCommande: commande.numeroCommande,
           adresse: adresse,
           infoSupplementaire: infoSupplementaire,
+          totalNet: totalNet,
         }),
       });
 
@@ -177,16 +262,13 @@ const Paiement = ({ route }) => {
         nomClient: nomClient,
         telephoneClient: telephoneClient,
         infoSupplementaire: infoSupplementaire,
-        numeroCommande:numeroCommande,
+        numeroCommande: numeroCommande,
       });
 
     } catch (err) {
       console.error("Erreur réseau :", err.message);
     }
   };
-
-
-
 
   return (
     <Layout>
@@ -205,11 +287,21 @@ const Paiement = ({ route }) => {
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionLabel}>{t('adr')}</Text>
               <Text style={styles.optionValue} numberOfLines={1}>{adresse || "Sélectionner une adresse"}</Text>
+              {marker && (
+                <Text style={styles.infoSupplementaireText}>
+                  Distance: {calculateDistance(
+                    superetteCoords.latitude,
+                    superetteCoords.longitude,
+                    marker.latitude,
+                    marker.longitude
+                  ).toFixed(2)} km • Temps estimé: {tempsLivraison} min
+                </Text>
+              )}
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9E9E9E" />
           </View>
         </TouchableOpacity>
- 
+
         {/* Options de livraison */}
         <TouchableOpacity
           style={styles.optionCard}
@@ -247,7 +339,7 @@ const Paiement = ({ route }) => {
             <Ionicons name="chevron-forward" size={20} color="#9E9E9E" />
           </View>
         </TouchableOpacity>
- 
+
         {/* Section Facturation */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('fact')}</Text>
@@ -258,15 +350,15 @@ const Paiement = ({ route }) => {
             </View>
             <View style={styles.facturationRow}>
               <Text style={styles.facturationLabel}>{t('livraison')}</Text>
-              <Text style={styles.facturationValue}>100 DA</Text>
+              <Text style={styles.facturationValue}>{prixLivraison} DA</Text>
             </View>
             <View style={styles.facturationRow}>
               <Text style={styles.facturationLabel}>{t('Fraisdeservice')}</Text>
-              <Text style={styles.facturationValue}>30 DA</Text>
+              <Text style={styles.facturationValue}>{fraistotal} DA</Text>
             </View>
             <View style={[styles.facturationRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>{t('totalnet')}</Text>
-              <Text style={styles.totalValue}>{totalNet} DA</Text>
+              <Text style={styles.totalValue}>{totalNet.toFixed(2)} DA</Text>
             </View>
           </View>
         </View>
@@ -279,6 +371,8 @@ const Paiement = ({ route }) => {
         >
           <Text style={styles.commanderButtonText}>{t('valider')}</Text>
         </TouchableOpacity>
+
+        {/* Modal Adresse */}
         {/* Modals (le contenu reste exactement le même) */}
         <Modal
           animationType="slide"
@@ -490,7 +584,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
     paddingHorizontal: 16,
-    marginTop: 25,
+    marginTop: 15,
   },
   optionCard: {
     backgroundColor: '#FFF',
@@ -539,6 +633,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    bottom: 10
   },
   facturationRow: {
     flexDirection: 'row',
@@ -554,6 +649,7 @@ const styles = StyleSheet.create({
   facturationLabel: {
     fontSize: 15,
     color: '#666',
+
   },
   facturationValue: {
     fontSize: 15,
@@ -582,15 +678,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
-    bottom:10,
+    bottom: 20,
+
   },
   commanderButtonText: {
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
-    
+
   },
-  // Styles pour les modals (restent identiques ou légèrement améliorés)
   modalContainer: {
     flex: 1,
     padding: 20,

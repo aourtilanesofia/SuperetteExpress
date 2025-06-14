@@ -14,7 +14,6 @@ export const inscriptionControllerL = async (req, res) => {
       return res.status(400).send({ success: false, message: "Veuillez remplir tous les champs !" });
     }
 
-
     if (mdp.length <= 6) {
       return res.status(400).send({ success: false, message: "Le mot de passe doit contenir plus de 6 caractères" });
     }
@@ -29,11 +28,20 @@ export const inscriptionControllerL = async (req, res) => {
       return res.status(400).send({ success: false, message: "Numéro de téléphone déjà utilisé !" });
     }
 
+    const livreur = await livreurModel.create({
+      nom,
+      numTel,
+      categorie,
+      matricule,
+      marque,
+      mdp,
+      position: {
+        type: 'Point',
+        coordinates: [0, 0],
+        lastUpdated: Date.now()
+      }
+    });
 
-
-    const livreur = await livreurModel.create({ nom, numTel, categorie, matricule, marque, mdp });
-
-    // Créer la notification **avant** d'envoyer la réponse
     try {
       const notification = new Notification({
         message: `${nom} vient de s'inscrire en tant que livreur.`,
@@ -41,13 +49,11 @@ export const inscriptionControllerL = async (req, res) => {
         role: "administrateur",
       });
       await notification.save();
-      //console.log("Notification envoyée via Socket.io :", notification);
       req.io.emit("newNotification", notification);
     } catch (notifError) {
       console.error("Erreur lors de la création de la notification :", notifError);
     }
 
-    // Envoyer la réponse une seule fois à la fin
     res.status(201).send({
       success: true,
       message: "Vous êtes maintenant inscrit !, veuillez vous connecter",
@@ -59,6 +65,7 @@ export const inscriptionControllerL = async (req, res) => {
     res.status(500).send({ success: false, message: "Erreur dans l'inscription", error });
   }
 };
+
 
 
 // CONNEXION
@@ -81,12 +88,12 @@ export const connexionControllerL = async (req, res) => {
 
     }
 
-     if (!livreur.isActive) {
-            return res.status(403).json({ 
-                success: false, 
-                message: " Votre compte est désactivé !" 
-            });
-        }
+    if (!livreur.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: " Votre compte est désactivé !"
+      });
+    }
 
     const token = livreur.generateToken();
 
@@ -194,22 +201,22 @@ export const getAllLivreurs = async (req, res) => {
 
 // Valider livreur par l'Admin 
 export const toggleStatus = async (req, res) => {
-    try {
-      const livreur = await livreurModel.findById(req.params.id);
-      
-      if (!livreur) {
-        return res.status(404).json({ message: "Utilisateur non trouvé" });
-      }
-  
-      livreur.isActive = !livreur.isActive;
-      await livreur.save();
-  
-      res.json(livreur);
-    } catch (error) {
-      console.error("Erreur lors de l'activation/désactivation :", error);
-      res.status(500).json({ message: error.message });
+  try {
+    const livreur = await livreurModel.findById(req.params.id);
+
+    if (!livreur) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
-  };
+
+    livreur.isActive = !livreur.isActive;
+    await livreur.save();
+
+    res.json(livreur);
+  } catch (error) {
+    console.error("Erreur lors de l'activation/désactivation :", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const validerLivreur = async (req, res) => {
   try {
@@ -255,7 +262,7 @@ export const getLivreurCountController = async (req, res) => {
     const count = await livreurModel.countDocuments();
     res.status(200).json({
       success: true,
-      count, 
+      count,
     });
   } catch (error) {
     console.error("Erreur lors de la récupération du nombre de livreurs :", error);
@@ -421,9 +428,9 @@ export const findNearbyLivreurs = async (req, res) => {
     }).lean();
 
     if (results.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Aucun livreur trouvé" 
+      return res.status(404).json({
+        success: false,
+        message: "Aucun livreur trouvé"
       });
     }
 
@@ -455,7 +462,7 @@ export const findNearbyLivreurs = async (req, res) => {
     if (req.app.get("io")) {
       const io = req.app.get("io");
       io.emit(`commande-assignee_${livreurAffecte._id}`, commande);
-      
+
       // Un seul emit pour la notification
       io.emit(`notification_livreur_${livreurAffecte._id}`, notification);
     }

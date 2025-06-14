@@ -39,7 +39,7 @@ const livreurSchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ['Point'], // GeoJSON type
-        //default: 'Point',
+        default: 'Point',
         required: false,
       },
       coordinates: {
@@ -56,7 +56,7 @@ const livreurSchema = new mongoose.Schema(
       },
       lastUpdated: {
         type: Date,
-        //default: Date.now,
+        default: Date.now,
          required: false,
       }
     },

@@ -257,41 +257,45 @@ export const getSupCountController = async (req, res) => {
 
 export const getStatsParSuperette = async (req, res) => {
   try {
-    const FRAIS_LIVRAISON = 100;
     const FRAIS_SERVICE = 30;
 
-    // 1. Récupérer TOUTES les superettes (noms seulement)
     const toutesSuperettes = await SuperetteModel.find().select('name').lean();
 
-    // 2. Calculs UNIQUEMENT pour Supérette A
     const stats = await Promise.all(
-      toutesSuperettes.map(async (superettes) => {
-        if (superettes.name === "Supérette A") {
+      toutesSuperettes.map(async (superette) => {
+        if (superette.name === "Supérette A") {
           console.log("Recherche des commandes pour Supérette A...");
 
-         const commandes = await CommandeModel.find({ livraison: "Livré" }).lean();
-         const nb = commandes.length;
+          const commandes = await CommandeModel.find({ livraison: "Livré" }).lean();
+          const nb = commandes.length;
 
-          console.log(`Nombre de commandes trouvées: ${commandes.length}`);
-          console.log("Exemple de commande:", commandes[0]);
+          let total = 0;
+          let totalNet = 0;
+          let totalFraisService = 0;
+          let totalPourcentage = 0;
 
-          
-          const totalPaye = commandes.reduce((sum, cmd) => sum + (cmd.total || 0), 0);
+          commandes.forEach((cmd) => {
+            total += cmd.total || 0;
+            totalNet += cmd.totalNet || 0;
+            totalFraisService += FRAIS_SERVICE;
+            totalPourcentage += (cmd.total || 0) * 0.10;
+          });
 
-          console.log("Total payé calculé:", totalPaye);
+          const totalLivraison = totalNet - (total + totalFraisService * nb);
+          const totalMarge = totalFraisService + totalPourcentage;
+          const totalAchats = totalNet - totalLivraison - totalMarge;
 
           return {
             nom: "Supérette A",
-            totalPaye,
-            totalLivraison: nb * FRAIS_LIVRAISON,
-            totalMarge: nb * FRAIS_SERVICE,
-            totalAchats: totalPaye - (nb * FRAIS_LIVRAISON) - (nb * FRAIS_SERVICE)
+            totalPaye: total,
+            totalLivraison,
+            totalMarge,
+            totalAchats
           };
         }
 
-        // Valeurs statiques pour les autres
         return {
-          nom: superettes.name,
+          nom: superette.name,
           totalPaye: 0,
           totalLivraison: 0,
           totalMarge: 0,
@@ -299,6 +303,7 @@ export const getStatsParSuperette = async (req, res) => {
         };
       })
     );
+
     console.log("Stats envoyées:", stats);
     res.json(stats);
   } catch (err) {

@@ -22,7 +22,7 @@ const getNextOrderNumber = async () => {
 // Ajouter une commande
 export const addOrder = async (req, res) => {
   try {
-    const { userId, produits, total } = req.body;
+    const { userId, produits, total} = req.body;
 
     if (!userId || !produits || !total) {
       return res.status(400).json({ message: "Données manquantes pour la commande" });
@@ -37,6 +37,8 @@ export const addOrder = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
+
+    
 
     const newOrder = new CommandeModel({
       numeroCommande,
@@ -222,7 +224,7 @@ export const getTodayOrdersCount = async (req, res) => {
 
 
 export const mettreAJourPaiement = async (req, res) => {
-  try {
+  try { 
     const { paiement, paymentMethod } = req.body;
     const { numeroCommande } = req.params;
 
@@ -265,7 +267,7 @@ export const mettreAJourPaiement = async (req, res) => {
 export const updateOrder = async (req, res) => {
   try {
     const { numeroCommande } = req.params;
-    const { adresse, infoSupplementaire } = req.body;
+    const { adresse, infoSupplementaire, totalNet } = req.body;
 
     const commande = await CommandeModel.findOne({ numeroCommande: Number(numeroCommande) });
     //console.log("Numéro reçu:", numeroCommande);
@@ -280,6 +282,7 @@ export const updateOrder = async (req, res) => {
 
     commande.destination.adresse = adresse;
     commande.destination.infoSup = infoSupplementaire;
+    commande.totalNet = totalNet;
 
     const updatedCommande = await commande.save();
 
@@ -778,5 +781,65 @@ export const getStatutLivraison = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+//récupérer le total net
+export const getTotalNetByNumeroCommande = async (req, res) => {
+  try {
+    const { numeroCommande } = req.params;
+
+    const commande = await CommandeModel.findOne({ numeroCommande }).select("totalNet");
+
+    if (!commande) {
+      return res.status(404).json({ message: "Commande non trouvée" });
+    }
+
+    res.status(200).json({ totalNet: commande.totalNet });
+  } catch (err) {
+    res.status(500).json({ error: "Erreur lors de la récupération du totalNet" });
+  }
+};
+
+// Mettre à jour la méthode de paiement d'une commande existante
+export const updatePayment = async (req, res) => {
+  try {
+    const { methodePaiement } = req.body;
+    const numeroCommande = req.params.numeroCommande;
+
+    // Utilisez findOneAndUpdate avec numeroCommande
+    const updatedCommande = await CommandeModel.findOneAndUpdate(
+      { numeroCommande: numeroCommande }, // Critère de recherche
+      { 
+        methodePaiement,
+        paiement: methodePaiement === 'Espèce' ? 'En attente de paiement' : 'Payée'
+      },
+      { new: true }
+    );
+
+    if (!updatedCommande) {
+      return res.status(404).json({ error: "Commande non trouvée" });
+    }
+
+    res.status(200).json(updatedCommande);
+  } catch (error) {
+    res.status(500).json({ 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+export const getCommandeByNumero = async (req, res) => {
+  try {
+    const commande = await CommandeModel.findOne({ numeroCommande: req.params.numero })
+    .populate('userId', 'nom numTel');
+    if (!commande) {
+      return res.status(404).json({ message: "Commande non trouvée" });
+    }
+    res.status(200).json(commande);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 
 

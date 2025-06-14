@@ -10,9 +10,9 @@ const { width } = Dimensions.get('window');
 const ModePaiement = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { commande } = route.params;
- 
-  const { 
-    total = '0DA', 
+
+  const {
+    total = '0DA',
     adresse = "Adresse non spécifiée",
     nomClient = "Nom non renseigné",
     telephoneClient = "Téléphone non renseigné",
@@ -23,16 +23,52 @@ const ModePaiement = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
 
-  const {livreur } = route.params;
+  const { livreur } = route.params;
+
+  const updatePaymentInDatabase = async (numeroCommande, method) => {
+  try {
+    const response = await fetch(`http://192.168.43.145:8080/api/commandes/update-payment/${numeroCommande}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        methodePaiement: method
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Erreur serveur');
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      error: error.message,
+      numeroCommande,
+      method
+    });
+    throw error;
+  }
+};
 
 
-  const handleCardChoice = (typeCarte) => {
+  const handleCardChoice = async (typeCarte) => {
     setModalVisible(false);
     setSelectedMethod(typeCarte);
 
+    // Enregistrer dans la BDD avant la navigation
+    await updatePaymentInDatabase(numeroCommande, typeCarte);
+
     if (typeCarte === 'CIB') {
       navigation.navigate('PaiementCIB', {
-        commande,
+        commande: {
+          ...commande,
+          methodePaiement: typeCarte,
+          paiement: 'Payée' // Ajoutez ce statut
+        },
         total: commande.total,
         adresse,
         nomClient,
@@ -40,10 +76,15 @@ const ModePaiement = ({ navigation, route }) => {
         infoSupplementaire,
         numeroCommande,
         livreur,
+        methodePaiement: typeCarte,
       });
     } else if (typeCarte === 'DAHABIYA') {
       navigation.navigate('PaiementDahabiya', {
-        commande,
+        commande: {
+          ...commande,
+          methodePaiement: typeCarte,
+          paiement: 'Payée' // Ajoutez ce statut
+        },
         total: commande.total,
         adresse,
         nomClient,
@@ -51,20 +92,31 @@ const ModePaiement = ({ navigation, route }) => {
         infoSupplementaire,
         numeroCommande,
         livreur,
-      }); 
+        methodePaiement: typeCarte,
+      });
     }
   };
+
+
+
 
   const paymentMethods = [
     {
       id: 'espece',
-     title: t('espec'),
-      icon: 'cash', 
+      title: t('espec'),
+      icon: 'cash',
       color: '#4CAF50',
-      onPress: () => {
+      onPress: async () => {
         setSelectedMethod('espece');
-        navigation.navigate('PaiementEspece', { 
-          commande,
+        // Enregistrer dans la BDD avant la navigation
+        await updatePaymentInDatabase(numeroCommande, 'Espèce');
+
+        navigation.navigate('PaiementEspece', {
+          commande: {
+            ...commande,
+            methodePaiement: 'Espèce',
+            paiement: 'En attente de paiement' // Ajoutez ce statut
+          },
           total: commande.total,
           adresse,
           nomClient,
@@ -73,6 +125,7 @@ const ModePaiement = ({ navigation, route }) => {
           numeroCommande,
           paymentMethod: 'Espèce',
           livreur,
+          methodePaiement: 'Espèce',
         });
       }
     },
@@ -106,7 +159,7 @@ const ModePaiement = ({ navigation, route }) => {
         colors={['#f5f7fa', '#e4e8f0']}
         style={styles.background}
       />
-      
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <MaterialIcons name="payment" size={32} color="#27D32" />
@@ -128,20 +181,20 @@ const ModePaiement = ({ navigation, route }) => {
 
             <View style={styles.paymentOptions}>
               {paymentMethods.map((method) => (
-                <TouchableOpacity 
+                <TouchableOpacity
                   key={method.id}
                   style={[
-                    styles.paymentButton, 
+                    styles.paymentButton,
                     selectedMethod === method.id && styles.selectedButton,
                     { borderLeftColor: method.color }
                   ]}
                   onPress={method.onPress}
                 >
                   <View style={styles.buttonContent}>
-                    <Ionicons 
-                      name={method.icon} 
-                      size={28} 
-                      color={selectedMethod === method.id ? 'white' : method.color} 
+                    <Ionicons
+                      name={method.icon}
+                      size={28}
+                      color={selectedMethod === method.id ? 'white' : method.color}
                     />
                     <Text style={[
                       styles.paymentButtonText,
@@ -151,10 +204,10 @@ const ModePaiement = ({ navigation, route }) => {
                     </Text>
                   </View>
                   {selectedMethod === method.id && (
-                    <Ionicons 
-                      name="checkmark-circle" 
-                      size={24} 
-                      color="white" 
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={24}
+                      color="white"
                       style={styles.selectedIcon}
                     />
                   )}
@@ -200,10 +253,10 @@ const ModePaiement = ({ navigation, route }) => {
                   >
                     <Image source={card.logo} style={styles.logo} />
                     <Text style={styles.cardText}>{card.title}</Text>
-                    <Ionicons 
-                      name="chevron-forward" 
-                      size={20} 
-                      color="#666" 
+                    <Ionicons
+                      name="chevron-forward"
+                      size={20}
+                      color="#666"
                     />
                   </TouchableOpacity>
                 ))}

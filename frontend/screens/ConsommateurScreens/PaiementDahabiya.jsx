@@ -80,6 +80,7 @@ const PaiementDahabiya = () => {
         telephoneClient,
         paymentMethod: 'Carte Dahabiya',
         numeroCommande,
+        methodePaiement:'DAHABIYA',
         infoSupplementaire,
         livreur,
       });
@@ -183,7 +184,7 @@ const PaiementDahabiya = () => {
         <Text style={styles.validateButtonText}>VALIDER</Text>
       </TouchableOpacity>
     </ScrollView>
-  );
+  ); 
 };
 
 const styles = StyleSheet.create({
