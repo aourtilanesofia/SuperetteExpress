@@ -491,6 +491,8 @@ const produits = [
       "aide": "Je suis là pour répondre à vos questions sur nos produits, livraisons, commandes, ou horaires.",
       "question": "Posez-moi votre question, je ferai de mon mieux pour vous aider.",
       "application": "L'application vous permet de commander, payer, et suivre vos achats en quelques clics.",
+      "supérette express": "L'application vous permet de commander, payer, et suivre vos achats en quelques clics.",
+      "services": "L'application vous permet de commander, payer, et suivre vos achats en quelques clics.",
       "commande": "Pour passer commande, allez dans la section Produits, ajoutez au panier et confirmez.",
       "annuler commande": "Vous pouvez annuler une commande tant qu'elle n'a pas été préparée.",
       "remboursement": "En cas de problème, contactez-nous pour un remboursement selon notre politique.",

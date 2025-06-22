@@ -190,6 +190,23 @@ const Liv1 = ({ route }) => {
         throw new Error(errorData.message || "Erreur serveur");
       }
 
+   if (livreur?._id) {
+      const notifResponse = await fetch('http://192.168.43.145:8080/api/v1/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: "Oops, la commande a été annulée !",
+          livreurId: livreur._id,
+          role: "livreur",
+        })
+      });
+
+      if (!notifResponse.ok) {
+        const errorData = await notifResponse.json();
+        throw new Error(errorData.message || "Échec d'envoi de notification");
+      }
+    }
+
       alert("Commande annulée avec succès!");
       navigation.navigate('AcceuilConsommateur');
     } catch (error) {
