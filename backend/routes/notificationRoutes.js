@@ -3,6 +3,31 @@ import Notification from '../models/NotificationModel.js';
 
 const router = express.Router();
 
+// Créer une nouvelle notification (AJOUTEZ CETTE ROUTE)
+router.post('/', async (req, res) => {
+    try {
+        const { message, livreurId, role } = req.body;
+        
+        // Validation des données
+        if (!message || !role) {
+            return res.status(400).json({ message: "Message et role sont obligatoires" });
+        }
+
+        const newNotification = new Notification({
+            message,
+            livreurId,
+            role,
+            isRead: false
+        });
+
+        await newNotification.save();
+        res.status(201).json(newNotification);
+    } catch (error) {
+        console.error("Erreur création notification:", error);
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+});
+
 // Récupérer les notifications d'un utilisateur spécifique
 router.get("/:userId", async (req, res) => {
     try {

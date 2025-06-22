@@ -424,7 +424,7 @@ export const findNearbyLivreurs = async (req, res) => {
           $maxDistance: radius
         }
       },
-      isValidated: true
+      isActive: true
     }).lean();
 
     if (results.length === 0) {
