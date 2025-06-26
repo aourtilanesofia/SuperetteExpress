@@ -4,7 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-const WelcomePage = ({ navigation }) => {
+const WelcomePage = ({ navigation, route }) => {
+
+   const shopId = route?.params?.shopId;
+    const shopName = route?.params?.shopName;
+   
+  console.log("ID de la supérette:", shopId);
+  console.log("Nom de la supérette:", shopName);
   return (
     <LinearGradient
       colors={['#FFFFFF', '#E8F5E9']}
@@ -27,16 +33,22 @@ const WelcomePage = ({ navigation }) => {
         />
 
         <View style={styles.buttonGroup}>
-          <TouchableOpacity 
+           <TouchableOpacity 
             style={[styles.button, styles.primaryButton]}
-            onPress={() => navigation.navigate('ConConsommateur')}
+            onPress={() => navigation.navigate('ConConsommateur', { 
+              shopId: shopId,
+              shopName: shopName 
+            })}
           >
             <Text style={styles.buttonTextPrimary}>Se connecter</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.button, styles.secondaryButton]}
-            onPress={() => navigation.navigate('InsConsommateur')}
+            onPress={() => navigation.navigate('InsConsommateur', { 
+              shopId: shopId,
+              shopName: shopName 
+            })}
           >
             <Text style={styles.buttonTextSecondary}>Créer un compte</Text>
           </TouchableOpacity>

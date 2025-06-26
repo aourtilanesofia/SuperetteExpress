@@ -12,11 +12,11 @@ import { useTranslation } from 'react-i18next';
 const Paiement = ({ route }) => {
   const navigation = useNavigation();
   const { commande } = route.params;
-  const [prixLivraison, setPrixLivraison] = useState(60);
+  const [prixLivraison, setPrixLivraison] = useState(50);
   const [tempsLivraison, setTempsLivraison] = useState(0);
   const fraistotal = 30;
   const numeroCommande = commande.numeroCommande;
-  const [totalNet, setTotalNet] = useState(commande.total + 60 + fraistotal);
+  const [totalNet, setTotalNet] = useState(commande.total + 50 + fraistotal);
   const [nomClient, setNomClient] = useState('');
   const [telephoneClient, setTelephoneClient] = useState(commande?.client?.telephone || '');
   const [adresse, setAdresse] = useState("");
@@ -47,9 +47,9 @@ const Paiement = ({ route }) => {
   }, []);
 
   const getPourcentageLivraison = (montant) => {
-    if (montant < 1000) return 0.15;
-    if (montant < 5000) return 0.10;
-    return 0.05;
+    if (montant < 1000) return 0.10;
+    if (montant < 5000) return 0.05;
+    return 0.02;
   };
 
 
@@ -64,16 +64,16 @@ const Paiement = ({ route }) => {
       );
 
       // Prix de livraison
-      const distanceCalculee = Math.max(distance, 0.5); // Minimum 0.5 km
-      const prixParKm = 20; // 30 DA par km
+      const distanceCalculee = Math.max(distance, 1); // Minimum 0.5 km
+      const prixParKm = 15; 
 
       // Calcul du prix
       const pourcentage = getPourcentageLivraison(commande.total);
-      const baseLivraison = Math.max(commande.total * pourcentage, 60);
+      const baseLivraison = Math.max(commande.total * pourcentage, 50);
       const prixCalculé = baseLivraison + (prixParKm * distanceCalculee);
       const prixArrondi = Math.round(prixCalculé);
       // Temps de livraison - minimum 5 minutes
-      const temps = Math.max(Math.round((distanceCalculee / vitesseMoyenne) * 60), 5);
+      const temps = Math.max(Math.round((distanceCalculee / vitesseMoyenne) * 50), 5);
 
       setPrixLivraison(prixArrondi);
       setTempsLivraison(Math.round(temps));
@@ -126,22 +126,38 @@ const Paiement = ({ route }) => {
   const [selectedAdresseOption, setSelectedAdresseOption] = useState("carte");
 
   const calculerPrixLivraison = (lat, lon) => {
-    const distance = calculateDistance(
-      superetteCoords.latitude,
-      superetteCoords.longitude,
-      lat,
-      lon
-    );
+  const distance = calculateDistance(
+    superetteCoords.latitude,
+    superetteCoords.longitude,
+    lat,
+    lon
+  );
 
-    const distanceCalculee = Math.max(distance, 0.5);
-    const pourcentage = getPourcentageLivraison(commande.total);
-    const baseLivraison = Math.max(commande.total * pourcentage, 60);
-    const prix = Math.round(baseLivraison + (20 * distanceCalculee));
+  // 1. Arrondir la distance au km supérieur (sans virgule)
+  const distanceArrondie = Math.ceil(distance); 
+  
+  // 2. Minimum de 1 km (au lieu de 0.5)
+  const distanceCalculee = Math.max(distanceArrondie, 1); 
 
-    const temps = Math.max(Math.round((distanceCalculee / vitesseMoyenne) * 60), 5);
+  // 3. Calcul du prix (15 DA par km entier)
+  const prixDistance = 15 * distanceCalculee;
 
-    return { prix, temps };
+  // 4. Partie variable (% du panier)
+  const pourcentage = getPourcentageLivraison(commande.total);
+  let prixVariable = commande.total * pourcentage;
+  prixVariable = Math.max(prixVariable, 50); // Minimum 50 DA
+
+  // 5. Total
+  const prixTotal = Math.round(prixVariable + prixDistance);
+
+  // Temps estimé (basé sur la distance réelle, pas arrondie)
+  const temps = Math.max(Math.round((distance / vitesseMoyenne) * 60), 5);
+
+  return { 
+    prix: prixTotal,
+    temps 
   };
+};
 
   // Obtenir la position actuelle
   const getCurrentLocation = async () => {
@@ -209,12 +225,12 @@ const Paiement = ({ route }) => {
       newMarker.longitude
     );
 
-    const distanceCalculee = Math.max(distance, 0.5);
-    const nouveauPrix = Math.round(60 + (20 * distanceCalculee));
+    const distanceCalculee = Math.max(distance, 1);
+    const nouveauPrix = Math.round(50 + (20 * distanceCalculee));
 
     // Mise à jour synchrone des états
     setPrixLivraison(nouveauPrix);
-    setTempsLivraison(Math.max((distanceCalculee / 40) * 60, 5));
+    setTempsLivraison(Math.max((distanceCalculee / 40) * 50, 5));
     setTotalNet(commande.total + nouveauPrix + fraistotal);
 
     // Reverse geocoding (peut rester asynchrone)

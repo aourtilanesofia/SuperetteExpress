@@ -6,7 +6,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-const InsConsommateur = ({ navigation }) => {
+const InsConsommateur = ({ navigation, route }) => {
+
+    const shopId = route?.params?.shopId;
+    const shopName = route?.params?.shopName;
     const [secureEntry, setSecureEntry] = useState(true);
     const [formData, setFormData] = useState({
         nom: '',
@@ -15,6 +18,9 @@ const InsConsommateur = ({ navigation }) => {
         mdp: ''
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    console.log("ID de la supérette (Inscription):", shopId);
+    //console.log("Route dans InsConsommateur :", route);
 
     const handleChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -35,7 +41,7 @@ const InsConsommateur = ({ navigation }) => {
 
         if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
             Alert.alert("Nom invalide", "Le nom doit contenir uniquement des lettres.");
-            return;  
+            return;
         }
 
 
@@ -48,7 +54,10 @@ const InsConsommateur = ({ navigation }) => {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    superetteId: shopId
+                }),
             });
 
             const data = await response.json();
@@ -66,7 +75,8 @@ const InsConsommateur = ({ navigation }) => {
                 nom: '',
                 numTel: '',
                 adresse: '',
-                mdp: ''
+                mdp: '',
+                shopId
             });
 
         } catch (error) {
@@ -92,7 +102,7 @@ const InsConsommateur = ({ navigation }) => {
                     <View style={styles.header}>
                         <Text style={styles.title}>Créez votre compte</Text>
                         <Text style={styles.subtitle}>Rejoignez notre communauté</Text>
-                    </View> 
+                    </View>
 
                     <View style={styles.formContainer}>
                         {/* Nom Complet */}
@@ -172,14 +182,14 @@ const InsConsommateur = ({ navigation }) => {
                         {/* Lien vers connexion */}
                         <View style={styles.loginContainer}>
                             <Text style={styles.loginText}>Vous avez déja un compte ? </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('ConConsommateur')}>
+                            <TouchableOpacity onPress={() => navigation.navigate("ConConsommateur")}>
                                 <Text style={styles.loginLink}>Se connecter</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </LinearGradient >
     );
 };
 
@@ -209,7 +219,7 @@ const styles = StyleSheet.create({
         color: '#616161',
     },
     formContainer: {
-        marginTop:50,
+        marginTop: 50,
         paddingHorizontal: 30,
     },
     inputContainer: {

@@ -12,13 +12,13 @@ const backendUrl = "http://192.168.43.145:8080";
 const ProduitsParCateg = ({searchText} ) => { 
   const [produitsparcategorie, setProduitsParCategorie] = useState([]);
   const route = useRoute();
-  const { categorie } = route.params;
-
+  const { categorieId } = route.params;
+ 
   useEffect(() => {
     //console.log("🔹 Catégorie envoyée à l'API :", categorie);
     const fetchProduitsParCateg = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/produits/categorie/${categorie}`);
+        const response = await fetch(`${backendUrl}/api/produits/categorie/${categorieId}`);
         const data = await response.json();       
         setProduitsParCategorie(data);
       } catch (error) {
@@ -27,7 +27,7 @@ const ProduitsParCateg = ({searchText} ) => {
     };
 
     fetchProduitsParCateg();
-  }, [categorie])
+  }, [categorieId])
 
   const produitsFiltres = produitsparcategorie.filter((produit) =>
     produit.nom && produit.nom.toLowerCase().includes(searchText?.toLowerCase() || "")
@@ -37,7 +37,7 @@ const ProduitsParCateg = ({searchText} ) => {
    return ( 
       <FlatList
         data={produitsFiltres}
-        keyExtractor={(item, index) => `${item.categorie}-${index}`}
+        keyExtractor={(item, index) => `${item.categorieId}-${index}`}
         renderItem={({ item }) => <ProductsCard p={item} />}
         numColumns={2}
         columnWrapperStyle={styles.row}

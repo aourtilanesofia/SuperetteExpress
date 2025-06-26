@@ -42,7 +42,10 @@ const ConCommercant = ({ navigation }) => {
 
             });
 
+
             const data = await response.json();
+            //console.log("Data reçue", data);
+            console.log("Commerçant reçu :", data.commercant);
 
             if (!response.ok || !data.commercant || !data.token) {
                 Alert.alert("Accès refusé", data.message || "Identifiants incorrects. Veuillez réessayer !");
@@ -52,11 +55,14 @@ const ConCommercant = ({ navigation }) => {
             await AsyncStorage.multiSet([
                 ['token', data.token],
                 ['userId', data.commercant._id],
-                ['user', JSON.stringify(data.commercant)]
+                ['user', JSON.stringify(data.commercant)],
+                ['superetteId', data.commercant.superette]
             ]);
             //console.log("Token enregistré :", data.token);
 
-            navigation.navigate("AcceuilCommerçant");
+            navigation.navigate("AcceuilCommerçant", {
+                superetteId: data.commercant.superette
+            });
             Alert.alert("Connexion validée", `Bienvenue dans votre espace professionnel ${data.commercant.nom || ''}!`);
 
         } catch (error) {
@@ -109,7 +115,7 @@ const ConCommercant = ({ navigation }) => {
                                 value={mdp}
                                 onChangeText={setMdp}
                                 autoCapitalize="none"
-                            /> 
+                            />
                             <TouchableOpacity
                                 onPress={() => setSecureEntry(prev => !prev)}
                                 style={styles.eyeIcon}

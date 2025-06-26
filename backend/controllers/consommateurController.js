@@ -5,9 +5,9 @@ import Notification from '../models/NotificationModel.js';
 // INSCRIPTION 
 export const inscriptionController = async (req, res) => { 
     try {
-        const { nom, numTel, adresse, mdp } = req.body;
+        const { nom, numTel, adresse, mdp ,superetteId} = req.body;
   
-        if (!nom || !numTel || !adresse || !mdp) {
+        if (!nom || !numTel || !adresse || !mdp ) {
             return res.status(400).send({
                 success: false,
                 message: "Veuillez remplir tous les champs ! ",
@@ -33,7 +33,7 @@ export const inscriptionController = async (req, res) => {
             });
         }
 
-        const consommateur = await consommateurModel.create({ nom, numTel, adresse, mdp });
+        const consommateur = await consommateurModel.create({ nom, numTel, adresse, mdp,superetteId });
 
         // Créer la notification **avant** d'envoyer la réponse
         try {
@@ -68,56 +68,94 @@ export const inscriptionController = async (req, res) => {
 
 // CONNEXION
 export const connexionController = async (req, res) => {
-    try {
-        const { numTel, mdp } = req.body;
+  try {
+    const { numTel, mdp, shopId } = req.body;
+    const now = new Date();
 
-        if (!numTel || !mdp) {
-            return res.status(400).send({
-                success: false,
-                message: "Veuillez entrer votre numéro de téléphone et votre mot de passe !",
-            });
-        }
-
-        const consommateur = await consommateurModel.findOne({ numTel });
-
-        if (!consommateur) {
-            return res.status(404).send({
-                success: false,
-                message: "Numéro de téléphone incorrects. Veuillez réessayer !",
-            });
-        }
-
-        if (mdp !== consommateur.mdp) {
-            return res.status(400).send({
-                success: false,
-                message: "Mot de passe invalide. Veuillez réessayer ! ",
-            });
-        }
-
-        if (!consommateur.isActive) {
-            return res.status(403).json({ 
-                success: false, 
-                message: "Votre compte est désactivé !" 
-            });
-        }
-
-        const token = consommateur.generateToken();
-
-        return res.status(200).cookie("token", token).send({
-            success: true,
-            message: "Bienvenue, vous êtes maintenant connecté(e) !",
-            token,
-            consommateur,
-        });
-
-    } catch (error) {
-        return res.status(500).send({ 
-            success: false,
-            message: "Erreur dans l'API de connexion",
-            error,
-        });
+    if (!numTel || !mdp) {
+      return res.status(400).json({
+        success: false,
+        message: "Veuillez entrer votre numéro de téléphone et votre mot de passe !",
+      });
     }
+
+    let consommateur = await consommateurModel.findOne({ numTel });
+
+    if (!consommateur) {
+      return res.status(404).json({
+        success: false,
+        message: "Numéro de téléphone incorrect.",
+      });
+    }
+
+    // Vérifier si bloqué
+    if (consommateur.blockUntil && consommateur.blockUntil > now) {
+      const minutes = Math.ceil((consommateur.blockUntil - now) / 60000);
+      return res.status(403).json({
+        success: false,
+        message: `Compte bloqué. Réessayez dans ${minutes} minute(s).`,
+      });
+    }
+
+    // Vérifier superette
+    if (shopId && consommateur.superetteId.toString() !== shopId) {
+      return res.status(403).json({
+        success: false,
+        message: "Vous n'êtes pas inscrit dans cette supérette !",
+      });
+    }
+
+    // Vérifier mot de passe
+    if (mdp !== consommateur.mdp) {
+      consommateur.loginAttempts += 1;
+
+      if (consommateur.loginAttempts >= 3) {
+        consommateur.blockUntil = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes
+        consommateur.loginAttempts = 0;
+        await consommateur.save();
+        return res.status(403).json({
+          success: false,
+          message: "3 tentatives échouées. Compte bloqué 5 minutes.",
+        });
+      }
+
+      await consommateur.save();
+      return res.status(400).json({
+        success: false,
+        message: `Mot de passe incorrect. Tentative ${consommateur.loginAttempts}/3`,
+      });
+    }
+
+    // Compte désactivé
+    if (!consommateur.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Votre compte est désactivé !",
+      });
+    }
+
+    // Réinitialiser après succès
+    consommateur.loginAttempts = 0;
+    consommateur.blockUntil = null;
+    await consommateur.save();
+
+    const token = consommateur.generateToken();
+
+    return res.status(200).json({
+      success: true,
+      message: "Connexion réussie.",
+      token,
+      consommateur,
+    });
+  } catch (error) {
+    console.error("Erreur connexion consommateur:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
 };
+
 
 // PROFIL UTILISATEUR
 export const getConsommateurProfileController = async (req, res) => {

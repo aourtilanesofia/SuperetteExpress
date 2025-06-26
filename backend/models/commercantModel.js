@@ -29,11 +29,20 @@ const commercantSchema = new mongoose.Schema(
       minLength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
     isActive: { type: Boolean, default: true },
+    loginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    blockUntil: {
+      type: Date,
+      default: null
+    }
   },
   {
     timestamps: true,
     collection: "Commercant",
-  }
+  },
+
 );
 
 // JWT token

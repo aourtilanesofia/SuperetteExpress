@@ -17,7 +17,16 @@ const notificationSchema = new mongoose.Schema({
     consommateurId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Consommateur",
-        required: false, // Facultatif, utile si la notification concerne un consommateur
+        required: false,
+    },
+    commercantId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Commercant",
+    },
+    superetteId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Superette",
+        //required: true 
     },
     createdAt: {
         type: Date,

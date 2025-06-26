@@ -19,18 +19,18 @@ export const inscriptionCommercantController = async (req, res) => {
 
         // Validation du mot de passe
         if (mdp.length <= 6) {
-            return res.status(400).send({ 
-                success: false, 
-                message: "Le mot de passe doit contenir plus de 6 caractères" 
+            return res.status(400).send({
+                success: false,
+                message: "Le mot de passe doit contenir plus de 6 caractères"
             });
         }
 
         // Validation du numéro de téléphone
         const numTelRegex = /^(06|07|05)[0-9]{8}$/;
         if (!numTelRegex.test(numTel)) {
-            return res.status(400).send({ 
-                success: false, 
-                message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres" 
+            return res.status(400).send({
+                success: false,
+                message: "Le numéro de téléphone doit commencer par 06, 07 ou 05 et contenir exactement 10 chiffres"
             });
         }
 
@@ -51,10 +51,10 @@ export const inscriptionCommercantController = async (req, res) => {
         }
 
         // Création du commerçant avec référence à la supérette
-        const commercant = await commercantModel.create({ 
-            nom, 
-            numTel, 
-            adresseBoutique, 
+        const commercant = await commercantModel.create({
+            nom,
+            numTel,
+            adresseBoutique,
             mdp,
             superette: superetteId
         });
@@ -95,53 +95,75 @@ export const inscriptionCommercantController = async (req, res) => {
 
 // CONNEXION
 export const connexionCommercantController = async (req, res) => {
-    try {
-        const { numTel, mdp } = req.body;
+  try {
+    const { numTel, mdp } = req.body;
 
-        if (!numTel || !mdp) {
-            return res.status(400).send({
-                success: false,
-                message: "Veuillez entrer votre numéro de téléphone et votre mot de passe!",
-            });
-        }
+    const commercant = await commercantModel.findOne({ numTel });
+    const now = new Date();
 
-        const commercant = await commercantModel.findOne({ numTel });
-
-        
-
-        if (!commercant) {
-            return res.status(404).send({
-                success: false,
-                message: "Numéro de téléphone. Veuillez réessayer !",
-            });
-        }
-
-        
-
-        if (mdp !== commercant.mdp) {
-            return res.status(400).send({
-                success: false,
-                message: " Mot de passe invalide. Veuillez réessayer !",
-            });
-        }
-
-        const token = commercant.generateToken();
-
-        return res.status(200).cookie("token", token).send({
-            success: true,
-            message: "Bienvenue, vous êtes maintenant connecté en tant que commerçant!",
-            token,
-            commercant,
-        });
-
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Erreur dans l'API de connexion",
-            error,
-        });
+    if (!commercant) {
+      return res.status(400).json({
+        success: false,
+        message: "Identifiants incorrects",
+      });
     }
+
+    // Vérifier si le compte est bloqué
+    if (commercant.blockUntil && commercant.blockUntil > now) {
+      const reste = Math.ceil((commercant.blockUntil - now) / 60000);
+      return res.status(403).json({
+        success: false,
+        message: `Compte bloqué. Réessayez dans ${reste} minute(s).`,
+      });
+    }
+
+    // Mot de passe incorrect
+    if (mdp !== commercant.mdp) {
+      commercant.loginAttempts += 1;
+
+      if (commercant.loginAttempts >= 3) {
+        commercant.blockUntil = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes
+        commercant.loginAttempts = 0;
+        await commercant.save();
+        return res.status(403).json({
+          success: false,
+          message: "3 tentatives échouées. Compte bloqué 5 minutes.",
+        });
+      }
+
+      await commercant.save();
+      return res.status(400).json({
+        success: false,
+        message: `Mot de passe incorrect. Tentative ${commercant.loginAttempts}/3`,
+      });
+    }
+
+    // Succès : Réinitialiser les tentatives
+    commercant.loginAttempts = 0;
+    commercant.blockUntil = null;
+    await commercant.save();
+
+    const token = commercant.generateToken();
+
+    return res.status(200).json({
+      success: true,
+      message: "Connexion réussie",
+      token,
+      commercant,
+    });
+
+  } catch (err) {
+    console.error("Erreur serveur :", err);
+    return res.status(500).json({
+      success: false,
+      message: "Erreur technique",
+    });
+  }
 };
+
+
+
+
 
 
 
@@ -149,11 +171,11 @@ export const connexionCommercantController = async (req, res) => {
 export const getCommercantProfileController = async (req, res) => {
     try {
         const commercant = await commercantModel.findById(req.user._id).populate({
-                path: 'superette',
-                select: 'name address',  // Sélectionne uniquement le nom et l'adresse
-            });
+            path: 'superette',
+            select: 'name address',  // Sélectionne uniquement le nom et l'adresse
+        });
         //console.log(commercant.superette);
-         console.log("Supérette peuplée :", commercant.superette);
+        console.log("Supérette peuplée :", commercant.superette);
         res.status(200).send({
             success: true,
             message: "Profil commerçant récupéré avec succès",
@@ -315,5 +337,5 @@ export const getCommercantCountController = async (req, res) => {
 };
 
 
-  
+
 

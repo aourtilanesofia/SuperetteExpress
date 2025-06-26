@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 import { useTranslation } from "react-i18next";
 
-
+ 
 
 const backendUrl = "http://192.168.43.145:8080";
 

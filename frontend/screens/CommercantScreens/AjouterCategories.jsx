@@ -3,10 +3,13 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant";
 import { useTranslation } from 'react-i18next';
 
-const AjouterCategories = ({ navigation }) => {
+const AjouterCategories = ({ navigation, route }) => { 
     const [nom, setName] = useState('');
     const [image, setImage] = useState('');
     const { t } = useTranslation();
+    const { superetteId } = route.params || {};
+
+     console.log("superetteId reçu dans:", superetteId);
 
     const handleAdd = async () => {
         if (!nom || !image) {
@@ -20,7 +23,7 @@ const AjouterCategories = ({ navigation }) => {
 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nom, image })
+                body: JSON.stringify({ nom, image, superette: superetteId })
             });
             Alert.alert(' ', 'Catégorie ajoutée avec succés!');
             navigation.goBack();

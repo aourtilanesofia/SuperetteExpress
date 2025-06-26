@@ -20,7 +20,7 @@ router.get("/", getProducts);
 router.get("/count", getProductCount);
 
 // Récupérer les produits par catégorie
-router.get("/categorie/:categorie", getProductsByCategory);
+router.get("/categorie/:categorieId", getProductsByCategory);
 
 // Recherche d'un produit par code-barres
 router.get("/codebarre/:codeBarre", async (req, res) => {

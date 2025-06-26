@@ -1,31 +1,45 @@
 import CategorieModel from "../models/CategorieModel.js";
-
+ 
 // Ajouter une catégorie
 export const addCategorie = async (req, res) => {
+  try {
+    const { nom, image, superette } = req.body;
+
+    const newCategorie = new CategorieModel({
+      nom,
+      image,
+      superetteId: superette  
+    });
+
+    await newCategorie.save();
+    res.status(201).json({ message: 'Catégorie ajoutée avec succès', categorie: newCategorie });
+  } catch (error) {
+    console.error("Erreur backend:", error);
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+
+
+
+// Récupérer les catégories par superetteId
+export const getCategories = async (req, res) => {
     try {
-        const { nom, image } = req.body;
-        const newCategorie = new CategorieModel({ nom, image });
-        await newCategorie.save();
-        res.status(201).json({ message: 'Catégorie ajoutée avec succès', categorie: newCategorie });
+        const { superetteId } = req.query;
+        const filter = superetteId ? { superetteId: superetteId } : {}; // Notez le changement ici
+        const categories = await CategorieModel.find(filter);
+        res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });
     }
 };
 
-// Récupérer toutes les catégories
-export const getCategories = async (req, res) => {
-    try {
-        const categories = await CategorieModel.find();
-        res.status(200).json(categories); 
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error });
-    }
-};
+
 
 // Récupérer le nombre total de catégories
 export const getCategorieCount = async (req, res) => {
     try {
-        const count = await CategorieModel.countDocuments();
+        const { superetteId } = req.query;
+        const count = await CategorieModel.countDocuments({ superetteId });
         res.status(200).json({ count }); // Retourne le nombre total de catégories
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur', error });

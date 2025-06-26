@@ -5,10 +5,10 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Alert, 
+  Alert,
   RefreshControl
 } from "react-native";
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import LayoutLivreur from '../../components/LayoutLivreur/LayoutLivreur';
 import { io } from "socket.io-client";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,7 +31,7 @@ const ListeCommandeALivre = () => {
   const [orderDetails, setOrderDetails] = useState({});
   const [orderData, setOrderData] = useState(null);
   const { t } = useTranslation();
-  
+
 
   const loadOrderDetails = async (commandes) => {
     const details = {};
@@ -43,8 +43,8 @@ const ListeCommandeALivre = () => {
           const orderData = JSON.parse(savedOrder);
           details[commande.numeroCommande] = {
             paymentMethod: orderData.paymentMethod || 'Non spécifiée',
-           // totalNet: orderData.totalNet
-            //total: (commande.total || 0) + 130
+            // totalNet: orderData.totalNet
+            //total: (commande.total || 0) + 130 
           };
         } else {
           details[commande.numeroCommande] = {
@@ -106,11 +106,11 @@ const ListeCommandeALivre = () => {
       const data = await response.json();
 
       const savedCommandes = await AsyncStorage.getItem('commandesAssignees');
-      const savedCommandesMap = savedCommandes 
+      const savedCommandesMap = savedCommandes
         ? JSON.parse(savedCommandes).reduce((acc, cmd) => {
-            acc[cmd.numeroCommande] = cmd;
-            return acc;
-          }, {})
+          acc[cmd.numeroCommande] = cmd;
+          return acc;
+        }, {})
         : {};
 
       const commandesAvecBadge = data.map(c => ({
@@ -172,8 +172,8 @@ const ListeCommandeALivre = () => {
 
       const data = JSON.parse(responseText);
       setAcceptedCommands(prev => [...prev, numeroCommande]);
-      
-      navigation.navigate('DetailsCommandeALivre', { 
+
+      navigation.navigate('DetailsCommandeALivre', {
         numeroCommande,
         numTel,
         nom,
@@ -181,9 +181,9 @@ const ListeCommandeALivre = () => {
       });
     } catch (error) {
       console.error('Erreur:', error);
-      const revertedCommandes = commandesAssignees.map(commande => 
-        commande.numeroCommande === numeroCommande 
-          ? { ...commande, isNew: true } 
+      const revertedCommandes = commandesAssignees.map(commande =>
+        commande.numeroCommande === numeroCommande
+          ? { ...commande, isNew: true }
           : commande
       );
       setCommandesAssignees(revertedCommandes);
@@ -204,7 +204,7 @@ const ListeCommandeALivre = () => {
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             livreurId,
             raison: "Livreur non disponible",
             livraison: "Refusée"
@@ -243,10 +243,10 @@ const ListeCommandeALivre = () => {
             <Text style={styles.newBadgeText}>NOUVEAU</Text>
           </View>
         )}
-        
+
         {/* Bouton de suppression */}
         {isLivree && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => supprimerCommandeListe(item.numeroCommande)}
           >
@@ -268,6 +268,13 @@ const ListeCommandeALivre = () => {
                   hour: '2-digit',
                   minute: '2-digit'
                 })}
+              </Text>
+            </View>
+            {/* Ajoutez cette partie pour afficher le nom de la supérette */}
+            <View style={styles.infoRow}>
+              <Icon name="store" size={16} color="#555" />
+              <Text style={styles.superetteText}>
+                {item.superetteId?.name || "Supérette non spécifiée"}
               </Text>
             </View>
           </View>
@@ -293,10 +300,10 @@ const ListeCommandeALivre = () => {
         <View style={styles.statusContainer}>
           <View style={[
             styles.statusBadge,
-            isLivree ? styles.statusLivree : 
-            item.livraison === "Refusée" ? styles.statusRefusee :
-            item.livraison === "Acceptée" ? styles.statusAcceptee :
-            styles.statusAssignee
+            isLivree ? styles.statusLivree :
+              item.livraison === "Refusée" ? styles.statusRefusee :
+                item.livraison === "Acceptée" ? styles.statusAcceptee :
+                  styles.statusAssignee
           ]}>
             <Text style={styles.statusText}>
               {item.livraison || 'En attente'}
@@ -304,18 +311,18 @@ const ListeCommandeALivre = () => {
           </View>
           <Text style={styles.total}>{t('total')}: {item.totalNet || 0} DA</Text>
         </View>
-          
+
         {/* Boutons d'action */}
         {showButtons && (
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity 
-              style={[styles.button, styles.acceptButton]} 
-              onPress={() => accepterCommande(item.numeroCommande, item.userId?.numTel, item.userId?.nom)}
+            <TouchableOpacity
+              style={[styles.button, styles.acceptButton]}
+              onPress={() => accepterCommande(item.numeroCommande, item.userId?.numTel, item.userId?.nom, item.superetteId?.name)}
             >
               <Text style={styles.buttonText}>{t('accepter')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.button, styles.rejectButton]} 
+            <TouchableOpacity
+              style={[styles.button, styles.rejectButton]}
               onPress={() => refuserCommande(item.numeroCommande)}
             >
               <Text style={styles.buttonText}>{t('refuser')}</Text>
@@ -346,9 +353,9 @@ const ListeCommandeALivre = () => {
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderItem}
           refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
-              onRefresh={onRefresh} 
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               colors={['#2E7D32']}
               tintColor="#2E7D32"
             />
@@ -380,6 +387,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#2E7D32',
+  },
+  superetteText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 5,
+    fontStyle: 'italic'
   },
   refreshButton: {
     padding: 5,
