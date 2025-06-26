@@ -83,6 +83,22 @@ router.get("/:userId", async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
 });
+
+router.get('/commercant/:commercantId', async (req, res) => {
+  try {
+    const { commercantId } = req.params;
+
+    const notifications = await Notification.find({ 
+      commercantId,
+      role: "commercant"
+    }).sort({ createdAt: -1 });
+
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
   
 
 export default router;

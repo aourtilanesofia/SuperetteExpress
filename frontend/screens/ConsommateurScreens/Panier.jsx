@@ -62,13 +62,15 @@ const Panier = () => {
             alert("Utilisateur non connecté !");
             return;
           }
+          const superetteId = await AsyncStorage.getItem('userShopId');
       
           const response = await fetch("http://192.168.43.145:8080/api/commandes/add", {
 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              userId,
+              userId, 
+              superetteId,
               produits: cartItems.map(item => ({
                 produitId: item._id,
                 nom: item.nom,
@@ -96,7 +98,8 @@ const Panier = () => {
                 numeroCommande: data.numeroCommande, // Numéro de commande
                 produits: cartItems,
                 total: totalPrice,
-                userId: userId
+                userId: userId,
+                 superetteId
               }
             });
           } else {

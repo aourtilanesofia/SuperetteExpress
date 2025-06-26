@@ -7,7 +7,7 @@ const commandeSchema = new mongoose.Schema({
   produits: [
     {
       nom: String,
-      prix: Number,
+      prix: Number, 
       quantite: Number  
     }
   ],

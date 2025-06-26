@@ -9,11 +9,16 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
 import { LogBox } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const AcceuilConsommateur = ({ navigation, route }) => {
 
-const AcceuilConsommateur = ({ navigation }) => {
   LogBox.ignoreLogs([
     "Pagination: Support for defaultProps will be removed from function components",
   ]);
+
+  const shopId = route?.params?.shopId;
+
+   console.log("Shop ID reçu :", shopId);
 
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
@@ -24,6 +29,22 @@ const AcceuilConsommateur = ({ navigation }) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     setShowScrollTop(offsetY > 200);
   };
+
+  const saveShopId = async (id) => {
+    try {
+      await AsyncStorage.setItem('userShopId', id);
+      console.log("Shop ID enregistré avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement du Shop ID :", error);
+    }
+  };
+
+   // Appel de la fonction lorsque shopId est disponible
+  React.useEffect(() => {
+    if (shopId) {
+      saveShopId(shopId);
+    }
+  }, [shopId]);
 
   return ( 
     <Layout>
@@ -46,7 +67,7 @@ const AcceuilConsommateur = ({ navigation }) => {
             {searchText === "" && (
               <>
                 <Text style={styles.txt}>{t("explorer_categorie")}</Text>
-                <Categories />
+                <Categories shopId={shopId}/>
                 <Banner />
                 <Text style={styles.txt}>{t("nos_produits")}</Text>
               </>
@@ -56,7 +77,7 @@ const AcceuilConsommateur = ({ navigation }) => {
         data={[{ key: "produits" }]}
         renderItem={() => (
           <View style={{ paddingHorizontal: 12 }}>
-            <Produits searchText={searchText} />
+            <Produits searchText={searchText} shopId={shopId}/>
           </View>
         )}
         keyExtractor={(item, index) => index.toString()}

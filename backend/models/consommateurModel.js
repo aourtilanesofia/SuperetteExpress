@@ -15,7 +15,7 @@ const consommateurSchema = new mongoose.Schema(
     },
     adresse: { 
       type: String,
-      required: [true, "Le champ est obligatoire"],
+      required: [true, "Le champ est obligatoire"], 
     },
     mdp: {
       type: String,
@@ -27,6 +27,14 @@ const consommateurSchema = new mongoose.Schema(
   type: mongoose.Schema.Types.ObjectId,
   ref: "Superette",
 },
+loginAttempts: {
+  type: Number,
+  default: 0,
+},
+blockUntil: {
+  type: Date,
+  default: null,
+}
   },
   { timestamps: true }
 );

@@ -6,11 +6,15 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const ConConsommateur = ({ navigation }) => {
+const ConConsommateur = ({ navigation, route }) => {
+    const shopId = route?.params?.shopId;
+    const shopName = route?.params?.shopName;
     const [secureEntry, setSecureEntry] = useState(true);
-    const [numTel, setnumTel] = useState(''); 
+    const [numTel, setnumTel] = useState('');
     const [mdp, setMdp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    console.log("ID de la supérette (Connexion):", shopId);
 
 
     const validatePhoneNumber = (number) => {
@@ -37,7 +41,11 @@ const ConConsommateur = ({ navigation }) => {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ numTel, mdp }),
+                body: JSON.stringify({
+                    numTel,
+                    mdp,
+                    shopId: shopId 
+                }),
             });
 
             const data = await response.json();
@@ -50,10 +58,14 @@ const ConConsommateur = ({ navigation }) => {
             await AsyncStorage.multiSet([
                 ['token', data.token],
                 ['userId', data.consommateur._id],
-                ['user', JSON.stringify(data.consommateur)]
+                ['user', JSON.stringify(data.consommateur)],
+                ['currentShopId', shopId]
             ]);
 
-            navigation.navigate("AcceuilConsommateur");
+            navigation.navigate("AcceuilConsommateur", { 
+            shopId: shopId,
+            shopName: shopName 
+        });
             Alert.alert("Connexion réussie", `Bienvenue ${data.consommateur.nom || ''}!`);
 
         } catch (error) {
@@ -86,7 +98,7 @@ const ConConsommateur = ({ navigation }) => {
                         <View style={styles.inputContainer}>
                             <Ionicons name='call-outline' size={22} color={'#329171'} style={styles.icon} />
                             <TextInput
-                                style={styles.textInput} 
+                                style={styles.textInput}
                                 placeholder='Numéro Téléphone'
                                 placeholderTextColor="#939494"
                                 keyboardType='phone-pad'
@@ -142,7 +154,7 @@ const ConConsommateur = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </KeyboardAvoidingView> 
+                </KeyboardAvoidingView>
             </LinearGradient>
         </TouchableWithoutFeedback>
     );

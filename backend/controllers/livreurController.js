@@ -72,43 +72,92 @@ export const inscriptionControllerL = async (req, res) => {
 export const connexionControllerL = async (req, res) => {
   try {
     const { numTel, mdp } = req.body;
+    const now = new Date();
 
     if (!numTel || !mdp) {
-      return res.status(400).json({ success: false, message: "Veuillez entrer votre numero de telephone et votre mot de passe!" });
-    }
-
-    const livreur = await livreurModel.findOne({ numTel });
-
-    if (!livreur) {
-      return res.status(404).json({ success: false, message: "Numéro de téléphone incorrects. Veuillez réessayer !" });
-    }
-
-    if (mdp !== livreur.mdp) {
-      return res.status(400).json({ success: false, message: "Mot de passe invalide. Veuillez réessayer !" });
-
-    }
-
-    if (!livreur.isActive) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
-        message: " Votre compte est désactivé !"
+        message: "Veuillez entrer votre numéro de téléphone et votre mot de passe !"
       });
     }
 
+    let livreur = await livreurModel.findOne({ numTel });
+
+    if (!livreur) {
+      return res.status(404).json({
+        success: false,
+        message: "Numéro de téléphone incorrect."
+      });
+    }
+
+    // Vérifier le blocage avec calcul précis du temps restant
+    if (livreur.blockUntil && livreur.blockUntil > now) {
+      const remainingTime = livreur.blockUntil - now;
+      const minutes = Math.floor(remainingTime / 60000);
+      const seconds = Math.floor((remainingTime % 60000) / 1000);
+      
+      return res.status(403).json({
+        success: false,
+        message: `Compte bloqué. Réessayez dans ${minutes}m ${seconds}s.`,
+        remainingTime: remainingTime // Optionnel: envoyer le temps en ms pour le frontend
+      });
+    }
+
+    // Vérifier mot de passe
+    if (mdp !== livreur.mdp) {
+      livreur.loginAttempts += 1;
+
+      if (livreur.loginAttempts >= 3) {
+        livreur.blockUntil = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes
+        livreur.loginAttempts = 0;
+        await livreur.save();
+        
+        // Message immédiat après blocage
+        return res.status(403).json({
+          success: false,
+          message: "Trop de tentatives. Compte bloqué pour 5 minutes."
+        });
+      }
+
+      await livreur.save();
+      return res.status(400).json({
+        success: false,
+        message: `Mot de passe incorrect. Tentative ${livreur.loginAttempts}/3`,
+        attemptsLeft: 3 - livreur.loginAttempts // Optionnel: nombre de tentatives restantes
+      });
+    }
+
+    // Vérifier si désactivé
+    if (!livreur.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Votre compte est désactivé !"
+      });
+    }
+
+    // Réinitialiser après succès
+    livreur.loginAttempts = 0;
+    livreur.blockUntil = null;
+    await livreur.save();
+
     const token = livreur.generateToken();
 
-    return res.status(200).cookie("token", token).json({
+    return res.status(200).json({
       success: true,
       message: "Connecté avec succès",
       token,
-      livreur,
+      livreur
     });
 
   } catch (error) {
     console.error("Erreur connexion livreur :", error);
-    return res.status(500).json({ success: false, message: "Erreur dans l'API de connexion", error });
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur"
+    });
   }
 };
+
 
 
 // PROFIL UTILISATEUR
@@ -524,7 +573,8 @@ export const getCommandesAssignees = async (req, res) => {
       //livraison: 'En attente'
     })
       .populate('userId', 'nom numTel')
-      .populate('livreur', 'nom');
+      .populate('livreur', 'nom')
+      .populate('superetteId', 'name');
 
     //console.log('Commandes trouvées:', commandes); 
 

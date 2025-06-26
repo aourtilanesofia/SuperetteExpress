@@ -5,36 +5,90 @@ import LayoutCommercant from "../../components/LayoutCommercant/LayoutCommercant
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 
-
-
 const backendUrl = "http://192.168.43.145:8080";
 
-
-
-const GestiondesProduits = () => {
+const GestiondesProduits = ({route}) => {
+  const { superetteId } = route.params || {};
   const navigation = useNavigation();
   const [produits, setProduits] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [categoriesOuvertes, setCategoriesOuvertes] = useState({});
+  const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
 
-  // Fonction pour récupérer les produits
-  const fetchProduits = () => {
-    fetch(`${backendUrl}/api/produits`)
-      .then((response) => response.json())
-      .then((data) => setProduits(data))
-      .catch((error) => console.error("Erreur lors de la récupération des produits :", error));
+  // Fonction pour récupérer les données
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      console.log("Chargement des données pour superetteId:", superetteId);
+      
+      // 1. Charger les catégories de la supérette
+      const catResponse = await fetch(`${backendUrl}/api/categories?superetteId=${superetteId}`);
+      const catData = await catResponse.json();
+      console.log("Catégories chargées:", catData);
+      setCategories(catData);
+
+      // 2. Charger tous les produits
+      const prodResponse = await fetch(`${backendUrl}/api/produits`);
+      const prodData = await prodResponse.json();
+      console.log("Produits chargés:", prodData);
+      setProduits(prodData);
+    } catch (error) {
+      console.error("Erreur lors du chargement:", error);
+      Alert.alert("Erreur", "Impossible de charger les données");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(fetchProduits, []);
+  useEffect(() => {
+    if (superetteId) {
+      fetchData();
+    }
+  }, [superetteId]);
 
-  useFocusEffect(useCallback(fetchProduits, []));
+  useFocusEffect(
+    useCallback(() => {
+      if (superetteId) {
+        fetchData();
+      }
+    }, [superetteId])
+  );
+
+  // Organiser les produits par catégorie
+  const produitsParCategorie = produits.reduce((acc, produit) => {
+    const categorie = categories.find(cat => cat._id === produit.categorieId);
+    
+    if (categorie && categorie.superetteId === superetteId) {
+      const nomCategorie = categorie.nom;
+      if (!acc[nomCategorie]) {
+        acc[nomCategorie] = [];
+      }
+      acc[nomCategorie].push({
+        ...produit,
+        categorieNom: nomCategorie
+      });
+    }
+    
+    return acc;
+  }, {});
+
+  console.log("Produits organisés par catégorie:", produitsParCategorie);
 
   // Fonction pour supprimer un produit
   const confirmDelete = (id) => {
-    Alert.alert("Confirmation", "Voulez-vous vraiment supprimer ce produit ?", [
-      { text: "Annuler", style: "cancel" },
-      { text: "Supprimer", onPress: () => handleDelete(id), style: "destructive" },
-    ]);
+    Alert.alert(
+      t("confirmation"),
+      t("voulez_vous_supprimer_produit"),
+      [
+        { text: t("annuler"), style: "cancel" },
+        { 
+          text: t("supprimer"), 
+          onPress: () => handleDelete(id), 
+          style: "destructive" 
+        },
+      ]
+    );
   };
 
   const handleDelete = async (id) => {
@@ -46,21 +100,14 @@ const GestiondesProduits = () => {
       const data = await response.json();
 
       if (data.message === "Produit supprimé avec succès") {
-        fetchProduits();
+        fetchData();
       } else {
-        Alert.alert("Erreur", "La suppression a échoué");
+        Alert.alert("Erreur", data.message || "La suppression a échoué");
       }
     } catch (error) {
       Alert.alert("Erreur", "Une erreur s'est produite lors de la suppression");
     }
   };
-
-  // Organiser les produits par catégorie
-  const produitsParCategorie = produits.reduce((acc, produit) => {
-    if (!acc[produit.categorie]) acc[produit.categorie] = [];
-    acc[produit.categorie].push(produit);
-    return acc;
-  }, {});
 
   // Basculer l'affichage d'une catégorie
   const toggleCategorie = (categorie) => {
@@ -70,99 +117,193 @@ const GestiondesProduits = () => {
     }));
   };
 
+  if (loading) {
+    return (
+      <LayoutCommercant>
+        <View style={styles.container}>
+          <Text>Chargement en cours...</Text>
+        </View>
+      </LayoutCommercant>
+    );
+  }
+
+  if (Object.keys(produitsParCategorie).length === 0) {
+    return (
+      <LayoutCommercant>
+        <View style={styles.container}>
+          <Text style={styles.title}>{t("listeproduits")}</Text>
+          <Text style={styles.emptySubtitle}>Aucun produit trouvé pour cette supérette</Text>
+          <TouchableOpacity 
+            style={styles.btnAjouter} 
+            onPress={() => navigation.navigate("AjouterProduit", { superetteId })}
+          >
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </LayoutCommercant>
+    );
+  }
+
   return (
-    
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("listeproduits")}</Text>
-      <ScrollView>
-        {Object.entries(produitsParCategorie).map(([categorie, produits]) => (
-          <View key={categorie} style={styles.categorieContainer}>
-            {/* En-tête de la catégorie */}
-            <TouchableOpacity style={styles.categorieHeader} onPress={() => toggleCategorie(categorie)}>
-              <Text style={styles.categorieTitle}>{categorie}</Text>
-              <Icon name={categoriesOuvertes[categorie] ? "chevron-up" : "chevron-down"} size={17} color="white" />
-            </TouchableOpacity>
+    <LayoutCommercant>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t("listeproduits")}</Text>
+        <ScrollView>
+          {Object.entries(produitsParCategorie).map(([nomCategorie, produits]) => (
+            <View key={nomCategorie} style={styles.categorieContainer}>
+              <TouchableOpacity 
+                style={styles.categorieHeader} 
+                onPress={() => toggleCategorie(nomCategorie)}
+              >
+                <Text style={styles.categorieTitle}>{nomCategorie}</Text>
+                <Icon 
+                  name={categoriesOuvertes[nomCategorie] ? "chevron-up" : "chevron-down"} 
+                  size={17} 
+                  color="white" 
+                />
+              </TouchableOpacity>
 
-            {/* Liste des produits (affichée uniquement si la catégorie est ouverte) */}
-            {categoriesOuvertes[categorie] && (
-              <FlatList
-                data={produits}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => { 
-                  // Vérifier si l'image commence par "http", sinon ajouter `backendUrl`
-                  const imageUri =
-                    item.image && typeof item.image === "string"
-                      ? item.image.startsWith("http") || item.image.startsWith("file://")
-                        ? item.image
-                        : `${backendUrl}${item.image}`
-                      : null; 
-
- 
-                  return (
-                    <View style={styles.produitContainer}>
-                      <View style={styles.produit}>
-                        <Image
-                          source={{ uri: imageUri }}
-                          style={styles.image}
-                          onError={() => console.error("Erreur de chargement de l'image :", imageUri)}
-                        />
-                        <View>
-                          <Text style={styles.nomProduit}>{item.nom}</Text>
-                          <Text>{item.prix} DA - {item.stock} {["Fruits", "Légumes"].includes(item.categorie) ? "Kg" : ""}</Text>
+              {categoriesOuvertes[nomCategorie] && (
+                <FlatList
+                  data={produits}
+                  keyExtractor={(item) => item._id}
+                  renderItem={({ item }) => {
+                    const imageUri = item.image?.startsWith("http") 
+                      ? item.image 
+                      : `${backendUrl}${item.image}`;
+                    
+                    return (
+                      <View style={styles.produitContainer}>
+                        <View style={styles.produit}>
+                          <Image
+                            source={{ uri: imageUri }}
+                            style={styles.image}
+                            onError={(e) => console.log("Erreur image:", e.nativeEvent.error)}
+                          />
+                          <View>
+                            <Text style={styles.nomProduit}>{item.nom}</Text>
+                            <Text>
+                              {item.prix} DA - {item.stock} 
+                              {["Fruits", "Légumes"].includes(item.categorieNom) ? "Kg" : ""}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.btnContainer}>
+                          <TouchableOpacity
+                            style={styles.btnModifier}
+                            onPress={() => navigation.navigate("ModifierProduit", { 
+                              produit: item,
+                              superetteId 
+                            })}
+                          >
+                            <Text style={styles.btnText}>{t("modifier")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity 
+                            style={styles.btnSupprimer} 
+                            onPress={() => confirmDelete(item._id)}
+                          >
+                            <Text style={styles.btnText}>{t("supprimer")}</Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
-                      <View style={styles.btnContainer}>
-                        <TouchableOpacity
-                          style={styles.btnModifier}
-                          onPress={() => navigation.navigate("ModifierProduit", { produit: item })}
-                        >
-                          <Text style={styles.btnText}>{t("modifier")}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.btnSupprimer} onPress={() => confirmDelete(item._id)}>
-                          <Text style={styles.btnText}>{t("supprimer")}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  );
-                }}
-              />
-            )}
-          </View>
-        ))}
-      </ScrollView>
+                    );
+                  }}
+                />
+              )}
+            </View>
+          ))}
+        </ScrollView>
 
-      <TouchableOpacity style={styles.btnAjouter} onPress={() => navigation.navigate("AjouterProduit")}>
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
-    
+        <TouchableOpacity 
+          style={styles.btnAjouter} 
+          onPress={() => navigation.navigate("AjouterProduit", { superetteId })}
+        >
+          <Text style={styles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </LayoutCommercant>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f8f8f8" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 20, color: "black" },
-
-  // Style pour les catégories
-  categorieContainer: { marginBottom: 15, backgroundColor: "#fff", borderRadius: 10, elevation: 5 },
-  categorieHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#2E7D32", padding: 16, borderRadius: 10 },
-  categorieTitle: { fontSize: 17, fontWeight: '600', color: "white" },
-
-  produitContainer: { padding: 15, borderBottomWidth: 1, borderBottomColor: "#ddd" },
-  produit: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  image: { width: 50, height: 50, borderRadius: 10, marginRight: 10 },
-  nomProduit: { fontSize: 15, fontWeight: "bold", maxWidth: 270 },
-
-  // Style des boutons
-  btnContainer: { flexDirection: "row", justifyContent: "space-between" },
-  btnModifier: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginRight: 7 },
-  btnSupprimer: { backgroundColor: "red", padding: 8, borderRadius: 8, flex: 1, alignItems: "center", marginLeft: 7 },
+  container: { 
+    flex: 1, 
+    padding: 20, 
+    backgroundColor: "#f8f8f8",
+    bottom:45,
+  },
+  title: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    marginBottom: 20, 
+    color: "black" 
+  },
+  categorieContainer: { 
+    marginBottom: 15, 
+    backgroundColor: "#fff", 
+    borderRadius: 10, 
+    elevation: 5 
+  },
+  categorieHeader: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    backgroundColor: "#2E7D32", 
+    padding: 16, 
+    borderRadius: 10 
+  },
+  categorieTitle: { 
+    fontSize: 17, 
+    fontWeight: '600', 
+    color: "white" 
+  },
+  produitContainer: { 
+    padding: 15, 
+    borderBottomWidth: 1, 
+    borderBottomColor: "#ddd" 
+  },
+  produit: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 10 
+  },
+  image: { 
+    width: 50, 
+    height: 50, 
+    borderRadius: 10, 
+    marginRight: 10 
+  },
+  nomProduit: { 
+    fontSize: 15, 
+    fontWeight: "bold", 
+    maxWidth: 270 
+  },
+  btnContainer: { 
+    flexDirection: "row", 
+    justifyContent: "space-between" 
+  },
+  btnModifier: { 
+    backgroundColor: "#4CAF50", 
+    padding: 8, 
+    borderRadius: 8, 
+    flex: 1, 
+    alignItems: "center", 
+    marginRight: 7 
+  },
+  btnSupprimer: { 
+    backgroundColor: "red", 
+    padding: 8, 
+    borderRadius: 8, 
+    flex: 1, 
+    alignItems: "center", 
+    marginLeft: 7 
+  },
   btnAjouter: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 40,
     right: 20,
     backgroundColor: '#007BFF',
-    width: 60, 
+    width: 60,  
     height: 60,
     borderRadius: 30, 
     elevation: 5,
@@ -173,7 +314,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnText: { color: "#fff", fontSize: 13, fontWeight: "bold" },
+  btnText: { 
+    color: "#fff", 
+    fontSize: 13, 
+    fontWeight: "bold" 
+  },
   addButtonText: {
     fontSize: 24,
     color: '#fff',
@@ -181,6 +326,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center', 
   },
+  emptySubtitle: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 80,
+        paddingHorizontal: 30,
+        marginTop:300,
+    },
 });
 
 export default GestiondesProduits;

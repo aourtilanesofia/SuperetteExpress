@@ -9,7 +9,7 @@ const ListeShops = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
+ 
   useEffect(() => {
     getLocation();
   }, []);
@@ -75,10 +75,13 @@ const ListeShops = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.shopCard}
-      onPress={() => {
-        if (item.name === 'Supérette A') {
-          navigation.navigate('WelcomePage');
-        }
+      onPress={() => { 
+        
+         navigation.navigate('WelcomePage', { 
+        shopId: item._id,  
+        shopName: item.name 
+      });
+        
       }}
       activeOpacity={0.7}
     >

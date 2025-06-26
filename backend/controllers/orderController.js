@@ -4,7 +4,6 @@ import Notification from '../models/NotificationModel.js';
 import consommateurModel from '../models/consommateurModel.js';
 import produitModel from "../models/produitModel.js";
 
-
 // Fonction pour obtenir le prochain numéro de commande
 const getNextOrderNumber = async () => {
   const counter = await Counter.findOneAndUpdate(
@@ -22,12 +21,13 @@ const getNextOrderNumber = async () => {
 // Ajouter une commande
 export const addOrder = async (req, res) => {
   try {
-    const { userId, produits, total} = req.body;
+    const { userId, produits, total, superetteId} = req.body;
 
     if (!userId || !produits || !total) {
       return res.status(400).json({ message: "Données manquantes pour la commande" });
     }
 
+    
     //console.log("Produits reçus :", JSON.stringify(produits, null, 2));
 
     const numeroCommande = await getNextOrderNumber();
@@ -43,6 +43,7 @@ export const addOrder = async (req, res) => {
     const newOrder = new CommandeModel({
       numeroCommande,
       userId: new mongoose.Types.ObjectId(userId),
+      superetteId: superetteId ? new mongoose.Types.ObjectId(superetteId) : null,
       produits,
       total
     });
@@ -77,9 +78,6 @@ export const addOrder = async (req, res) => {
         return res.status(400).json({ message: `Stock insuffisant pour ${produit.nom}` });
       }
     }
-
- 
-
     //console.log("Stock mis à jour après validation de la commande");
 
     const notification = new Notification({
@@ -97,16 +95,13 @@ export const addOrder = async (req, res) => {
       //console.log("Notification envoyée via WebSocket");
     }
 
-    res.status(201).json({ message: "Commande enregistrée avec succès !", numeroCommande });
+    res.status(201).json({ message: "Commande enregistrée avec succès !", numeroCommande,superetteId });
 
   } catch (error) {
     console.error("Erreur lors de l'enregistrement de la commande :", error.stack);
     res.status(500).json({ message: "Erreur lors de l'enregistrement de la commande", error: error.message });
   }
 };
-
-
-
 
 
 // Récupérer toutes les commandes d'un client
@@ -199,9 +194,29 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+export const getOrdersBySuperette = async (req, res) => {
+  try {
+    const { superetteId } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(superetteId)) {
+      return res.status(400).json({ message: "ID de supérette invalide" });
+    }
+
+    const commandes = await CommandeModel.find({ superetteId })
+      .populate("userId", "nom numTel")
+      .populate("livreur", "nom vehicule")
+      .sort({ createdAt: -1 }); // Tri par date décroissante
+
+    res.status(200).json(commandes);
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 export const getTodayOrdersCount = async (req, res) => {
   try {
+    const { superetteId } = req.query;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -209,6 +224,7 @@ export const getTodayOrdersCount = async (req, res) => {
     tomorrow.setDate(today.getDate() + 1);
 
     const count = await CommandeModel.countDocuments({
+       superetteId,
       $or: [
         { createdAt: { $gte: today, $lt: tomorrow } },
         { date: { $gte: today, $lt: tomorrow } }

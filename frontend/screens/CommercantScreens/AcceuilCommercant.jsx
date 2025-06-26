@@ -5,19 +5,24 @@ import { AntDesign, MaterialCommunityIcons, FontAwesome, Ionicons } from 'react-
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 
-const AcceuilCommerçant = ({ navigation }) => {
+const AcceuilCommerçant = ({ navigation, route }) => {
+
+  const { superetteId } = route.params || {};
   const { t } = useTranslation();
   const [categorieCount, setCategorieCount] = useState(null);
   const [productCount, setProductCount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const [todayOrdersCount, setTodayOrdersCount] = useState(null);
+
+  console.log("Superette ID reçu :", superetteId);
+
 
 
   useEffect(() => {
     const fetchCategorieCount = async () => {
       try {
-        const response = await fetch('http://192.168.43.145:8080/api/categories/count');
+        const response = await fetch(`http://192.168.43.145:8080/api/categories/count?superetteId=${superetteId}`);
 
         if (!response.ok) {
           throw new Error('Erreur de récupération des données');
@@ -37,7 +42,7 @@ const AcceuilCommerçant = ({ navigation }) => {
   useEffect(() => {
     const fetchProductsCount = async () => {
       try {
-        const response = await fetch('http://192.168.43.145:8080/api/produits/count');
+        const response = await fetch(`http://192.168.43.145:8080/api/produits/count?superetteId=${superetteId}`);
 
         const text = await response.text();
         //console.log('Réponse brute:', text); // ← Regarde ce que tu reçois
@@ -52,12 +57,12 @@ const AcceuilCommerçant = ({ navigation }) => {
     };
 
     fetchProductsCount();
-  }, []);
+  }, [superetteId]);
 
   useEffect(() => {
     const fetchTodayOrdersCount = async () => {
       try {
-        const response = await fetch('http://192.168.43.145:8080/api/commandes/count/today');
+        const response = await fetch(`http://192.168.43.145:8080/api/commandes/count/today?superetteId=${superetteId}`);
         if (!response.ok) throw new Error('Erreur de récupération des commandes');
         const data = await response.json();
         setTodayOrdersCount(data.count);
@@ -66,10 +71,10 @@ const AcceuilCommerçant = ({ navigation }) => {
         setError(err.message);
       }
     };
-  
+
     fetchTodayOrdersCount();
   }, []);
-  
+
 
 
 
@@ -78,23 +83,23 @@ const AcceuilCommerçant = ({ navigation }) => {
     {
       title: t('Gestion_des_catégories'),
       icon: <MaterialCommunityIcons name="shape-outline" style={styles.icone} />,
-      nav: 'GestionDesCategories',
-      color: '#4CAF50'
+      color: '#4CAF50',
+      onPress: () => navigation.navigate('GestionDesCategories', { superetteId })
     },
     {
       title: t('Gestion_des_produits'),
       icon: <Ionicons name="fast-food-outline" style={styles.icone} />,
-      nav: 'GestiondesProduits',
-      color: '#2196F3'
+      color: '#2196F3',
+      onPress: () => navigation.navigate('GestiondesProduits', { superetteId })
     },
     {
-      title: t('Liste_des_commandes'),
+      title: t('Liste_des_commandes'), 
       icon: <FontAwesome name="list-alt" style={styles.icone} />,
-      nav: 'GestionDesCommandes',
-      color: '#FF9800'
+      color: '#FF9800',
+      onPress: () => navigation.navigate('GestionDesCommandes', { superetteId })
     },
-   
   ];
+
 
   return (
     <LayoutCommercant>
@@ -115,7 +120,7 @@ const AcceuilCommerçant = ({ navigation }) => {
             <TouchableOpacity
               key={index}
               style={[styles.card, { backgroundColor: item.color }]}
-              onPress={() => navigation.navigate(item.nav)}
+              onPress={item.onPress}
               activeOpacity={0.8}
             >
               <View style={styles.iconTextContainer}>

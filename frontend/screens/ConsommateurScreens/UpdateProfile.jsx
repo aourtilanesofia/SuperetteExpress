@@ -137,18 +137,21 @@ const UpdateProfile = ({ navigation }) => {
         return colors[charCode % colors.length];
     };
     // Fonction pour générer les initiales
-    const getInitials = (name) => {
-        if (!name) return '';
+   const getInitials = (name) => {
+    if (!name || typeof name !== 'string') return '';
 
-        const names = name.split(' ');
-        let initials = names[0][0].toUpperCase();
+    const names = name.trim().split(' ').filter(n => n);
+    if (names.length === 0) return '';
 
-        if (names.length > 1) {
-            initials += names[names.length - 1][0].toUpperCase();
-        }
+    let initials = names[0][0]?.toUpperCase() || '';
 
-        return initials;
-    };
+    if (names.length > 1) {
+        initials += names[names.length - 1][0]?.toUpperCase() || '';
+    }
+
+    return initials;
+};
+
 
     return (
         <Layout>

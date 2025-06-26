@@ -1,13 +1,57 @@
 import produitModel from "../models/produitModel.js";
+import CategorieModel from"../models/CategorieModel.js";
 
-// Liste des produits
+// Liste des produits 
 export const getProducts = async (req, res) => {
   try {
-    const products = await produitModel.find();
-    res.json(products);
+    const { superetteId, search } = req.query;
+    let query = {};
+
+    // Si superetteId est fourni, on filtre par ses catégories
+    if (superetteId) {
+      // 1. Trouver les catégories de cette supérette
+      const categories = await CategorieModel.find({ superetteId });
+      
+      // 2. Filtrer les produits par ces catégories
+      query.categorieId = { $in: categories.map(cat => cat._id) };
+    }
+
+    // Filtre de recherche si fourni
+    if (search) {
+      query.$or = [
+        { nom: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const produits = await produitModel.find(query);
+    res.json(produits);
   } catch (error) {
-    console.error("Erreur lors de la récupération des produits :", error);
-    res.status(500).json({ message: "Erreur lors de la récupération des produits" });
+    console.error("Erreur:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+export const getProduits = async (req, res) => {
+  try {
+    const { superetteId } = req.query;
+    
+    if (!superetteId) {
+      return res.status(400).json({ message: "superetteId est requis" });
+    }
+
+    // Trouver les catégories de la supérette
+    const categories = await CategorieModel.find({ superetteId });
+    const categorieIds = categories.map(cat => cat._id);
+    
+    // Trouver les produits de ces catégories
+    const produits = await produitModel.find({ 
+      categorieId: { $in: categorieIds } 
+    }).populate('categorieId', 'nom');
+    
+    res.status(200).json(produits);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits:", error);
+    res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
 
@@ -27,30 +71,33 @@ export const getProductById = async (req, res) => {
 
 // Ajouter un produit
 export const addProduct = async (req, res) => {
-  const { nom, prix, categorie, stock, description, codeBarre } = req.body;
+  const { nom, prix, categorie, categorieId, stock, description, codeBarre } = req.body;
 
   const imageUrl = req.file ? `http://192.168.43.145:8080/uploads/${req.file.filename}` : null;
 
   try {
-    // Création d'un nouveau produit avec tous les champs requis
+    // Vérifier que la catégorie existe
+    const categorieExist = await CategorieModel.findById(categorieId);
+    if (!categorieExist) {
+      return res.status(400).json({ message: "Catégorie invalide" });
+    }
+
     const newProduct = new produitModel({
       nom,
       prix,
-      categorie,
+      categorie,        
+      categorieId,      
       stock,
       description,
-      codeBarre,  // Ajout du champ codeBarre
+      codeBarre,
       image: imageUrl,
     });
 
-    // Sauvegarder le produit dans la base de données
     await newProduct.save();
-
-    // Retourner une réponse avec le produit ajouté
     res.status(201).json(newProduct);
   } catch (error) {
     console.error("Erreur lors de l'ajout du produit:", error);
-    res.status(500).json({ message: "Erreur serveur lors de l'ajout du produit" });
+    res.status(500).json({ message: "Erreur serveur", error });
   }
 };
 
@@ -102,8 +149,6 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-
-
 // Supprimer un produit
 export const deleteProduct = async (req, res) => {
   try {
@@ -121,11 +166,12 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-// Récupérer les produits par catégorie
+// Récupérer les produits par categorieId
 export const getProductsByCategory = async (req, res) => {
   try {
-    const { categorie } = req.params;
-    const produits = await produitModel.find({ categorie });
+    const { categorieId } = req.params;
+
+    const produits = await produitModel.find({ categorieId });
 
     if (produits.length === 0) {
       return res.status(404).json({ message: "Aucun produit trouvé pour cette catégorie" });
@@ -138,14 +184,31 @@ export const getProductsByCategory = async (req, res) => {
   }
 };
 
+
 // Récupérer le nombre total de produits
 export const getProductCount = async (req, res) => {
   try {
-    const count = await produitModel.countDocuments(); 
-    res.status(200).json({ count }); 
+    const { superetteId } = req.query;
+
+    if (!superetteId) {
+      return res.status(400).json({ message: "superetteId est requis" });
+    }
+
+    // 1. Trouver toutes les catégories de cette supérette
+    const categories = await CategorieModel.find({ superetteId }, '_id');
+
+    // 2. Compter les produits qui ont ces catégories
+    const count = await produitModel.countDocuments({
+      categorieId: { $in: categories.map(cat => cat._id) }
+    });
+
+    res.status(200).json({ count });
   } catch (error) {
     console.error("Erreur lors du comptage des produits :", error);
-    res.status(500).json({ message: "Erreur serveur lors du comptage des produits" });
+    res.status(500).json({ 
+      message: "Erreur serveur lors du comptage des produits",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 

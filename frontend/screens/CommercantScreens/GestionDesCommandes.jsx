@@ -4,7 +4,7 @@ import {
   Text, 
   View, 
   TouchableOpacity, 
-  FlatList, 
+  FlatList,  
   ActivityIndicator,
   Alert,
   RefreshControl
@@ -21,13 +21,17 @@ const socket = io("http://192.168.43.145:8080");
 
 
 
-const GestionDesCommandes = () => {
+const GestionDesCommandes = ({route}) => {
+    const { superetteId } = route.params || {};
     const { t } = useTranslation();
     const [commandes, setCommandes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [newCommandes, setNewCommandes] = useState([]);
     const navigation = useNavigation();
+   
+
+    console.log("L'ID reçu :", superetteId);
 
     // Charger les commandes déjà vues depuis AsyncStorage
     const loadSeenCommands = async () => {
@@ -62,7 +66,7 @@ const GestionDesCommandes = () => {
     const fetchCommandes = async () => {
         try {
 
-            const response = await fetch("http://192.168.43.145:8080/api/commandes/");
+            const response = await fetch(`http://192.168.43.145:8080/api/commandes/superette/${superetteId}`);
 
             const data = await response.json();
             
@@ -98,7 +102,7 @@ const GestionDesCommandes = () => {
         }
     };
 
-    useEffect(() => {
+    useEffect((superetteId) => {
         fetchCommandes();
 
         socket.on("connect", () => {
@@ -112,7 +116,7 @@ const GestionDesCommandes = () => {
         return () => {
             socket.off("nouvelleCommande");
         };
-    }, []);
+    }, [superetteId]);
 
     useFocusEffect(
         useCallback(() => {

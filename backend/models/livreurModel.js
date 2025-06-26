@@ -60,6 +60,15 @@ const livreurSchema = new mongoose.Schema(
          required: false,
       }
     },
+    loginAttempts: {
+  type: Number,
+  default: 0
+},
+blockUntil: {
+  type: Date,
+  default: null
+}
+
   },
   { 
     timestamps: true 

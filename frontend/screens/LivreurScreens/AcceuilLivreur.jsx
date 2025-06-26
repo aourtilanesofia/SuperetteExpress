@@ -137,7 +137,7 @@ const AcceuilLivreur = ({ navigation }) => {
         'Impossible d\'accéder à la géolocalisation: ' + error.message
       );
     }
-  };
+  }; 
   // Récupérer les statistiques
   const fetchStats = async () => {
     try {

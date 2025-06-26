@@ -9,7 +9,7 @@ router.post('/add',addCategorie);
 router.get('/',getCategories);
 
 //Récupérer le nombre de catégories
-router.get('/count', getCategorieCount);
+router.get('/count', getCategorieCount); 
 
 // Modifier une catégorie
 router.put('/update/:id',updateCategorie);

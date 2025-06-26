@@ -23,7 +23,7 @@ export default SuperetteModel;*/
 
 import mongoose from "mongoose";
 
-const superetteSchema = new mongoose.Schema({
+const superetteSchema = new mongoose.Schema({ 
   name: {
     type: String,
     required: [true, "Le nom est obligatoire"],

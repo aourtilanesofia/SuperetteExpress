@@ -3,7 +3,7 @@ import { addOrder, getUserOrders, getOrderByNumber, cancelOrder,
      updateOrderStatus, getAllOrders, getTodayOrdersCount, mettreAJourPaiement,updateOrder,
      getCommandesPayeesOuEnAttente, updateLivraisonCommande,ModifierCommande,getTodayOrdersLiv,
      updatePositionLivreur,getDerniereLocalisation,countCommandesLivrees,countCommandesNonLivrees,
-     countCommandesEnAttente,countAllStatuts,assignerCommande,getCommandeByNumero, getStatutLivraison , getTotalNetByNumeroCommande, updatePayment } from "../controllers/orderController.js";
+     countCommandesEnAttente,countAllStatuts,assignerCommande,getCommandeByNumero, getStatutLivraison , getTotalNetByNumeroCommande, updatePayment, getOrdersBySuperette } from "../controllers/orderController.js";
 import { CommandeModel } from "../models/OrderModel.js";
 
 
@@ -19,6 +19,8 @@ router.get("/count/today", getTodayOrdersCount);
 ///Mettre a jour une commande (statut) 
 router.put("/:orderId", updateOrderStatus);
 router.get("/", getAllOrders);  // Route pour récupérer toutes les commandes
+
+router.get("/superette/:superetteId", getOrdersBySuperette);
 
 //mettre à jour l'attribut payer 
 router.put('/payer/:numeroCommande', mettreAJourPaiement);
